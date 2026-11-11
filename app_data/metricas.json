@@ -1,0 +1,741 @@
+{
+ "fecha_datos": "2026-09-09",
+ "tipo_cambio": 1565.0,
+ "semilla": 42,
+ "pasos": [
+  {
+   "paso": "Filas en la capa plata del pipeline",
+   "filas": 9039,
+   "por_que": "CSV de plata: CarOne + DeRuedas"
+  },
+  {
+   "paso": "Con precio publicado",
+   "filas": 8975,
+   "por_que": "sin precio no hay objetivo"
+  },
+  {
+   "paso": "Motor con valor posible",
+   "filas": 8974,
+   "por_que": "motor_lt > 40 es un error de carga"
+  },
+  {
+   "paso": "Sin avisos repetidos",
+   "filas": 8909,
+   "por_que": "mismo auto (marca, modelo, versión, año, km) y mismo precio"
+  }
+ ],
+ "por_fuente": {
+  "deruedas": 8729,
+  "carone": 180
+ },
+ "columnas_descartadas": [
+  "fuente",
+  "id_publicacion",
+  "ubicacion",
+  "version",
+  "fecha_ingesta",
+  "grupo",
+  "url",
+  "precio"
+ ],
+ "n_train": 7127,
+ "n_test": 1782,
+ "vehiculos_compartidos": 0,
+ "comparacion": [
+  {
+   "modelo": "Piso (mediana)",
+   "mae": 6201.473032042641,
+   "desvio": 190.34210297515094
+  },
+  {
+   "modelo": "Lineal (Ridge)",
+   "mae": 2151.0596450963108,
+   "desvio": 128.35148721173354
+  },
+  {
+   "modelo": "Random forest",
+   "mae": 1518.0331878077068,
+   "desvio": 100.28342098257556
+  },
+  {
+   "modelo": "HistGradientBoosting",
+   "mae": 1478.336877557141,
+   "desvio": 101.53787208735947
+  },
+  {
+   "modelo": "HistGradientBoosting ajustado",
+   "mae": 1407.515487047213,
+   "desvio": 86.90779977310518
+  }
+ ],
+ "mejores_parametros": {
+  "learning_rate": 0.1,
+  "max_iter": 600,
+  "max_leaf_nodes": 15,
+  "min_samples_leaf": 10
+ },
+ "grilla": [
+  {
+   "learning_rate": 0.1,
+   "max_iter": 600,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1407.5,
+   "desvio_val": 86.9,
+   "mae_train": 944.3
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 400,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1410.4,
+   "desvio_val": 94.4,
+   "mae_train": 861.8
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 600,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1413.2,
+   "desvio_val": 87.6,
+   "mae_train": 910.8
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 400,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1417.8,
+   "desvio_val": 86.2,
+   "mae_train": 1017.1
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 600,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1418.2,
+   "desvio_val": 95.7,
+   "mae_train": 790.5
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 200,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1421.3,
+   "desvio_val": 92.7,
+   "mae_train": 983.7
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 400,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1421.9,
+   "desvio_val": 86.4,
+   "mae_train": 982.3
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 600,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1428.2,
+   "desvio_val": 97.6,
+   "mae_train": 1001.6
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 600,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1432.2,
+   "desvio_val": 90.8,
+   "mae_train": 1066.1
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 600,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1433.6,
+   "desvio_val": 101.6,
+   "mae_train": 1043.1
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 400,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1435.4,
+   "desvio_val": 83.7,
+   "mae_train": 958.3
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 400,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1437.4,
+   "desvio_val": 95.1,
+   "mae_train": 1062.6
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 600,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1438.9,
+   "desvio_val": 87.0,
+   "mae_train": 894.8
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 600,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1443.2,
+   "desvio_val": 98.0,
+   "mae_train": 1141.2
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 400,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1443.9,
+   "desvio_val": 96.5,
+   "mae_train": 1104.0
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 200,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1445.5,
+   "desvio_val": 82.3,
+   "mae_train": 1064.9
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 400,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1459.5,
+   "desvio_val": 92.8,
+   "mae_train": 1139.1
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 100,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1461.6,
+   "desvio_val": 91.0,
+   "mae_train": 1106.6
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 200,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1462.6,
+   "desvio_val": 87.7,
+   "mae_train": 1108.7
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 200,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1464.3,
+   "desvio_val": 88.4,
+   "mae_train": 1145.9
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 200,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1473.5,
+   "desvio_val": 92.5,
+   "mae_train": 1171.1
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 400,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1475.4,
+   "desvio_val": 95.3,
+   "mae_train": 1203.6
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 100,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1484.4,
+   "desvio_val": 84.1,
+   "mae_train": 1175.8
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 200,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1487.2,
+   "desvio_val": 93.5,
+   "mae_train": 1206.7
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 200,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1530.5,
+   "desvio_val": 97.5,
+   "mae_train": 1276.7
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 100,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1541.3,
+   "desvio_val": 91.2,
+   "mae_train": 1260.3
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 100,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1542.2,
+   "desvio_val": 91.4,
+   "mae_train": 1283.3
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 200,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1542.5,
+   "desvio_val": 94.5,
+   "mae_train": 1318.7
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 100,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1547.2,
+   "desvio_val": 98.7,
+   "mae_train": 1323.7
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 100,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1560.4,
+   "desvio_val": 94.0,
+   "mae_train": 1311.7
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 100,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1650.6,
+   "desvio_val": 101.1,
+   "mae_train": 1460.8
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 100,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1650.7,
+   "desvio_val": 102.2,
+   "mae_train": 1440.0
+  }
+ ],
+ "test": {
+  "mae": 1428.1699412015985,
+  "rel_mediano": 0.06589338145185702,
+  "por_tramo": [
+   {
+    "tramo": "1k–8k",
+    "orden": 0,
+    "mae": 625.9735257690288,
+    "rel": 0.08019582874045536
+   },
+   {
+    "tramo": "8k–10k",
+    "orden": 1,
+    "mae": 740.522781779494,
+    "rel": 0.06696726537403945
+   },
+   {
+    "tramo": "10k–13k",
+    "orden": 2,
+    "mae": 875.2231379964687,
+    "rel": 0.0589179162611827
+   },
+   {
+    "tramo": "13k–19k",
+    "orden": 3,
+    "mae": 1205.4946911476886,
+    "rel": 0.05439570396182328
+   },
+   {
+    "tramo": "19k–105k",
+    "orden": 4,
+    "mae": 3694.1982406656916,
+    "rel": 0.07600666144321462
+   }
+  ],
+  "sesgo_moneda": {
+   "ARS": -20.052312321702292,
+   "USD": -3196.520789588947
+  }
+ },
+ "importancia": [
+  {
+   "columna": "fabricado_en",
+   "sube_mae": 3102.6610941615036,
+   "desvio": 132.96538206864835
+  },
+  {
+   "columna": "potencia_hp",
+   "sube_mae": 1565.7964129456188,
+   "desvio": 47.651615849728984
+  },
+  {
+   "columna": "marca",
+   "sube_mae": 1207.876856056211,
+   "desvio": 33.88662334398515
+  },
+  {
+   "columna": "modelo",
+   "sube_mae": 602.0564365917123,
+   "desvio": 15.914105853650247
+  },
+  {
+   "columna": "kilometraje",
+   "sube_mae": 495.97549473749325,
+   "desvio": 32.08754054393922
+  },
+  {
+   "columna": "transmision",
+   "sube_mae": 330.3630746740062,
+   "desvio": 9.425361011273008
+  },
+  {
+   "columna": "motor_lt",
+   "sube_mae": 171.7675075243185,
+   "desvio": 22.054713633329243
+  },
+  {
+   "columna": "traccion",
+   "sube_mae": 133.09859793796713,
+   "desvio": 6.306294099129477
+  },
+  {
+   "columna": "consumo_lt_100km",
+   "sube_mae": 102.04213575263493,
+   "desvio": 6.49688771520135
+  },
+  {
+   "columna": "combustible",
+   "sube_mae": 52.255603672024975,
+   "desvio": 1.4873495400174335
+  },
+  {
+   "columna": "moneda",
+   "sube_mae": 0.0,
+   "desvio": 0.0
+  },
+  {
+   "columna": "clave",
+   "sube_mae": 0.0,
+   "desvio": 0.0
+  }
+ ],
+ "columnas_probadas": [
+  {
+   "variante": "referencia (todas)",
+   "mae": 1478.336877557141,
+   "desvio": 101.53787208735947,
+   "delta": 0.0
+  },
+  {
+   "variante": "sin modelo (sólo marca)",
+   "mae": 1535.1164869257573,
+   "desvio": 110.95007061200863,
+   "delta": 56.77960936861632
+  },
+  {
+   "variante": "sin marca ni modelo",
+   "mae": 1679.830523678084,
+   "desvio": 114.6576583910683,
+   "delta": 201.49364612094314
+  },
+  {
+   "variante": "sin fabricado_en",
+   "mae": 1862.2741192464127,
+   "desvio": 121.3076341063383,
+   "delta": 383.9372416892718
+  },
+  {
+   "variante": "sin potencia_hp",
+   "mae": 1550.8446776240137,
+   "desvio": 115.61359910040089,
+   "delta": 72.50780006687273
+  },
+  {
+   "variante": "sin kilometraje",
+   "mae": 1512.6130008180346,
+   "desvio": 95.8224742267578,
+   "delta": 34.276123260893655
+  },
+  {
+   "variante": "sin motor_lt",
+   "mae": 1498.3408953108421,
+   "desvio": 94.63702961152283,
+   "delta": 20.00401775370119
+  },
+  {
+   "variante": "sin consumo_lt_100km",
+   "mae": 1484.8139392976316,
+   "desvio": 93.96212246471381,
+   "delta": 6.477061740490626
+  },
+  {
+   "variante": "sin transmision",
+   "mae": 1486.048065980987,
+   "desvio": 99.74921692472145,
+   "delta": 7.711188423846124
+  },
+  {
+   "variante": "sin traccion ni combustible",
+   "mae": 1520.9714491817672,
+   "desvio": 88.6584881776977,
+   "delta": 42.63457162462623
+  }
+ ],
+ "fuga": {
+  "mae_agrupado": 1478.336877557141,
+  "desvio_agrupado": 101.53787208735947,
+  "mae_azar": 1454.449865239128,
+  "desvio_azar": 42.45429040999454,
+  "spearman_anio": 0.7635760968397605,
+  "repetidos": 232,
+  "vehiculos_train": 6800
+ },
+ "target_encoder": [
+  {
+   "avisos_en_train": "0 (nunca visto)",
+   "autos_test": 30,
+   "mae": 7370.116324631274,
+   "rel": 0.18852345570035833
+  },
+  {
+   "avisos_en_train": "1–9",
+   "autos_test": 164,
+   "mae": 3415.272140793616,
+   "rel": 0.11892343325133749
+  },
+  {
+   "avisos_en_train": "10–49",
+   "autos_test": 498,
+   "mae": 1494.9006920986199,
+   "rel": 0.07343959224401371
+  },
+  {
+   "avisos_en_train": "50+",
+   "autos_test": 1090,
+   "mae": 935.1652933275643,
+   "rel": 0.05788663663185689
+  }
+ ],
+ "depreciacion_anual": 0.07640673246603702,
+ "mediana_por_anio": [
+  {
+   "fabricado_en": 2000,
+   "median": 5000.0,
+   "size": 19
+  },
+  {
+   "fabricado_en": 2001,
+   "median": 7750.0,
+   "size": 20
+  },
+  {
+   "fabricado_en": 2002,
+   "median": 4472.843450479233,
+   "size": 11
+  },
+  {
+   "fabricado_en": 2003,
+   "median": 4153.35463258786,
+   "size": 11
+  },
+  {
+   "fabricado_en": 2004,
+   "median": 4792.332268370607,
+   "size": 36
+  },
+  {
+   "fabricado_en": 2005,
+   "median": 4408.945686900958,
+   "size": 40
+  },
+  {
+   "fabricado_en": 2006,
+   "median": 4920.127795527156,
+   "size": 81
+  },
+  {
+   "fabricado_en": 2007,
+   "median": 5303.514376996805,
+   "size": 109
+  },
+  {
+   "fabricado_en": 2008,
+   "median": 5686.900958466454,
+   "size": 170
+  },
+  {
+   "fabricado_en": 2009,
+   "median": 5910.543130990415,
+   "size": 199
+  },
+  {
+   "fabricado_en": 2010,
+   "median": 6613.418530351438,
+   "size": 279
+  },
+  {
+   "fabricado_en": 2011,
+   "median": 6964.856230031949,
+   "size": 473
+  },
+  {
+   "fabricado_en": 2012,
+   "median": 7651.757188498403,
+   "size": 490
+  },
+  {
+   "fabricado_en": 2013,
+   "median": 7987.220447284345,
+   "size": 693
+  },
+  {
+   "fabricado_en": 2014,
+   "median": 8626.198083067093,
+   "size": 603
+  },
+  {
+   "fabricado_en": 2015,
+   "median": 8945.686900958466,
+   "size": 575
+  },
+  {
+   "fabricado_en": 2016,
+   "median": 9904.153354632588,
+   "size": 616
+  },
+  {
+   "fabricado_en": 2017,
+   "median": 10862.619808306708,
+   "size": 791
+  },
+  {
+   "fabricado_en": 2018,
+   "median": 12076.67731629393,
+   "size": 743
+  },
+  {
+   "fabricado_en": 2019,
+   "median": 13353.993610223642,
+   "size": 437
+  },
+  {
+   "fabricado_en": 2020,
+   "median": 14536.741214057507,
+   "size": 308
+  },
+  {
+   "fabricado_en": 2021,
+   "median": 17252.396166134185,
+   "size": 313
+  },
+  {
+   "fabricado_en": 2022,
+   "median": 17571.88498402556,
+   "size": 331
+  },
+  {
+   "fabricado_en": 2023,
+   "median": 18210.862619808307,
+   "size": 322
+  },
+  {
+   "fabricado_en": 2024,
+   "median": 20529.952076677317,
+   "size": 270
+  },
+  {
+   "fabricado_en": 2025,
+   "median": 21405.750798722045,
+   "size": 283
+  },
+  {
+   "fabricado_en": 2026,
+   "median": 26769.968051118212,
+   "size": 463
+  }
+ ],
+ "rangos": {
+  "fabricado_en": [
+   1993.0,
+   2026.0,
+   1937.0,
+   2026.0
+  ],
+  "kilometraje": [
+   0.0,
+   300739.99999999977,
+   0.0,
+   4700000.0
+  ],
+  "motor_lt": [
+   0.0,
+   3.2,
+   0.0,
+   6.4
+  ],
+  "potencia_hp": [
+   0.0,
+   280.0,
+   0.0,
+   575.0
+  ],
+  "consumo_lt_100km": [
+   4.5,
+   12.047999999999956,
+   1.4,
+   541.0
+  ]
+ },
+ "precio_mediano": 10734.82428115016,
+ "precio_p10_p90": [
+  5878.594249201278,
+  25559.105431309905
+ ]
+}

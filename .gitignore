@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.venv/
+pipeline/include/output/
+pipeline/.astro/
