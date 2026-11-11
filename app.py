@@ -749,6 +749,12 @@ with tab_probar:
             avisos.append(f"{nombre} ({num(v, 1 if col == 'motor_lt' else 0)}) está fuera del rango donde está el 98 % "
                           f"de los autos que vio el modelo ({num(p01, 1 if col == 'motor_lt' else 0)} a "
                           f"{num(p99, 1 if col == 'motor_lt' else 0)}).")
+    # Autos caros: el tramo de precio más alto es donde más se equivoca el modelo (ver el gráfico de "El modelo").
+    alto = TEST["por_tramo"][-1]
+    if precio > p90:
+        avisos.append(f"Esta tasación está en el 10 % más caro del mercado (más de {usd(p90)}). Ahí el modelo se equivoca "
+                      f"más: en el tramo más caro del test el error fue de {usd(alto['mae'])} en promedio "
+                      f"({num(alto['rel'] * 100, 1)} %). Tomalo como orientación.")
     if anio >= 2025 and km_v > 60000:
         avisos.append("Un auto tan nuevo con tantos kilómetros es raro en los datos.")
 
