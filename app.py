@@ -424,7 +424,7 @@ capa_ciu = pdk.Layer("ScatterplotLayer", mapa_df, get_position=["longitud", "lat
                      get_fill_color=["rojo", "verde", "azul", 210], get_line_color=[255, 255, 255], line_width_min_pixels=1,
                      stroked=True, pickable=True, radius_min_pixels=3, radius_max_pixels=45)
 # Vista inicial: todo el país o, si se eligió una o más provincias, un zoom que las encuadra (caja de sus límites).
-ALIAS_GEO = {"Capital Federal": "Ciudad Autónoma de Buenos Aires"}
+ALIAS_GEO = {"Capital Federal": "Ciudad Autónoma de Buenos Aires", "Tierra Del Fuego": "Tierra del Fuego"}
 
 
 def puntos_de(geom):
@@ -496,7 +496,7 @@ barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
 col_barras.altair_chart(barras.properties(height=250, title="Autos por provincia"), width="stretch")
 col_barras.markdown(LEYENDA, unsafe_allow_html=True)
-col_barras.caption(f"Cada círculo es una ciudad: pasá el mouse para ver sus autos. Faltan {UB['sin_coordenadas']} ciudades sin coordenadas (pocos autos cada una).")
+col_barras.caption(f"Cada círculo es una ciudad: pasá el mouse para ver sus autos. {UB['sin_coordenadas']} ciudades chicas no tienen coordenadas propias y se dibujan en el centro de su provincia.")
 st.markdown(
     "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
     "parecidos. Lo que cambia el precio es *qué auto es* (marca, modelo, año), no *dónde* se publica.")
@@ -517,7 +517,7 @@ Provincia ({num(UB['eta2_provincia'] * 100, 1)} %) y ciudad ({num(UB['eta2_ciuda
    {usd(c_prov['mae'])} (+{usd(c_prov['delta'])}) con la provincia y a {usd(c_ciu['mae'])} (+{usd(c_ciu['delta'])}) con provincia y ciudad.
    El ruido de la validación es de ± {usd(CPV['referencia (todas)']['desvio'])}: no mejora, incluso empeora un poco.
 3. **¿Hay datos suficientes para separar por lugar?** No: el {num(UB['pct_top_provincias'] * 100, 0)} % de los autos está en
-   Mendoza, Córdoba y Buenos Aires, y {UB['sin_coordenadas']} de las {UB['n_ciudades']} ciudades tienen pocos autos y no pudimos ubicarlas en el mapa.
+   Mendoza, Córdoba y Buenos Aires, y {UB['sin_coordenadas']} de las {UB['n_ciudades']} ciudades tienen pocos autos y las dibujamos en el centro de su provincia.
 
 **Gráfico:** el precio mediano de las ciudades con más avisos contra la mediana de todo el mercado (línea naranja).
 """, unsafe_allow_html=True)
