@@ -415,7 +415,7 @@ capa_prov = pdk.Layer("GeoJsonLayer", GEO, stroked=True, filled=True, get_fill_c
 capa_ciu = pdk.Layer("ScatterplotLayer", mapa_df, get_position=["longitud", "latitud"], get_radius="r",
                      get_fill_color=["rojo", "verde", "azul", 210], get_line_color=[255, 255, 255], line_width_min_pixels=1,
                      stroked=True, pickable=True, radius_min_pixels=3, radius_max_pixels=45)
-vista = pdk.ViewState(latitude=-33.5, longitude=-65.5, zoom=3.6 if not sel_prov else 5.2)
+vista = pdk.ViewState(latitude=-39.0, longitude=-64.5, zoom=3.15 if not sel_prov else 4.6)   # el país entero entra en 520 px de alto
 col_mapa, col_barras = st.columns([3, 2])
 # scrollZoom apagado: con la rueda se baja la página; el zoom va con los botones + / − o pellizcando; se arrastra para mover
 vista_mapa = pdk.View("MapView", controller={"scrollZoom": False, "dragPan": True, "doubleClickZoom": True, "touchZoom": True})
