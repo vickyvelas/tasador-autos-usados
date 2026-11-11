@@ -105,6 +105,9 @@ a.idx small { display:none; }
 .kicker { font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#2c5f8f; margin:.4rem 0 -.6rem 0; }
 .kicker.copa { color:#b5603a; }
 .concl { border-left:4px solid #2c5f8f; background:#f6f8fa; border-radius:0 8px 8px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
+.alerta {background:#fdecea; border:2px solid #c0392b; color:#8a1c12; border-radius:10px; padding:.6rem .8rem;
+  margin-bottom:.6rem; font-size:.9rem; font-weight:500; animation:parp 1.4s ease-in-out 3;}
+@keyframes parp {50% {box-shadow:0 0 0 6px rgba(192,57,43,.35);}}
 .panel { background:#22364d; color:#fff; border-radius:10px; padding:.9rem 1.1rem; }
 .panel .t { font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
 .panel .v { font-size:2rem; font-weight:700; line-height:1.1; }
@@ -141,7 +144,7 @@ def dato(valor, etiqueta, color="azul"):
 
 # Carga de lo que generó build_app.py. La app NO calcula nada del modelo: sólo lee app_data/.
 @st.cache_data
-def cargar():
+def cargar(version):   # version: fecha de los archivos, para no servir una copia vieja
     m = json.loads((DATA / "metricas.json").read_text(encoding="utf-8"))
     a, me, d = m["fecha_datos"].split("-")
     m["fecha_datos"] = f"{int(d)}/{int(me)}/{a}"
@@ -161,7 +164,7 @@ def cargar_modelo():
     return joblib.load(DATA / "modelo.joblib")
 
 
-M, AUTOS = cargar()
+M, AUTOS = cargar((DATA / "metricas.json").stat().st_mtime_ns + (DATA / "autos.csv").stat().st_mtime_ns)
 MODELO = cargar_modelo()
 # Atajos a los números que usan los títulos: test, comparación de modelos, piso, elegido y columnas probadas.
 TEST = M["test"]
@@ -397,6 +400,7 @@ u4.markdown(dato(f"{'+' if c_prov['delta'] >= 0 else '−'}{usd(abs(c_prov['delt
 @st.cache_data
 def cargar_mapa(version):   # version = fecha de los archivos: si cambian, se vuelve a leer y no queda un caché viejo
     ub = pd.read_csv(DATA / "ubicaciones.csv")
+    ub["mas_publicados"] = ub["mas_publicados"].astype(str).str.replace("<br>", "\n", regex=False)
     geo = json.loads((DATA / "provincias.geojson").read_text(encoding="utf-8"))
     return ub, geo
 
@@ -449,7 +453,7 @@ col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], views=[vista_mapa],
                                tooltip={"html": "<b>{ubicacion_corregida}</b><br>{autos} autos · mediana {mediana_txt}"
                                         "<br><br><b>Más publicados</b><br>{mas_publicados}"
                                         "<br><br><b>Más caro:</b> {mas_caro}<br><b>Más barato:</b> {mas_barato}",
-                                        "style": {"backgroundColor": "#22364d", "color": "white", "fontSize": "12px"}}),
+                                        "style": {"backgroundColor": "#22364d", "color": "white", "fontSize": "12px", "whiteSpace": "pre-line"}}),
                       height=520)
 # Referencias del mapa: tamaño = cantidad de autos de la ciudad, color = precio mediano de sus autos.
 p_lo, p_hi = UBIC_OK["mediana_usd"].min(), UBIC_OK["mediana_usd"].max()
@@ -706,6 +710,10 @@ with tab_exp:
                   delta=f"{num(elegido['dif'] * 100)} % vs tasación", delta_color="off")
         e3.metric("Año · km", f"{int(elegido['fabricado_en'])} · {num(elegido['kilometraje'])} km")
         e4.metric("Avisos de este modelo en entrenamiento", num(elegido["avisos_modelo"]))
+        if abs(elegido["dif"]) >= 0.25:
+            st.error(f"TASACIÓN MUY DESFASADA: el modelo tasa este auto {num(abs(elegido['dif']) * 100)} % "
+                     f"{'por encima' if elegido['dif'] < 0 else 'por debajo'} del precio publicado. "
+                     "Puede ser un precio fuera de mercado o un caso que el modelo no ve bien.", icon=":material/warning:")
         if elegido["avisos_modelo"] < 10:
             st.warning("El tasador vio menos de 10 autos de este modelo: su tasación es poco confiable.")
         if isinstance(elegido["url"], str):
@@ -816,6 +824,7 @@ with tab_probar:
     lo, hi, tc = precio * (1 - margen), precio * (1 + margen), M["tipo_cambio"]
     # Comparables: los 3 avisos del mismo modelo más parecidos en año y km (con su precio real y la tasación del modelo).
     comp_html = ""
+    alerta_html = ""
     if len(ref_m):
         cerca = ref_m.assign(dist=(ref_m["fabricado_en"] - anio).abs() * 10000 + (ref_m["kilometraje"] - km_v).abs() / 10).nsmallest(3, "dist")
         filas = "".join(
@@ -823,7 +832,15 @@ with tab_probar:
             f"<td style='text-align:right'>{usd(r.precio_usd)} real<br>{usd(r.tasacion_usd)} tasado</td></tr>"
             for r in cerca.itertuples())
         comp_html = f"<div class='r' style='margin-top:.5rem'>Comparables en los datos</div><table>{filas}</table>"
-    der.markdown(
+        # Alerta de desfase: la tasación contra el precio real mediano de los comparables más parecidos.
+        med_comp = float(cerca["precio_usd"].median())
+        desf = precio / med_comp - 1
+        if abs(desf) >= 0.25:
+            sentido = "más CARA" if desf > 0 else "más BARATA"
+            alerta_html = (f"<div class='alerta'><b>TASACIÓN MUY DESFASADA</b><br>Es {num(abs(desf) * 100)} % {sentido} que "
+                           f"los {len(cerca)} avisos más parecidos (mediana {usd(med_comp)}). Revisá los datos cargados "
+                           "(año, kilometraje, versión) o no te fíes de este número.</div>")
+    der.markdown(alerta_html + 
         f"<div class='panel'><div class='t'>Tasación estimada</div><div class='v'>{usd(precio)}</div>"
         f"<div class='s'>≈ ARS {num(precio * tc)} (cotización de referencia {num(tc)} ARS/USD)</div>"
         f"<div class='r'>Rango sugerido: {usd(lo)} a {usd(hi)} (± {num(margen * 100, 1)} %)</div>"

@@ -261,7 +261,7 @@ def main(ruta_datos: str):
     def resumen_ciudad(idx):
         g = info.loc[idx.index].assign(nombre=nombre.loc[idx.index])
         top = g.groupby("nombre")["precio_usd"].agg(["size", "median"]).sort_values("size", ascending=False).head(3)
-        txt = "<br>".join(f"{n} ({int(r['size'])}) · USD {r['median']:,.0f}".replace(",", ".") for n, r in top.iterrows())
+        txt = "\n".join(f"{n} ({int(r['size'])}) · USD {r['median']:,.0f}".replace(",", ".") for n, r in top.iterrows())
         caro, barato = g.loc[g["precio_usd"].idxmax()], g.loc[g["precio_usd"].idxmin()]
         fmt = lambda r: f"{r['nombre']} {int(r['fabricado_en'])} · USD {r['precio_usd']:,.0f}".replace(",", ".")
         return pd.Series({"mas_publicados": txt, "mas_caro": fmt(caro), "mas_barato": fmt(barato)})
