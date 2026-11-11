@@ -202,7 +202,8 @@ st.sidebar.markdown(
     '<line x1="35" y1="138" x2="85" y2="138" stroke="#b5603a" stroke-width="4" stroke-linecap="round"/>'
     '<circle cx="82" cy="30" r="5" fill="#b5603a"/></svg></div>', unsafe_allow_html=True)
 st.sidebar.caption("Dentro de cada sección, el desplegable *Cómo lo sabemos* tiene la evidencia técnica.")
-st.caption("Proyecto integrador · Ciencia de Datos · UTN FRM · 2026 · grupo 5K09-03")
+st.caption("Proyecto integrador · Ciencia de Datos · UTN FRM · 2026 · Comisión 5K09 · Grupo 03")
+st.caption("Integrantes: García Nicolás · Ramos Ignacio · Velasco Victoria · Via Tomás · Villanueva Sergio")
 ancla("portada")
 st.markdown(
     f'''<div class="hero"><div style="opacity:.85;font-size:.85rem;letter-spacing:.06em;margin-bottom:.3rem">CIENCIA DE DATOS · UTN FRM · 2026 · COMISIÓN 5K09 · GRUPO 03</div><h1>¿Cuánto vale un auto usado?</h1>
@@ -220,7 +221,6 @@ c2.markdown(kpi(usd(PISO["mae"]), "Error si tasáramos todo a la mediana (piso)"
                 "El número a vencer: sin modelo, mismo método de validación"), unsafe_allow_html=True)
 c3.markdown(kpi(num(N_AUTOS), "Autos usados analizados", "verde",
                 f"CarOne y DeRuedas, cosecha del {M['fecha_datos']}"), unsafe_allow_html=True)
-st.caption("Integrantes: García Nicolás · Ramos Ignacio · Velasco Victoria · Via Tomás · Villanueva Sergio")
 st.divider()
 
 # =========================================================================
@@ -238,6 +238,14 @@ d2.markdown(dato(usd(M["precio_mediano"]), "precio mediano", "azul"), unsafe_all
 d3.markdown(dato(usd(p90), "piso del 10 % más caro", "naranja"), unsafe_allow_html=True)
 d4.markdown(dato(num(M["ubicacion"]["n_ciudades"]), f"ciudades en {M['ubicacion']['n_provincias']} provincias", "violeta"),
             unsafe_allow_html=True)
+# Fuentes de los datos, con sus logos (app_data/logos/). Los autos por fuente salen de metricas.json.
+import base64
+carone_b64 = base64.b64encode((DATA / "logos" / "carone.svg").read_bytes()).decode()   # el logo de CarOne es blanco: va sobre un chip oscuro
+lg0, lg1, lg2, lg3 = st.columns([1, 1.4, 1, 1.4], vertical_alignment="center")
+lg0.markdown(f'<div style="background:#22364d;border-radius:10px;padding:8px 12px;display:inline-block"><img src="data:image/svg+xml;base64,{carone_b64}" width="56"></div>', unsafe_allow_html=True)
+lg1.markdown(f"**CarOne** · {num(M['por_fuente'].get('carone', 0))} autos<br><span style='font-size:.8rem;color:#6b7280'>API GraphQL</span>", unsafe_allow_html=True)
+lg2.image(str(DATA / "logos" / "deruedas.png"), width=130)
+lg3.markdown(f"**DeRuedas** · {num(M['por_fuente'].get('deruedas', 0))} autos<br><span style='font-size:.8rem;color:#6b7280'>páginas HTML</span>", unsafe_allow_html=True)
 # Histograma de precios: marca de barras, x = precio en tramos de USD 2.000, y = cantidad de autos (count).
 # Se cortó en USD 80.000 para que se lea; la línea azul punteada es la mediana.
 hist = alt.Chart(AUTOS[AUTOS["precio_usd"] <= 80000]).mark_bar(color=TINTA, opacity=0.85).encode(
@@ -395,23 +403,29 @@ UBIC_OK = UBIC.dropna(subset=["latitud", "longitud"])
 provs = alfabetico(UBIC_OK["provincia"].unique())
 sel_prov = st.multiselect("Provincias en el mapa", provs, placeholder="Todas las provincias")
 mapa_df = UBIC_OK[UBIC_OK["provincia"].isin(sel_prov)] if sel_prov else UBIC_OK
-contorno = alt.Chart(alt.Data(values=GEO["features"])).mark_geoshape(fill="#eef1f5", stroke="#b8c0cc", strokeWidth=0.6)
-puntos_mapa = alt.Chart(mapa_df).mark_circle(opacity=0.8, stroke="white", strokeWidth=0.7).encode(
-    longitude="longitud:Q", latitude="latitud:Q",
-    size=alt.Size("autos:Q", scale=alt.Scale(type="sqrt", range=[25, 1100]),
-                  legend=alt.Legend(title="Autos", orient="bottom", values=[10, 100, 1000], direction="horizontal")),
-    color=alt.Color("mediana_usd:Q", scale=alt.Scale(scheme="oranges"),
-                    legend=alt.Legend(title="Precio mediano (USD)", orient="bottom", direction="horizontal", gradientLength=160)),
-    tooltip=[alt.Tooltip("ubicacion_corregida:N", title="Ciudad"), alt.Tooltip("autos:Q", title="Autos"),
-             alt.Tooltip("mediana_usd:Q", title="Precio mediano (USD)", format=",.0f")])
-col_mapa, col_barras = st.columns([2, 3])
-col_mapa.altair_chart((contorno + puntos_mapa).project("mercator").properties(height=520), width="stretch")
+# Mapa con zoom y desplazamiento (pydeck, con mapa base real). Un círculo por ciudad: el radio sale de la raíz de la
+# cantidad de autos y el color (de claro a oscuro) del precio mediano. Contorno de provincias de app_data/provincias.geojson.
+import pydeck as pdk
+t = (mapa_df["mediana_usd"] - UBIC_OK["mediana_usd"].min()) / (UBIC_OK["mediana_usd"].max() - UBIC_OK["mediana_usd"].min())
+mapa_df = mapa_df.assign(
+    r=(mapa_df["autos"] ** 0.5) * 2500 + 3000,
+    rojo=(254 + (181 - 254) * t).round().astype(int), verde=(215 + (96 - 215) * t).round().astype(int),
+    azul=(170 + (58 - 170) * t).round().astype(int), mediana_txt=mapa_df["mediana_usd"].map(usd))
+capa_prov = pdk.Layer("GeoJsonLayer", GEO, stroked=True, filled=False, get_line_color=[90, 100, 115], line_width_min_pixels=1)
+capa_ciu = pdk.Layer("ScatterplotLayer", mapa_df, get_position=["longitud", "latitud"], get_radius="r",
+                     get_fill_color=["rojo", "verde", "azul", 210], get_line_color=[255, 255, 255], line_width_min_pixels=1,
+                     stroked=True, pickable=True, radius_min_pixels=3, radius_max_pixels=45)
+vista = pdk.ViewState(latitude=-33.5, longitude=-65.5, zoom=3.6 if not sel_prov else 5.2)
+col_mapa, col_barras = st.columns([3, 2])
+col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], initial_view_state=vista, map_style="light",
+                               tooltip={"text": "{ubicacion_corregida}\n{autos} autos · mediana {mediana_txt}"}),
+                      height=520)
 por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().sort_values("autos", ascending=False).head(8))
 barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),
     tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
 col_barras.altair_chart(barras.properties(height=320, title="Dónde están los autos (8 provincias con más)"), width="stretch")
-col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color = precio mediano. "
+col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color más oscuro = precio mediano más alto. Se puede hacer zoom con la rueda del mouse y arrastrar el mapa. "
                    f"Faltan {UB['sin_coordenadas']} ciudades sin coordenadas (con pocos autos cada una).")
 st.markdown(
     "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
@@ -759,13 +773,12 @@ st.divider()
 st.caption(f"Datos: cosecha del {M['fecha_datos']} del pipeline de Airflow del grupo. Modelo: HistGradientBoosting "
            f"con objetivo logarítmico, semilla {M['semilla']}, regenerado con build_app.py.")
 
-# Resaltado del índice según la parte de la página donde estás (scroll-spy). Un componente HTML de altura 0 corre un
-# poco de JavaScript en la página principal: mira qué ancla (`ancla("...")`) quedó más cerca del borde de arriba y
+# Resaltado del índice según la parte de la página donde estás (scroll-spy). Un bloque st.html corre un
+# poco de JavaScript (st.html con unsafe_allow_javascript) en la página principal: mira qué ancla (`ancla("...")`) quedó más cerca del borde de arriba y
 # marca con la clase "act" el link del índice que le corresponde.
-import streamlit.components.v1 as components
-components.html("""
+st.html("""
 <script>
-const doc = window.parent.document;
+const doc = document;
 function marcar() {
   const links = [...doc.querySelectorAll('a.idx')];
   let actual = null;
@@ -777,10 +790,10 @@ function marcar() {
   if (sc && sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 5) actual = links[links.length - 1];  // al final de todo: el último
   links.forEach(l => l.classList.toggle('act', l === (actual || links[0])));
 }
-if (!window.parent.__idxSpy) {
-  window.parent.__idxSpy = true;
+if (!window.__idxSpy) {
+  window.__idxSpy = true;
   doc.addEventListener('scroll', marcar, true);
 }
 setInterval(marcar, 400);   // también al volver a dibujarse la página
 marcar();
-</script>""", height=0)
+</script>""", unsafe_allow_javascript=True)
