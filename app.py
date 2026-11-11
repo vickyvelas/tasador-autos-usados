@@ -500,6 +500,23 @@ col_barras.caption(f"Cada círculo es una ciudad: pasá el mouse para ver sus au
 st.markdown(
     "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
     "parecidos. Lo que cambia el precio es *qué auto es* (marca, modelo, año), no *dónde* se publica.")
+with st.expander("Cómo lo sabemos"):
+    st.markdown(f"""
+**Cómo probamos la hipótesis de la ubicación.** Hicimos tres comprobaciones:
+
+1. **¿Cuánto del precio explica cada variable?** Con η² (la parte de la variación del precio que explica un grupo):
+   provincia **{num(UB['eta2_provincia'] * 100, 1)} %**, ciudad {num(UB['eta2_ciudad'] * 100, 1)} % y marca
+   **{num(UB['eta2_marca'] * 100, 0)} %**. La marca pesa unas 17 veces más que la provincia.
+2. **¿Mejora el modelo si la conoce?** Repetimos la misma validación cruzada (agrupada por auto, semilla {M['semilla']}) agregando
+   la provincia y después provincia y ciudad. El error pasó de {usd(CPV['referencia (todas)']['mae'])} a
+   {usd(c_prov['mae'])} (+{usd(c_prov['delta'])}) con la provincia y a {usd(c_ciu['mae'])} (+{usd(c_ciu['delta'])}) con provincia y ciudad.
+   El ruido de la validación es de ± {usd(CPV['referencia (todas)']['desvio'])}: no mejora, incluso empeora un poco.
+3. **¿Hay datos suficientes para separar por lugar?** No: el {num(UB['pct_top_provincias'] * 100, 0)} % de los autos está en
+   Mendoza, Córdoba y Buenos Aires, y {UB['sin_coordenadas']} de las {UB['n_ciudades']} ciudades tienen pocos autos y no pudimos ubicarlas en el mapa.
+
+**Decisión:** la ubicación no entra al modelo. Las ciudades tienen precios medianos parecidos y lo que cambia el precio es qué auto es.
+Las coordenadas del mapa son aproximadas (por ciudad) y están en `app_data/ubicaciones.csv`; el η² y las pruebas con provincia y ciudad se calculan en `build_app.py`.
+""")
 
 st.divider()
 
