@@ -3,7 +3,7 @@
 Proyecto integrador de Ciencia de Datos · UTN FRM · 2026 · comisión 5K09, grupo 03
 (García Nicolás, Ramos Ignacio, Velasco Victoria, Via Tomás, Villanueva Sergio).
 
-**App publicada:** _https://tasador-autos-usados.streamlit.app_
+**App publicada:** [tasador-autos-usados.streamlit.app](https://tasador-autos-usados.streamlit.app)
 
 > Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio de un auto usado con un
 > error típico de **6,6 %** (USD 1.428 de error promedio en test), **4,3 veces menos** que tasar todo al
@@ -43,14 +43,28 @@ Una "copa de martini":
 - **Portada:** la idea central y tres números (error en test, error del piso, autos analizados).
 - **Los datos:** distribución de precios. En *Cómo lo sabemos*: el pipeline (fuentes, bronce, plata, calidad),
   qué es una fila, los filtros paso por paso con las filas que quedan y las columnas descartadas por fuga.
-- **Lo que encontramos:** un auto pierde cerca del 8 % de su valor por año. En *Cómo lo sabemos*: una hipótesis que
+- **Índice lateral:** con la ficha del grupo y links a cada sección; marca en cuál estás mientras bajás la página.
+- **Portada:** la idea central y tres números (error en test, error del piso, autos analizados).
+- **Los datos:** distribución de precios. En *Cómo lo sabemos*: el pipeline (fuentes, bronce, plata, calidad),
+  qué es una fila, los filtros paso por paso con las filas que quedan y las columnas descartadas por fuga.
+- **Lo que encontramos:** un auto pierde cerca del 7,6 % de su valor por año. En *Cómo lo sabemos*: una hipótesis que
   se sostuvo (el año es lo que más pesa) y una que no (el kilometraje casi no agrega aparte del año), con números.
-- **El modelo:** comparación del piso y los 4 modelos (media ± desvío en validación cruzada agrupada). En
-  *Cómo lo sabemos*: métrica, piso, validación, grilla, test, error por tramo, modelos raros, importancia y fugas.
+  Además, **la hipótesis descartada de la ubicación (H4)**: la provincia explica 1,8 % del precio y la ciudad 4,3 %
+  (η² por debajo de 0,05, zona roja de la cátedra) contra 30 % de la marca, y agregarlas al modelo cambia el error
+  unos dólares (+USD 6 con provincia, +USD 7 con provincia y ciudad), menos que el ruido. Incluye un **mapa interactivo**
+  (zoom, filtro de provincias, cartel con los autos de cada ciudad) y, en *Cómo lo sabemos*, el gráfico por ciudad
+  contra la mediana del mercado y la tabla completa de pruebas.
+- **El modelo:** comparación del piso y los 4 modelos (media ± desvío en validación cruzada agrupada), el gráfico
+  **real contra predicho** en el test (R² 0,90 en dólares, 0,94 en escala logarítmica) al lado del **error por
+  tramo de precio** con doble eje. En *Cómo lo sabemos*: métrica, piso, validación, grilla, test, modelos raros,
+  importancia y fugas.
 - **Explorá:** todos los autos coloreados según si están por encima o por debajo de la tasación del modelo, con
   filtros de marca, año, precio y caja, y la ficha de cada auto al hacer clic.
-- **Probá el tasador:** cargás un auto y el modelo estima el precio. Sólo deja elegir marcas y modelos que el
-  modelo vio y avisa cuando un valor está fuera de lo habitual.
+- **Probá el tasador:** cargás un auto y el modelo estima el precio, con un panel que muestra el rango (± %),
+  el valor en pesos, la posición en el mercado, el percentil y 3 comparables. Caja, combustible y tracción sólo
+  ofrecen lo que existe para ese modelo. Avisa cuando hay pocos avisos del modelo, el año no existe para ese modelo,
+  un valor está fuera de lo habitual (percentil 1 a 99), la tasación está en el 10 % más caro, y muestra una
+  **alerta roja cuando la tasación se desvía 25 % o más de los 3 avisos más parecidos**.
 
 ## Cómo correr todo
 
@@ -96,8 +110,9 @@ ubicación queda como *aproximada* (el cartel del mapa lo avisa). Las respuestas
 cada ciudad se pide una sola vez. Con `--sin-api` no se consulta nada (por ejemplo, sin internet).
 Después se suben los cambios a GitHub y Streamlit Cloud vuelve a publicar la app solo.
 
-Las versiones de `requirements.txt` están fijas a propósito: con otras versiones de scikit-learn el boosting da
-números un poco distintos a los del notebook.
+Las versiones de `requirements.txt` están fijas a propósito: con otras versiones de scikit-learn o de numpy el boosting da
+números un poco distintos a los del notebook (por ejemplo, el error de test puede dar USD 1.435 en vez de USD 1.428). Los
+números publicados se generaron con numpy 2.0.2.
 
 ## Publicarla en Streamlit Community Cloud
 
