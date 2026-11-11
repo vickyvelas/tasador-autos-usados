@@ -3,7 +3,7 @@
 Proyecto integrador de Ciencia de Datos · UTN FRM · 2026 · comisión 5K09, grupo 03
 (García Nicolás, Ramos Ignacio, Velasco Victoria, Via Tomás, Villanueva Sergio).
 
-**App publicada:** _(pegar acá la URL de Streamlit Community Cloud)_
+**App publicada:** _https://tasador-autos-usados.streamlit.app_
 
 > Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio de un auto usado con un
 > error típico de **6,6 %** (USD 1.428 de error promedio en test), **4,3 veces menos** que tasar todo al
