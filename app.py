@@ -92,6 +92,16 @@ a.idx small { display:block; font-weight:400; opacity:.75; font-size:.72rem; }
 .dato { border-radius:14px; padding:.8rem 1rem; background:var(--bg); border:1px solid var(--bd); border-left:6px solid var(--bd); margin:.25rem 0 .75rem 0; }
 .dato .v { font-size:1.5rem; font-weight:800; color:var(--tx); line-height:1.15; }
 .dato .l { font-size:.85rem; color:#3d3d3a; }
+.kicker { font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; font-weight:800; color:#1d4f91; margin:.4rem 0 -.6rem 0; }
+.kicker.copa { color:#d95926; }
+.concl { border-left:6px solid #1d4f91; background:#f3f7fc; border-radius:0 12px 12px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
+.panel { background:linear-gradient(160deg,#1d4f91 0%,#2f6fa8 100%); color:#fff; border-radius:18px; padding:1.2rem 1.4rem; box-shadow:0 6px 18px rgba(20,60,120,.3); }
+.panel .t { font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
+.panel .v { font-size:2.4rem; font-weight:800; line-height:1.1; }
+.panel .r { font-size:1.02rem; font-weight:700; margin-top:.5rem; }
+.panel .s { font-size:.82rem; opacity:.85; margin-top:.2rem; }
+.panel table { width:100%; font-size:.85rem; margin-top:.4rem; border-collapse:collapse; }
+.panel td { padding:.3rem .2rem; border-top:1px solid rgba(255,255,255,.25); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -170,6 +180,14 @@ st.sidebar.markdown(
     + '<div class="idx-grupo">Más</div>'
     + idx("pie", "📦", "Repositorio", "Cómo regenerar todo", "#6b7280"),
     unsafe_allow_html=True)
+# La copa de martini del modelo "tallo y copa": el tallo se lee en orden, la copa la maneja quien visita.
+st.sidebar.markdown(
+    '<div style="text-align:center;margin-top:1.2rem"><svg width="120" height="150" viewBox="0 0 120 150">'
+    '<polygon points="10,10 110,10 60,80" fill="#cfe2f7" stroke="#2a78d6" stroke-width="3"/>'
+    '<polygon points="22,22 98,22 60,70" fill="#2a78d6" opacity=".55"/>'
+    '<line x1="60" y1="80" x2="60" y2="135" stroke="#d95926" stroke-width="4"/>'
+    '<line x1="35" y1="138" x2="85" y2="138" stroke="#d95926" stroke-width="4" stroke-linecap="round"/>'
+    '<circle cx="82" cy="30" r="5" fill="#d95926"/></svg></div>', unsafe_allow_html=True)
 st.sidebar.caption("Dentro de cada sección, el desplegable *Cómo lo sabemos* tiene la evidencia técnica.")
 st.caption("Proyecto integrador · Ciencia de Datos · UTN FRM · 2026 · grupo 5K09-03")
 ancla("portada")
@@ -178,6 +196,10 @@ st.markdown(
     <p>Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio con un error típico de
     <b>{num(TEST['rel_mediano'] * 100, 1)} %</b>: <b>{num(PISO['mae'] / TEST['mae'], 1)} veces menos error</b>
     que tasar todo al precio mediano.</p></div>''', unsafe_allow_html=True)
+st.markdown(
+    f'<div class="concl">El precio de un usado se puede estimar con un error de <b>{usd(TEST["mae"])}</b> usando año, '
+    f'kilometraje, motor, potencia, marca y modelo. El <b>año</b> es lo que más pesa y los autos de alta gama son los que '
+    f'más se le escapan.</div>', unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
 c1.markdown(kpi(usd(TEST["mae"]), "Error promedio del tasador (test)", "azul",
                 "En el 20 % de autos que el modelo nunca vio, medido una sola vez"), unsafe_allow_html=True)
@@ -194,6 +216,7 @@ st.divider()
 # TALLO 1 · LOS DATOS. El título afirma algo con números calculados (mediana y percentil 90 del precio).
 p10, p90 = M["precio_p10_p90"]
 ancla("datos")
+st.markdown('<div class="kicker">Los datos</div>', unsafe_allow_html=True)
 st.subheader(f"Los datos · La mitad de los autos cuesta menos de {usd(M['precio_mediano'])}, "
              f"pero el 10 % más caro pasa los {usd(p90)}")
 d1, d2, d3, d4 = st.columns(4)
@@ -264,6 +287,7 @@ st.divider()
 # TALLO 2 · LO QUE ENCONTRAMOS. El título usa la depreciación anual que calculó build_app.py (paso 11).
 dep = M["depreciacion_anual"]
 ancla("hallazgos")
+st.markdown('<div class="kicker">Lo que encontramos</div>', unsafe_allow_html=True)
 st.subheader(f"Lo que encontramos · Un auto pierde cerca del {num(dep * 100)} % de su valor por cada año de antigüedad")
 h1, h2, h3 = st.columns(3)
 h1.markdown(dato(f"−{num(dep * 100)} % por año", "lo que pierde un auto de su valor", "naranja"), unsafe_allow_html=True)
@@ -386,6 +410,7 @@ st.divider()
 # TALLO 3 · EL MODELO. "veces" = cuántas veces menor es el error del modelo que el del piso.
 veces = PISO["mae"] / TEST["mae"]
 ancla("modelo")
+st.markdown('<div class="kicker">El modelo</div>', unsafe_allow_html=True)
 st.subheader(f"El modelo · El tasador se equivoca en promedio {usd(TEST['mae'])} por auto, "
              f"{num(veces, 1)} veces menos que tasar todo a la mediana")
 m1, m2, m3, m4 = st.columns(4)
@@ -524,6 +549,7 @@ st.divider()
 # COPA · Explorá (panorama + filtros + detalle) y Probá el tasador (caso nuevo).
 ancla("explora")
 ancla("proba")
+st.markdown('<div class="kicker copa">La copa · tu turno</div>', unsafe_allow_html=True)
 st.header("Ahora vos")
 tab_exp, tab_probar = st.tabs(["🔎 Explorá los autos", "🧮 Probá el tasador"])
 
@@ -678,13 +704,26 @@ with tab_probar:
 
     r1, r2 = st.columns([1, 1.4])
     with r1:
-        st.metric("Precio estimado", usd(precio))
-        st.markdown(f"Rango probable: **{usd(precio * (1 - margen))} a {usd(precio * (1 + margen))}** "
-                    f"(± {num(margen * 100, 1)} %: el error mediano en test para modelos con {tramo_te} avisos, "
-                    f"y {marca} {modelo} tiene {n_train_mod} en entrenamiento).")
-        st.caption(f"≈ ARS {num(precio * M['tipo_cambio'])} al tipo de cambio del modelo ({num(M['tipo_cambio'])}).")
-        for a in avisos:
-            st.warning(a)
+        # Percentil: de todos los autos publicados, qué porcentaje cuesta menos que esta tasación.
+        pct = float((AUTOS["precio_usd"] < precio).mean() * 100)
+        # Comparables: los 4 avisos del mismo modelo más parecidos en año y km (con su precio real y la tasación del modelo).
+        comp_html = ""
+        if len(ref_m):
+            cerca = ref_m.assign(dist=(ref_m["fabricado_en"] - anio).abs() * 10000 + (ref_m["kilometraje"] - km_v).abs() / 10).nsmallest(4, "dist")
+            filas = "".join(
+                f"<tr><td>{r.marca} {r.modelo} · {int(r.fabricado_en)} · {num(r.kilometraje)} km</td>"
+                f"<td style='text-align:right'>{usd(r.precio_usd)} real<br>{usd(r.tasacion_usd)} tasado</td></tr>"
+                for r in cerca.itertuples())
+            comp_html = f"<div class='r' style='margin-top:.9rem'>Comparables en los datos</div><table>{filas}</table>"
+        st.markdown(
+            f"<div class='panel'><div class='t'>Tasación estimada</div><div class='v'>{usd(precio)}</div>"
+            f"<div class='s'>≈ ARS {num(precio * M['tipo_cambio'])} (cotización de referencia {num(M['tipo_cambio'])} ARS/USD)</div>"
+            f"<div class='r'>Rango probable: {usd(precio * (1 - margen))} a {usd(precio * (1 + margen))} (± {num(margen * 100, 1)} %)</div>"
+            f"<div class='s'>Error mediano en test para modelos con {tramo_te} avisos; {marca} {modelo} tiene {n_train_mod} en entrenamiento.</div>"
+            f"<div class='r'>Percentil {num(pct)} del mercado ({num(len(AUTOS))} autos)</div>{comp_html}</div>",
+            unsafe_allow_html=True)
+        for a_ in avisos:
+            st.warning(a_)
     with r2:
         if len(ref_m):
             otros = alt.Chart(ref_m).mark_circle(color=GRIS, opacity=0.6, size=40).encode(
