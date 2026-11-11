@@ -600,7 +600,7 @@ with tab_exp:
     a_min, a_max = int(AUTOS["fabricado_en"].min()), int(AUTOS["fabricado_en"].max())
     # el slider abarca TODOS los años de los datos (por defecto, el rango completo)
     rango_anio = f2.slider("Año", a_min, a_max, (a_min, a_max))
-    pmax = int(np.ceil(AUTOS["precio_usd"].quantile(0.99) / 1000) * 1000)
+    pmax = int(np.ceil(AUTOS["precio_usd"].max() / 1000) * 1000)   # hasta el auto más caro: por defecto se ven TODOS los autos
     rango_precio = f3.slider("Precio publicado (USD)", 0, pmax, (0, pmax), step=1000)
     CAJAS = {"Todas": None, "Manual": "manual", "Automática": "automatico"}
     caja = f4.radio("Caja", list(CAJAS), horizontal=False)
