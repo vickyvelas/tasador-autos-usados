@@ -6,8 +6,8 @@ Proyecto integrador de Ciencia de Datos · UTN FRM · 2026 · comisión 5K09, gr
 **App publicada:** _(pegar acá la URL de Streamlit Community Cloud)_
 
 > Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio de un auto usado con un
-> error típico de **6,5 %** (USD 1.380 de error promedio en test), **4,5 veces menos** que tasar todo al
-> precio mediano (USD 6.186).
+> error típico de **6,6 %** (USD 1.428 de error promedio en test), **4,3 veces menos** que tasar todo al
+> precio mediano (USD 6.201).
 
 ## La cadena completa
 
@@ -100,12 +100,12 @@ En *Advanced settings* elegir Python 3.12.
 
 | Modelo | Error promedio (validación cruzada agrupada) |
 |---|---|
-| Piso: tasar todo a la mediana | USD 6.186 ± 217 |
-| Regresión lineal (Ridge) | USD 2.159 ± 120 |
-| Random forest | USD 1.520 ± 127 |
-| Boosting sin ajustar | USD 1.492 ± 148 |
-| **Boosting ajustado (elegido)** | **USD 1.428 ± 139** |
+| Piso: tasar todo a la mediana | USD 6.201 ± 190 |
+| Regresión lineal (Ridge) | USD 2.151 ± 128 |
+| Random forest | USD 1.518 ± 100 |
+| Boosting sin ajustar | USD 1.478 ± 102 |
+| **Boosting ajustado (elegido)** | **USD 1.408 ± 87** |
 
-Test (20 % de los vehículos, medido una sola vez): **USD 1.380**, error relativo mediano **6,5 %**.
+Test (20 % de los vehículos, medido una sola vez): **USD 1.428**, error relativo mediano **6,6 %**.
 
-Nota: marcas y modelos escritos distinto se unifican (Leapmotor/Leapmotors, Eco sport/EcoSport, Up/Up!, Stepway/Sandero Stepway), por eso los números difieren levemente de los del Colab (USD 1.428 / 6,6 %).
+Los nombres repetidos (Leapmotor/Leapmotors, Eco sport/EcoSport, Up/Up!, Stepway/Sandero Stepway) se unifican sólo para mostrarlos en la app; el modelo usa la misma normalización del notebook, por eso los números coinciden.

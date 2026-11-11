@@ -48,9 +48,9 @@ def main(ruta_datos: str):
     # Copia con TODAS las columnas (versión, url, fuente, moneda...) para mostrar en la app.
     # El modelo, en cambio, recibe sólo las columnas de abajo (sin las COLUMNAS_SIN_USO).
     info = df.copy()  # guarda versión, fuente y moneda para mostrar en la app
-    # Nombres para mostrar: el modelo unifica CITROEN/Citroen/Citroën, Eco sport/EcoSport, Leapmotors/Leapmotor...
-    # con tasador.claves_marca_modelo; acá se elige la escritura más frecuente de cada marca y modelo para mostrar.
-    clave_m, clave_mo = T.claves_marca_modelo(info)
+    # Nombres para mostrar: se unifican CITROEN/Citroen/Citroën, Eco sport/EcoSport, Leapmotors/Leapmotor...
+    # con tasador.claves_marca_modelo(unificar=True) (el modelo NO las unifica, como el notebook); acá se elige la escritura más frecuente de cada marca y modelo para mostrar.
+    clave_m, clave_mo = T.claves_marca_modelo(info, unificar=True)
     info["marca"] = info.groupby(clave_m)["marca"].transform(lambda s: s.value_counts().index[0])
     info["modelo"] = info.groupby(clave_m + "|" + clave_mo)["modelo"].transform(lambda s: s.value_counts().index[0])
     # Ubicación: se corrige la codificación y se saca la provincia. Sólo sirve para probar la hipótesis y para el mapa.

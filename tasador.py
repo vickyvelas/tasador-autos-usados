@@ -120,8 +120,19 @@ def eta_cuadrado(y, grupos):
     return float(ss_entre / ((d["y"] - d["y"].mean()) ** 2).sum())
 
 
-def claves_marca_modelo(df):
-    """Dos Series alineadas con df: clave de marca y clave de modelo (lo que usan el Pipeline y la clave del vehículo)."""
+# Para que la app dé EXACTAMENTE los números del notebook de la Entrega 3, el modelo y la clave del vehículo usan la
+# misma normalización del notebook (minúsculas, sin tildes). La unificación de nombres repetidos (Leapmotor/Leapmotors,
+# Eco sport/EcoSport, Up/Up!, Stepway) se usa sólo para MOSTRAR marcas y modelos en la app (build_app.py).
+UNIFICAR_EN_MODELO = False
+
+
+def claves_marca_modelo(df, unificar=None):
+    """Dos Series alineadas con df: clave de marca y clave de modelo.
+    unificar=False (el modelo, igual que el notebook): sólo norm_text. unificar=True (para mostrar): clave sin signos + alias."""
+    if unificar is None:
+        unificar = UNIFICAR_EN_MODELO
+    if not unificar:
+        return df["marca"].map(norm_text), df["modelo"].map(norm_text)
     marcas = df["marca"].map(clave_marca)
     modelos = pd.Series([clave_modelo(a, b) for a, b in zip(df["marca"], df["modelo"])], index=df.index)
     return marcas, modelos

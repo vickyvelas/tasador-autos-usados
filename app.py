@@ -679,7 +679,9 @@ with tab_probar:
     marca = c_a.selectbox("Marca", marcas_p, index=marcas_p.index("Volkswagen") if "Volkswagen" in marcas_p else 0)
     opciones = cuenta[cuenta["marca"] == marca].copy()
     opciones = opciones.set_index("modelo").loc[alfabetico(opciones["modelo"])].reset_index()  # A-Z
-    modelo = c_b.selectbox("Modelo", opciones["modelo"].tolist(),
+    lista_mod = opciones["modelo"].tolist()
+    mas_publicado = opciones.sort_values("n", ascending=False)["modelo"].iloc[0]   # la lista va A-Z pero arranca en el más publicado
+    modelo = c_b.selectbox("Modelo", lista_mod, index=lista_mod.index(mas_publicado),
                            format_func=lambda m: f"{m}  ({int(opciones.set_index('modelo').loc[m, 'n'])} avisos)")
     ref_m = AUTOS[(AUTOS["marca"] == marca) & (AUTOS["modelo"] == modelo)]
 

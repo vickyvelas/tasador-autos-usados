@@ -38,422 +38,422 @@
   "url",
   "precio"
  ],
- "n_train": 7128,
- "n_test": 1781,
+ "n_train": 7127,
+ "n_test": 1782,
  "vehiculos_compartidos": 0,
  "comparacion": [
   {
    "modelo": "Piso (mediana)",
-   "mae": 6185.711464534285,
-   "desvio": 217.42600910790247
+   "mae": 6201.473032042641,
+   "desvio": 190.34210297515094
   },
   {
    "modelo": "Lineal (Ridge)",
-   "mae": 2158.559206979809,
-   "desvio": 119.7400515380807
+   "mae": 2151.0596450963108,
+   "desvio": 128.35148721173354
   },
   {
    "modelo": "Random forest",
-   "mae": 1520.4599498551593,
-   "desvio": 126.88260778142492
+   "mae": 1518.0331878077072,
+   "desvio": 100.28342098257566
   },
   {
    "modelo": "HistGradientBoosting",
-   "mae": 1492.3153958343705,
-   "desvio": 147.8023507327994
+   "mae": 1478.336877557141,
+   "desvio": 101.53787208735947
   },
   {
    "modelo": "HistGradientBoosting ajustado",
-   "mae": 1428.472877271324,
-   "desvio": 139.45353111912607
+   "mae": 1407.515487047213,
+   "desvio": 86.90779977310518
   }
  ],
  "mejores_parametros": {
-  "learning_rate": 0.05,
+  "learning_rate": 0.1,
   "max_iter": 600,
-  "max_leaf_nodes": 31,
+  "max_leaf_nodes": 15,
   "min_samples_leaf": 10
  },
  "grilla": [
   {
-   "learning_rate": 0.05,
-   "max_iter": 600,
-   "max_leaf_nodes": 31,
-   "min_samples_leaf": 10,
-   "mae_val": 1428.5,
-   "desvio_val": 139.5,
-   "mae_train": 904.8
-  },
-  {
    "learning_rate": 0.1,
    "max_iter": 600,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 10,
-   "mae_val": 1433.2,
-   "desvio_val": 130.6,
-   "mae_train": 939.0
+   "mae_val": 1407.5,
+   "desvio_val": 86.9,
+   "mae_train": 944.3
   },
   {
    "learning_rate": 0.1,
    "max_iter": 400,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 10,
-   "mae_val": 1433.5,
-   "desvio_val": 120.8,
-   "mae_train": 859.0
+   "mae_val": 1410.4,
+   "desvio_val": 94.4,
+   "mae_train": 861.8
   },
   {
    "learning_rate": 0.05,
-   "max_iter": 400,
+   "max_iter": 600,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 10,
-   "mae_val": 1437.0,
-   "desvio_val": 145.2,
-   "mae_train": 975.5
+   "mae_val": 1413.2,
+   "desvio_val": 87.6,
+   "mae_train": 910.8
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 400,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1417.8,
+   "desvio_val": 86.2,
+   "mae_train": 1017.1
   },
   {
    "learning_rate": 0.1,
    "max_iter": 600,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 10,
-   "mae_val": 1439.6,
-   "desvio_val": 117.6,
-   "mae_train": 785.4
+   "mae_val": 1418.2,
+   "desvio_val": 95.7,
+   "mae_train": 790.5
   },
   {
    "learning_rate": 0.1,
    "max_iter": 200,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 10,
-   "mae_val": 1440.7,
-   "desvio_val": 130.0,
-   "mae_train": 978.8
+   "mae_val": 1421.3,
+   "desvio_val": 92.7,
+   "mae_train": 983.7
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 400,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1421.9,
+   "desvio_val": 86.4,
+   "mae_train": 982.3
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 600,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1428.2,
+   "desvio_val": 97.6,
+   "mae_train": 1001.6
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 600,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1432.2,
+   "desvio_val": 90.8,
+   "mae_train": 1066.1
   },
   {
    "learning_rate": 0.1,
    "max_iter": 600,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 30,
-   "mae_val": 1443.1,
-   "desvio_val": 131.0,
-   "mae_train": 1048.3
+   "mae_val": 1433.6,
+   "desvio_val": 101.6,
+   "mae_train": 1043.1
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 400,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1435.4,
+   "desvio_val": 83.7,
+   "mae_train": 958.3
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 400,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1437.4,
+   "desvio_val": 95.1,
+   "mae_train": 1062.6
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 600,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1438.9,
+   "desvio_val": 87.0,
+   "mae_train": 894.8
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 600,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1443.2,
+   "desvio_val": 98.0,
+   "mae_train": 1141.2
   },
   {
    "learning_rate": 0.1,
    "max_iter": 400,
    "max_leaf_nodes": 15,
-   "min_samples_leaf": 10,
+   "min_samples_leaf": 30,
    "mae_val": 1443.9,
-   "desvio_val": 133.2,
-   "mae_train": 1012.2
-  },
-  {
-   "learning_rate": 0.05,
-   "max_iter": 600,
-   "max_leaf_nodes": 31,
-   "min_samples_leaf": 30,
-   "mae_val": 1446.8,
-   "desvio_val": 136.9,
-   "mae_train": 994.0
-  },
-  {
-   "learning_rate": 0.05,
-   "max_iter": 600,
-   "max_leaf_nodes": 15,
-   "min_samples_leaf": 10,
-   "mae_val": 1450.7,
-   "desvio_val": 138.4,
-   "mae_train": 1060.6
-  },
-  {
-   "learning_rate": 0.1,
-   "max_iter": 400,
-   "max_leaf_nodes": 31,
-   "min_samples_leaf": 30,
-   "mae_val": 1454.9,
-   "desvio_val": 120.9,
-   "mae_train": 956.5
-  },
-  {
-   "learning_rate": 0.1,
-   "max_iter": 400,
-   "max_leaf_nodes": 15,
-   "min_samples_leaf": 30,
-   "mae_val": 1455.5,
-   "desvio_val": 127.6,
-   "mae_train": 1109.1
-  },
-  {
-   "learning_rate": 0.05,
-   "max_iter": 400,
-   "max_leaf_nodes": 31,
-   "min_samples_leaf": 30,
-   "mae_val": 1459.2,
-   "desvio_val": 139.0,
-   "mae_train": 1054.7
-  },
-  {
-   "learning_rate": 0.1,
-   "max_iter": 600,
-   "max_leaf_nodes": 31,
-   "min_samples_leaf": 30,
-   "mae_val": 1460.5,
-   "desvio_val": 116.7,
-   "mae_train": 894.1
+   "desvio_val": 96.5,
+   "mae_train": 1104.0
   },
   {
    "learning_rate": 0.1,
    "max_iter": 200,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 30,
-   "mae_val": 1466.8,
-   "desvio_val": 124.2,
-   "mae_train": 1060.3
-  },
-  {
-   "learning_rate": 0.05,
-   "max_iter": 200,
-   "max_leaf_nodes": 31,
-   "min_samples_leaf": 10,
-   "mae_val": 1477.4,
-   "desvio_val": 139.7,
-   "mae_train": 1105.0
-  },
-  {
-   "learning_rate": 0.05,
-   "max_iter": 600,
-   "max_leaf_nodes": 15,
-   "min_samples_leaf": 30,
-   "mae_val": 1478.2,
-   "desvio_val": 134.6,
-   "mae_train": 1147.0
+   "mae_val": 1445.5,
+   "desvio_val": 82.3,
+   "mae_train": 1064.9
   },
   {
    "learning_rate": 0.05,
    "max_iter": 400,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 10,
-   "mae_val": 1479.5,
-   "desvio_val": 138.8,
-   "mae_train": 1137.8
-  },
-  {
-   "learning_rate": 0.1,
-   "max_iter": 200,
-   "max_leaf_nodes": 15,
-   "min_samples_leaf": 10,
-   "mae_val": 1483.2,
-   "desvio_val": 136.1,
-   "mae_train": 1140.6
+   "mae_val": 1459.5,
+   "desvio_val": 92.8,
+   "mae_train": 1139.1
   },
   {
    "learning_rate": 0.1,
    "max_iter": 100,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 10,
-   "mae_val": 1483.8,
-   "desvio_val": 130.6,
-   "mae_train": 1111.9
+   "mae_val": 1461.6,
+   "desvio_val": 91.0,
+   "mae_train": 1106.6
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 200,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 10,
+   "mae_val": 1462.6,
+   "desvio_val": 87.7,
+   "mae_train": 1108.7
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 200,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1464.3,
+   "desvio_val": 88.4,
+   "mae_train": 1145.9
   },
   {
    "learning_rate": 0.05,
    "max_iter": 200,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 30,
-   "mae_val": 1501.6,
-   "desvio_val": 145.4,
-   "mae_train": 1164.8
-  },
-  {
-   "learning_rate": 0.1,
-   "max_iter": 100,
-   "max_leaf_nodes": 31,
-   "min_samples_leaf": 30,
-   "mae_val": 1502.1,
-   "desvio_val": 133.5,
-   "mae_train": 1171.0
-  },
-  {
-   "learning_rate": 0.1,
-   "max_iter": 200,
-   "max_leaf_nodes": 15,
-   "min_samples_leaf": 30,
-   "mae_val": 1502.9,
-   "desvio_val": 127.9,
-   "mae_train": 1214.8
+   "mae_val": 1473.5,
+   "desvio_val": 92.5,
+   "mae_train": 1171.1
   },
   {
    "learning_rate": 0.05,
    "max_iter": 400,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 30,
-   "mae_val": 1503.8,
-   "desvio_val": 137.2,
-   "mae_train": 1206.4
+   "mae_val": 1475.4,
+   "desvio_val": 95.3,
+   "mae_train": 1203.6
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 100,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 30,
+   "mae_val": 1484.4,
+   "desvio_val": 84.1,
+   "mae_train": 1175.8
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 200,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 30,
+   "mae_val": 1487.2,
+   "desvio_val": 93.5,
+   "mae_train": 1206.7
   },
   {
    "learning_rate": 0.05,
    "max_iter": 200,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 10,
-   "mae_val": 1555.0,
-   "desvio_val": 141.6,
-   "mae_train": 1275.7
+   "mae_val": 1530.5,
+   "desvio_val": 97.5,
+   "mae_train": 1276.7
   },
   {
    "learning_rate": 0.05,
    "max_iter": 100,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 10,
-   "mae_val": 1557.9,
-   "desvio_val": 139.3,
-   "mae_train": 1248.7
+   "mae_val": 1541.3,
+   "desvio_val": 91.2,
+   "mae_train": 1260.3
+  },
+  {
+   "learning_rate": 0.1,
+   "max_iter": 100,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1542.2,
+   "desvio_val": 91.4,
+   "mae_train": 1283.3
   },
   {
    "learning_rate": 0.05,
    "max_iter": 200,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 30,
-   "mae_val": 1561.9,
-   "desvio_val": 137.2,
-   "mae_train": 1316.0
+   "mae_val": 1542.5,
+   "desvio_val": 94.5,
+   "mae_train": 1318.7
   },
   {
    "learning_rate": 0.1,
    "max_iter": 100,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 30,
-   "mae_val": 1562.5,
-   "desvio_val": 144.4,
-   "mae_train": 1325.6
-  },
-  {
-   "learning_rate": 0.1,
-   "max_iter": 100,
-   "max_leaf_nodes": 15,
-   "min_samples_leaf": 10,
-   "mae_val": 1564.9,
-   "desvio_val": 136.8,
-   "mae_train": 1277.8
+   "mae_val": 1547.2,
+   "desvio_val": 98.7,
+   "mae_train": 1323.7
   },
   {
    "learning_rate": 0.05,
    "max_iter": 100,
    "max_leaf_nodes": 31,
    "min_samples_leaf": 30,
-   "mae_val": 1588.0,
-   "desvio_val": 147.1,
-   "mae_train": 1301.4
-  },
-  {
-   "learning_rate": 0.05,
-   "max_iter": 100,
-   "max_leaf_nodes": 15,
-   "min_samples_leaf": 10,
-   "mae_val": 1671.8,
-   "desvio_val": 145.3,
-   "mae_train": 1434.2
+   "mae_val": 1560.4,
+   "desvio_val": 94.0,
+   "mae_train": 1311.7
   },
   {
    "learning_rate": 0.05,
    "max_iter": 100,
    "max_leaf_nodes": 15,
    "min_samples_leaf": 30,
-   "mae_val": 1680.4,
-   "desvio_val": 138.5,
-   "mae_train": 1460.6
+   "mae_val": 1650.6,
+   "desvio_val": 101.1,
+   "mae_train": 1460.8
+  },
+  {
+   "learning_rate": 0.05,
+   "max_iter": 100,
+   "max_leaf_nodes": 15,
+   "min_samples_leaf": 10,
+   "mae_val": 1650.7,
+   "desvio_val": 102.2,
+   "mae_train": 1440.0
   }
  ],
  "test": {
-  "mae": 1380.304479187223,
-  "rel_mediano": 0.06451812681967505,
+  "mae": 1428.1699412015985,
+  "rel_mediano": 0.06589338145185702,
   "por_tramo": [
    {
     "tramo": "1k–8k",
     "orden": 0,
-    "mae": 607.4553952725618,
-    "rel": 0.07331247217349679
+    "mae": 625.9735257690288,
+    "rel": 0.08019582874045536
    },
    {
     "tramo": "8k–10k",
     "orden": 1,
-    "mae": 738.5459653420423,
-    "rel": 0.06436662010944841
+    "mae": 740.522781779494,
+    "rel": 0.06696726537403945
    },
    {
     "tramo": "10k–13k",
     "orden": 2,
-    "mae": 838.8754339780373,
-    "rel": 0.05661577634870722
+    "mae": 875.2231379964687,
+    "rel": 0.0589179162611827
    },
    {
     "tramo": "13k–19k",
     "orden": 3,
-    "mae": 1248.9938628535504,
-    "rel": 0.057186585211326434
+    "mae": 1205.4946911476886,
+    "rel": 0.05439570396182328
    },
    {
     "tramo": "19k–105k",
     "orden": 4,
-    "mae": 3527.4833400437847,
-    "rel": 0.08051115460332073
+    "mae": 3694.1982406656916,
+    "rel": 0.07600666144321462
    }
   ],
   "sesgo_moneda": {
-   "ARS": 38.185992713684534,
-   "USD": -2928.962981809926
+   "ARS": -20.052312321702292,
+   "USD": -3196.520789588947
   }
  },
  "importancia": [
   {
    "columna": "fabricado_en",
-   "sube_mae": 3150.2017618985647,
-   "desvio": 26.60432955489375
+   "sube_mae": 3102.6610941615036,
+   "desvio": 132.96538206864835
   },
   {
    "columna": "potencia_hp",
-   "sube_mae": 1608.8519316463196,
-   "desvio": 42.90355972313027
+   "sube_mae": 1565.7964129456188,
+   "desvio": 47.651615849728984
   },
   {
    "columna": "marca",
-   "sube_mae": 1167.28661758506,
-   "desvio": 25.545981023295113
+   "sube_mae": 1207.876856056211,
+   "desvio": 33.88662334398515
   },
   {
    "columna": "modelo",
-   "sube_mae": 757.2265975028247,
-   "desvio": 12.65514946934189
+   "sube_mae": 602.0564365917123,
+   "desvio": 15.914105853650247
   },
   {
    "columna": "kilometraje",
-   "sube_mae": 616.105925607166,
-   "desvio": 18.56322630833387
+   "sube_mae": 495.97549473749325,
+   "desvio": 32.08754054393922
   },
   {
    "columna": "transmision",
-   "sube_mae": 364.71454788767846,
-   "desvio": 28.085046411830984
+   "sube_mae": 330.3630746740062,
+   "desvio": 9.425361011273008
   },
   {
    "columna": "motor_lt",
-   "sube_mae": 185.5798462598525,
-   "desvio": 22.26192379963895
+   "sube_mae": 171.7675075243185,
+   "desvio": 22.054713633329243
   },
   {
    "columna": "traccion",
-   "sube_mae": 126.51479039444621,
-   "desvio": 6.8186238752802
+   "sube_mae": 133.09859793796713,
+   "desvio": 6.306294099129477
   },
   {
    "columna": "consumo_lt_100km",
-   "sube_mae": 84.81526538440585,
-   "desvio": 8.703681522635563
+   "sube_mae": 102.04213575263493,
+   "desvio": 6.49688771520135
   },
   {
    "columna": "combustible",
-   "sube_mae": 42.556851221371474,
-   "desvio": 6.0270111527522285
+   "sube_mae": 52.255603672024975,
+   "desvio": 1.4873495400174335
   },
   {
    "columna": "moneda",
@@ -469,83 +469,83 @@
  "columnas_probadas": [
   {
    "variante": "referencia (todas)",
-   "mae": 1492.3153958343705,
-   "desvio": 147.8023507327994,
+   "mae": 1478.336877557141,
+   "desvio": 101.53787208735947,
    "delta": 0.0
   },
   {
    "variante": "sin modelo (sólo marca)",
-   "mae": 1536.566520377693,
-   "desvio": 155.7386437154075,
-   "delta": 44.251124543322476
+   "mae": 1535.1164869257573,
+   "desvio": 110.95007061200863,
+   "delta": 56.77960936861632
   },
   {
    "variante": "sin marca ni modelo",
-   "mae": 1708.2865702678887,
-   "desvio": 153.28262840988154,
-   "delta": 215.97117443351817
+   "mae": 1679.830523678084,
+   "desvio": 114.6576583910683,
+   "delta": 201.49364612094314
   },
   {
    "variante": "sin fabricado_en",
-   "mae": 1932.6734601999822,
-   "desvio": 114.53808474655376,
-   "delta": 440.35806436561165
+   "mae": 1862.2741192464127,
+   "desvio": 121.3076341063383,
+   "delta": 383.9372416892718
   },
   {
    "variante": "sin potencia_hp",
-   "mae": 1572.6309834332244,
-   "desvio": 155.75680228404272,
-   "delta": 80.31558759885388
+   "mae": 1550.8446776240137,
+   "desvio": 115.61359910040089,
+   "delta": 72.50780006687273
   },
   {
    "variante": "sin kilometraje",
-   "mae": 1529.9686607819156,
-   "desvio": 142.2782895699539,
-   "delta": 37.65326494754504
+   "mae": 1512.6130008180346,
+   "desvio": 95.8224742267578,
+   "delta": 34.276123260893655
   },
   {
    "variante": "sin motor_lt",
-   "mae": 1519.979677971068,
-   "desvio": 148.2321345890212,
-   "delta": 27.664282136697466
+   "mae": 1498.3408953108421,
+   "desvio": 94.63702961152283,
+   "delta": 20.00401775370119
   },
   {
    "variante": "sin consumo_lt_100km",
-   "mae": 1504.7904369833498,
-   "desvio": 135.6542529950417,
-   "delta": 12.475041148979244
+   "mae": 1484.8139392976316,
+   "desvio": 93.96212246471381,
+   "delta": 6.477061740490626
   },
   {
    "variante": "sin transmision",
-   "mae": 1506.5682269868116,
-   "desvio": 133.93535899119885,
-   "delta": 14.252831152441104
+   "mae": 1486.048065980987,
+   "desvio": 99.74921692472145,
+   "delta": 7.711188423846124
   },
   {
    "variante": "sin traccion ni combustible",
-   "mae": 1538.3621859370946,
-   "desvio": 139.79257203103322,
-   "delta": 46.04679010272412
+   "mae": 1520.9714491817672,
+   "desvio": 88.6584881776977,
+   "delta": 42.63457162462623
   },
   {
    "variante": "con provincia",
-   "mae": 1499.6588120245688,
-   "desvio": 145.04209585767723,
-   "delta": 7.343416190198241
+   "mae": 1484.3734608448706,
+   "desvio": 98.76287949962602,
+   "delta": 6.036583287729627
   },
   {
    "variante": "con provincia y ciudad",
-   "mae": 1493.8932434208166,
-   "desvio": 154.03767548672909,
-   "delta": 1.5778475864460688
+   "mae": 1485.366259863762,
+   "desvio": 99.50270424535522,
+   "delta": 7.029382306621073
   }
  ],
  "fuga": {
-  "mae_agrupado": 1492.3153958343705,
-  "desvio_agrupado": 147.8023507327994,
-  "mae_azar": 1467.7355192588807,
-  "desvio_azar": 53.84716633857608,
-  "spearman_anio": 0.7628327225261265,
+  "mae_agrupado": 1478.336877557141,
+  "desvio_agrupado": 101.53787208735947,
+  "mae_azar": 1454.449865239128,
+  "desvio_azar": 42.45429040999454,
+  "spearman_anio": 0.7635760968397605,
   "repetidos": 232,
   "vehiculos_train": 6800
  },
@@ -553,26 +553,26 @@
   {
    "avisos_en_train": "0 (nunca visto)",
    "autos_test": 30,
-   "mae": 6637.163026799614,
-   "rel": 0.17436899069459905
+   "mae": 7370.116324631274,
+   "rel": 0.18852345570035833
   },
   {
    "avisos_en_train": "1–9",
-   "autos_test": 158,
-   "mae": 3381.5056147538116,
-   "rel": 0.13481004394987484
+   "autos_test": 164,
+   "mae": 3415.272140793616,
+   "rel": 0.11892343325133749
   },
   {
    "avisos_en_train": "10–49",
-   "autos_test": 518,
-   "mae": 1448.4496005792387,
-   "rel": 0.07007106443295877
+   "autos_test": 498,
+   "mae": 1494.9006920986199,
+   "rel": 0.07343959224401371
   },
   {
    "avisos_en_train": "50+",
-   "autos_test": 1075,
-   "mae": 906.6349826951698,
-   "rel": 0.05664048877949572
+   "autos_test": 1090,
+   "mae": 935.1652933275643,
+   "rel": 0.05788663663185689
   }
  ],
  "depreciacion_anual": 0.07640673246603702,
@@ -722,13 +722,13 @@
   ],
   "kilometraje": [
    0.0,
-   305568.9999999977,
+   300739.99999999977,
    0.0,
    4700000.0
   ],
   "motor_lt": [
    0.0,
-   3.272999999999956,
+   3.2,
    0.0,
    6.4
   ],
@@ -740,7 +740,7 @@
   ],
   "consumo_lt_100km": [
    4.5,
-   12.044999999999892,
+   12.047999999999956,
    1.4,
    541.0
   ]
