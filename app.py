@@ -756,16 +756,17 @@ with tab_exp:
               help="Autos publicados más de 10 % por debajo de lo que estima el modelo: posibles oportunidades (o autos con algún problema).")
 
     # Detalle a pedido: al hacer clic en un punto se guarda su fila y abajo aparece la ficha con la tasación del modelo.
-    clic = alt.selection_point(name="auto", fields=["idx"], on="click", empty=False)
+    clic = alt.selection_point(name="auto", fields=["idx"], on="click", nearest=True, empty=False)
     dd = d.reset_index(names="idx")
-    jitter = alt.Chart(dd).transform_calculate(anio_j="datum.fabricado_en + (random() - 0.5) * 0.7")
-    disp = jitter.mark_circle(size=28, opacity=0.65).encode(
+    # Desplazamiento horizontal fijo por auto (no al azar en cada dibujo): así los puntos no se mueven entre un clic y otro.
+    dd["anio_j"] = dd["fabricado_en"] + (((dd["idx"] * 2654435761) % 1000) / 1000 - 0.5) * 0.7
+    disp = alt.Chart(dd).mark_circle(size=36, opacity=0.65).encode(
         x=alt.X("anio_j:Q", title="Año de fabricación", axis=alt.Axis(format="d"),
                 scale=alt.Scale(domain=[rango_anio[0] - 0.5, rango_anio[1] + 0.5])),
         y=alt.Y("precio_usd:Q", scale=ESCALA_PRECIO, axis=eje("Precio publicado (USD, escala log)", MARCAS_PRECIO)),
         color=alt.Color("veredicto:N", scale=ESCALA_VEREDICTO, title=None,
                         legend=alt.Legend(orient="top")),
-        size=alt.condition(clic, alt.value(160), alt.value(28)),
+        size=alt.condition(clic, alt.value(160), alt.value(36)),
         tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("version:N", title="Versión"),
                  alt.Tooltip("fabricado_en:Q", title="Año"),
                  alt.Tooltip("kilometraje:Q", title="Km", format=",.0f"),

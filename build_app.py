@@ -25,7 +25,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import (GridSearchCV, GroupKFold, GroupShuffleSplit, KFold,
                                      cross_val_predict, cross_validate)
 
-import geocodificar as G
+import coordenadas as geo_coords
 import tasador as T
 
 AQUI = Path(__file__).parent
@@ -251,11 +251,9 @@ def main(ruta_datos: str, sin_api: bool = False):
     # con cuántos autos hay y el precio mediano. También las provincias simplificadas para dibujar el contorno.
     ub = (info.groupby("ubicacion_c").agg(autos=("precio_usd", "size"), mediana_usd=("precio_usd", "median"))
           .reset_index().rename(columns={"ubicacion_c": "ubicacion_corregida"}))
-    # Coordenadas: geocodificar.py pide a la API (Nominatim) las ubicaciones que todavía no están en
-    # data/ubicaciones_coordenadas.csv y las guarda ahí; las demás salen de esa tabla.
-    prov_de = info.groupby("ubicacion_c")["provincia"].first().to_dict()
-    coords = G.completar_coordenadas(prov_de, AQUI / "data" / "ubicaciones_coordenadas.csv",
-                                     AQUI / "data" / "provincias.geojson", consultar_api=not sin_api)
+    # Coordenadas: coordenadas.py usa las de data/ubicaciones_coordenadas.csv y, para las ubicaciones nuevas, las pide a la
+    # API oficial Georef (departamento -> localidad cabecera) y las capitales a Wikidata; sin red, el centro de la provincia.
+    coords = geo_coords.obtener(ub["ubicacion_corregida"], T.provincia_de, usar_api=not sin_api)
     ub = ub.merge(coords, on="ubicacion_corregida", how="left")
     ub["mediana_usd"] = ub["mediana_usd"].round(0)
     n_sin_coordenadas = int(ub["latitud"].isna().sum())

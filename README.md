@@ -29,7 +29,7 @@ DeRuedas (HTML)    ───┘                                                 
 | `notebooks/entrega3_modelo.ipynb` | Análisis y modelo (Entregas 2 y 3), el mismo Colab que se presentó |
 | `tasador.py` | Limpieza y `Pipeline` de scikit-learn, idénticos al notebook. Lo usan `build_app.py` y la app |
 | `build_app.py` | Toma el CSV del pipeline, entrena el modelo con semilla 42 y genera `app_data/` |
-| `geocodificar.py` | Pide a la API de Nominatim (OpenStreetMap) las coordenadas de las ubicaciones nuevas del CSV. `build_app.py` lo llama solo |
+| `coordenadas.py` | Pide las coordenadas de las ubicaciones nuevas a la API oficial Georef (apis.datos.gob.ar) y las capitales a Wikidata. `build_app.py` lo llama solo |
 | `data/ubicaciones_coordenadas.csv`, `data/provincias.geojson` | Coordenadas ya obtenidas (caché de la API) y contorno de las provincias para el mapa |
 | `app_data/` | Lo que lee la app: `modelo.joblib`, `autos.csv` (cada auto con su tasación), `ubicaciones.csv` (datos del mapa) y `metricas.json` |
 | `app.py` | La aplicación de Streamlit |
@@ -100,11 +100,13 @@ python build_app.py --datos pipeline/include/output/silver/final_AAAA-MM-DD.csv
 Sin `--datos` usa `data/dataset.csv`. Repite la misma limpieza, la misma partición (semilla 42), la comparación de
 modelos, la grilla de 32 combinaciones, el test y la importancia, y reescribe `app_data/`. Tarda unos minutos.
 
-**Mapa.** `build_app.py` llama a `geocodificar.py`, que toma las `ubicacion_corregida` del CSV, busca cuáles no están en
-`data/ubicaciones_coordenadas.csv` y le pide la latitud y longitud de cada una a Nominatim (1 consulta por segundo). Acepta el
-resultado sólo si cae dentro de su provincia; si no responde la API o el punto cae afuera, usa el centro de la provincia y la
-ubicación queda como *aproximada* (el cartel del mapa lo avisa). Las respuestas de la API quedan guardadas en esa tabla, así
-cada ciudad se pide una sola vez. Con `--sin-api` no se consulta nada (por ejemplo, sin internet).
+**Mapa.** `build_app.py` llama a `coordenadas.py`: toma las `ubicacion_corregida` del CSV, busca cuáles no están en
+`data/ubicaciones_coordenadas.csv` y las pide a Georef, la API oficial de georreferenciación de Argentina. Como DeRuedas
+publica el departamento ("Mendoza, Godoy Cruz"), busca el departamento y su localidad cabecera; "Provincia, Capital" se
+resuelve con la capital de Wikidata. Cada punto tiene que caer dentro de su provincia; si la API no responde o no lo
+encuentra, usa el centro de la provincia y lo marca como aproximado (el cartel lo avisa). Lo que trae la API queda en esa
+tabla, así cada lugar se pide una sola vez. Con `--sin-api` no consulta nada. No hay coordenadas ni nombres escritos en el
+código. No se usa Nominatim porque ubica los departamentos en la capital de la provincia.
 Después se suben los cambios a GitHub y Streamlit Cloud vuelve a publicar la app solo.
 
 Las versiones de `requirements.txt` están fijas a propósito: con otras versiones de scikit-learn o de numpy el boosting da
