@@ -699,16 +699,26 @@ with tab_probar:
                             value=float(np.clip(round(tipico("motor_lt", 1.6), 1), 0.6, R["motor_lt"][3])), step=0.1, format="%.1f")
     hp = c4.number_input("Potencia (HP)", min_value=40.0, max_value=float(R["potencia_hp"][3]),
                          value=float(np.clip(round(tipico("potencia_hp", 110)), 40, R["potencia_hp"][3])), step=5.0, format="%.0f")
-    caja_p = c5.selectbox("Caja", ["Automática", "Manual"],
-                          index=0 if (ref_m["caja"] == "automatico").mean() > 0.5 else 1)
+    # Los desplegables de caja, combustible y tracción ofrecen sólo lo que aparece en los avisos de ESE modelo
+    # (una Amarok sólo se ofrece diésel, no nafta). Con 20 avisos o más se ignora lo que aparece en menos del 3 %
+    # (errores de carga). Si el modelo no tiene dato de alguna, se ofrecen todas.
+    def disponibles(col, mapa):
+        vc = ref_m[col].dropna().value_counts()
+        if len(ref_m) >= 20:
+            vc = vc[vc / len(ref_m) >= 0.03]
+        pres = [k for k, v in mapa.items() if v in vc.index]
+        return (pres or list(mapa)), vc
+
+    CAJAS_P = {"Automática": "automatico", "Manual": "manual"}
+    cajas_ok, vc_caja = disponibles("caja", CAJAS_P)
+    caja_p = c5.selectbox("Caja", cajas_ok, index=cajas_ok.index(next((k for k, v in CAJAS_P.items() if len(vc_caja) and v == vc_caja.index[0] and k in cajas_ok), cajas_ok[0])))
     comb_opts = {"Diésel": "diesel", "Eléctrico": "electrico", "GNC": "gnc", "Híbrido": "hibrido", "Nafta": "nafta"}  # A-Z
-    comb_moda = ref_m["comb"].mode()
-    comb_def = list(comb_opts.values()).index(comb_moda.iloc[0]) if len(comb_moda) and comb_moda.iloc[0] in comb_opts.values() else 0
-    comb = c6.selectbox("Combustible", list(comb_opts.keys()), index=comb_def)
+    combs_ok, vc_comb = disponibles("comb", comb_opts)
+    comb = c6.selectbox("Combustible", combs_ok, index=combs_ok.index(next((k for k, v in comb_opts.items() if len(vc_comb) and v == vc_comb.index[0] and k in combs_ok), combs_ok[0])))
     TRACS = {"Delantera": "delantera", "Trasera": "trasera", "4x4": "4x4"}
-    trac_moda = ref_m["trac"].mode()
-    trac_def = list(TRACS.values()).index(trac_moda.iloc[0]) if len(trac_moda) and trac_moda.iloc[0] in TRACS.values() else 0
-    trac = c_c.selectbox("Tracción", list(TRACS), index=trac_def)
+    tracs_ok, vc_trac = disponibles("trac", TRACS)
+    trac = c_c.selectbox("Tracción", tracs_ok, index=tracs_ok.index(next((k for k, v in TRACS.items() if len(vc_trac) and v == vc_trac.index[0] and k in tracs_ok), tracs_ok[0])))
+    izq.caption("Caja, combustible y tracción: sólo las que aparecen en los avisos de este modelo.")
 
     # El caso nuevo, con las MISMAS columnas que recibió el modelo al entrenar (sin precio). IngenieriaAutos lo limpia
     # igual que a los datos de entrenamiento. Consumo en blanco = el modelo usa la mediana. "moneda" y "clave" son relleno.
