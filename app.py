@@ -395,13 +395,13 @@ u4.markdown(dato(f"{'+' if c_prov['delta'] >= 0 else '−'}{usd(abs(c_prov['delt
 
 
 @st.cache_data
-def cargar_mapa():
+def cargar_mapa(version):   # version = fecha de los archivos: si cambian, se vuelve a leer y no queda un caché viejo
     ub = pd.read_csv(DATA / "ubicaciones.csv")
     geo = json.loads((DATA / "provincias.geojson").read_text(encoding="utf-8"))
     return ub, geo
 
 
-UBIC, GEO = cargar_mapa()
+UBIC, GEO = cargar_mapa((DATA / "ubicaciones.csv").stat().st_mtime_ns + len(list(pd.read_csv(DATA / "ubicaciones.csv", nrows=0).columns)))
 UBIC_OK = UBIC.dropna(subset=["latitud", "longitud"])
 provs = alfabetico(UBIC_OK["provincia"].unique())
 sel_prov = st.multiselect("Provincias en el mapa", provs, placeholder="Todas las provincias")
