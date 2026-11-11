@@ -155,12 +155,12 @@ def dato(valor, etiqueta, color="azul"):
             f'<div class="l">{etiqueta}</div></div>')
 
 
-def sticker(texto, x, y, color=None, align="left", size=13, valor=None):
+def sticker(texto, x, y, color=None, align="left", size=12, valor=None, dx=0):
     """Etiqueta pegada DENTRO de un gráfico. x e y son encodings de Altair (alt.X, alt.value(px)...). Si x es un dato, `valor` es
     su número. Se dibuja dos veces: una con halo blanco (para leerse sobre barras y puntos) y otra encima con el color."""
     base = alt.Chart(pd.DataFrame({"t": [texto], "m": [valor if valor is not None else 0]})).encode(x=x, y=y, text="t:N")
-    kw = dict(align=align, baseline="middle", fontSize=size, fontWeight="bold")
-    return base.mark_text(stroke="white", strokeWidth=5, color="white", **kw) + base.mark_text(color=color or TINTA, **kw)
+    kw = dict(align=align, baseline="middle", fontSize=size, fontWeight="bold", lineBreak="\n", lineHeight=size + 3)
+    return base.mark_text(stroke="white", strokeWidth=5, color="white", dx=dx, **kw) + base.mark_text(color=color or TINTA, dx=dx, **kw)
 
 
 def px(v):
@@ -274,7 +274,7 @@ lg3.markdown(f"**DeRuedas** · {num(M['por_fuente'].get('deruedas', 0))} autos<b
 # Histograma de precios: marca de barras, x = precio en tramos de USD 2.000, y = cantidad de autos (count).
 # Se cortó en USD 80.000 para que se lea; la línea azul punteada es la mediana.
 hist = alt.Chart(AUTOS[AUTOS["precio_usd"] <= 80000]).mark_bar(color=TINTA, opacity=0.85).encode(
-    x=alt.X("precio_usd:Q", bin=alt.Bin(step=2000), axis=eje("Precio publicado (USD), tramos de 2.000")),
+    x=alt.X("precio_usd:Q", bin=alt.Bin(step=2000), axis=eje("Precio publicado (USD)")),
     y=alt.Y("count():Q", axis=eje("Cantidad de autos")),
     tooltip=[alt.Tooltip("precio_usd:Q", bin=alt.Bin(step=2000), title="Desde (USD)", format=",.0f"),
              alt.Tooltip("count():Q", title="Autos")],
@@ -283,10 +283,10 @@ mediana = alt.Chart(pd.DataFrame({"m": [M["precio_mediano"]]})).mark_rule(
     color=AZUL, strokeDash=[4, 4], size=2).encode(x="m:Q")
 g_h, e_h = st.columns([2.2, 1], gap="large")
 p90_regla = alt.Chart(pd.DataFrame({"m": [p90]})).mark_rule(color="#C8602F", strokeDash=[4, 4], size=2).encode(x="m:Q")
-st_med = sticker(f"mitad de los autos: menos de {usd(M['precio_mediano'])}", alt.X("m:Q"), px(14), AZUL, valor=M["precio_mediano"])
-st_p90 = sticker(f"10 % más caro: más de {usd(p90)}", alt.X("m:Q"), px(40), "#C8602F", valor=p90)
+st_med = sticker(f"mitad de los autos:\nmenos de {usd(M['precio_mediano'])}", alt.X("m:Q"), px(20), AZUL, valor=M["precio_mediano"], dx=5)
+st_p90 = sticker(f"10 % más caro:\nmás de {usd(p90)}", alt.X("m:Q"), px(62), "#C8602F", valor=p90, dx=5)
 g_h.altair_chart((hist + mediana + p90_regla + st_med + st_p90).properties(
-    height=340, title=alt.TitleParams(f"{num(N_AUTOS)} autos usados, ya limpios (cortado en USD 80.000)", anchor="start", fontSize=13, color="#555")), width="stretch")
+    height=340, title=alt.TitleParams(f"{num(N_AUTOS)} autos (hasta USD 80.000)", anchor="start", fontSize=13, color="#555")), width="stretch")
 e_h.markdown(explica(
     "Cada barra cuenta cuántos autos cuestan entre dos precios (en tramos de USD 2.000): cuanto más alta, más autos. "
     "La línea punteada marca el precio del medio, la mediana.",
@@ -358,7 +358,7 @@ linea = alt.Chart(por_anio[por_anio["anio"].between(2000, 2026)]).mark_line(
              alt.Tooltip("autos:Q", title="Autos")],
 )
 g_a, e_a = st.columns([2.2, 1], gap="large")
-st_dep = sticker(f"−{num(dep * 100)} % por año: un año más viejo vale ~{num(dep * 100)} % menos", alt.value(14), px(16), "#C8602F")
+st_dep = sticker(f"−{num(dep * 100)} % por año:\nun año más viejo vale ~{num(dep * 100)} % menos", px(10), px(20), "#C8602F")
 g_a.altair_chart((puntos + linea + st_dep).properties(height=380), width="stretch")
 e_a.markdown(explica(
     "Cada punto gris es un auto: cuanto más a la derecha, más nuevo; cuanto más arriba, más caro. "
@@ -520,9 +520,10 @@ por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().
 barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     y=alt.Y("provincia:N", sort="-x", title=None, axis=alt.Axis(labelOverlap=False)), x=alt.X("autos:Q", title="Autos publicados"),
     tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
-st_prov = sticker(f"{num(UB['pct_top_provincias'] * 100, 0)} % de los autos: Mendoza, Córdoba y Buenos Aires", px(190), px(150), "#C8602F", size=12)
-st_eta = sticker(f"la provincia explica {num(UB['eta2_provincia'] * 100, 1)} % del precio (la marca, {num(UB['eta2_marca'] * 100, 0)} %)", px(190), px(172), AZUL, size=12)
-col_barras.altair_chart((barras + st_prov + st_eta).properties(height=250, title="Autos por provincia"), width="stretch")
+col_barras.altair_chart(barras.properties(height=260, padding={"right": 20}, title=alt.TitleParams(
+    "Autos por provincia", subtitle=[f"{num(UB['pct_top_provincias'] * 100, 0)} % de los autos: Mendoza, Córdoba y Buenos Aires",
+                                     f"La provincia explica {num(UB['eta2_provincia'] * 100, 1)} % del precio (la marca, {num(UB['eta2_marca'] * 100, 0)} %)"],
+    subtitleColor="#555", anchor="start")), width="stretch")
 col_barras.markdown(LEYENDA, unsafe_allow_html=True)
 col_barras.caption(f"Cada círculo es una ciudad: pasá el mouse para ver sus autos. {int(UBIC['aproximada'].sum())} ciudades chicas tienen ubicación aproximada (cabecera del departamento o centro de la provincia).")
 st.markdown(
@@ -589,7 +590,7 @@ Provincia ({num(UB['eta2_provincia'] * 100, 1)} %) y ciudad ({num(UB['eta2_ciuda
                  alt.Tooltip("mediana_usd:Q", title="Mediana (USD)", format=",.0f")])
     t_c = b_c.mark_text(align="left", dx=3, color="#3d3d3a").encode(text=alt.Text("mediana_usd:Q", format="$,.0f"))
     r_c = alt.Chart(pd.DataFrame({"m": [med_glob]})).mark_rule(color=NARANJA, strokeDash=[5, 3], size=2).encode(x="m:Q")
-    st.altair_chart((b_c + t_c + r_c).properties(height=260, title=f"Precio mediano por ciudad vs. mediana del mercado ({usd(med_glob)})"),
+    st.altair_chart((b_c + t_c + r_c).properties(height=260, title=f"Mediana por ciudad vs. mercado ({usd(med_glob)})"),
                     width="stretch")
     st.caption("Las ciudades grandes quedan cerca de la mediana global: la localización no introduce diferencias sistemáticas en el precio.")
     st.markdown("**La tabla completa de las pruebas** (error medio de validación cruzada; Δ = cuánto sube respecto de la referencia):")
@@ -629,18 +630,18 @@ comp["tipo"] = np.where(comp["modelo"] == "HistGradientBoosting ajustado", "Eleg
                         np.where(comp["modelo"] == "Piso (mediana)", "Piso", "Probado"))
 comp["lo"], comp["hi"] = comp["mae"] - comp["desvio"], comp["mae"] + comp["desvio"]
 comp["txt"] = comp["mae"].map(usd)
-comp.loc[comp["modelo"] == "HistGradientBoosting ajustado", "txt"] = f"{usd(AJ['mae'])} en validación · {usd(TEST['mae'])} en test"
+comp.loc[comp["modelo"] == "HistGradientBoosting ajustado", "txt"] = f"{usd(AJ['mae'])} validación\n{usd(TEST['mae'])} test"
 comp["nombre"] = comp["modelo"].map(NOMBRES)
 orden = list(comp.sort_values("mae", ascending=False)["nombre"])
 escala_tipo = alt.Scale(domain=["Piso", "Probado", "Elegido"], range=[GRIS, "#a9c8ee", AZUL])
 base = alt.Chart(comp).encode(y=alt.Y("nombre:N", sort=orden, title=None, axis=alt.Axis(labelLimit=260)))
 barras = base.mark_bar().encode(
-    x=alt.X("mae:Q", axis=eje("Error promedio en validación cruzada por vehículo (USD, ± 1 desvío)")),
+    x=alt.X("mae:Q", scale=alt.Scale(domain=[0, 8800]), axis=eje("Error en validación (USD, ± 1 desvío)")),
     color=alt.Color("tipo:N", scale=escala_tipo, legend=None),
     tooltip=[alt.Tooltip("nombre:N", title="Modelo"), alt.Tooltip("mae:Q", title="MAE", format=",.0f"),
              alt.Tooltip("desvio:Q", title="Desvío", format=",.0f")])
 bigotes = base.mark_rule(color=TINTA).encode(x="lo:Q", x2="hi:Q")
-textos = base.mark_text(align="left", dx=8, color=TINTA).encode(x="hi:Q", text="txt:N")
+textos = base.mark_text(align="left", dx=8, color=TINTA, lineBreak="\n").encode(x="hi:Q", text="txt:N")
 g_c, e_c = st.columns([2.2, 1], gap="large")
 g_c.altair_chart((barras + bigotes + textos).properties(height=260), width="stretch")
 e_c.markdown(explica(
@@ -686,7 +687,7 @@ mae_p, dentro_p, r2l_p = resumen_rp(en_pesos)
 mae_d, dentro_d, r2l_d = resumen_rp(en_dolares)
 g_r, e_r = st.columns([2.2, 1], gap="large")
 def txt_rp(df):
-    return f"{num(len(df))} autos · error USD {num(float((df['precio_usd'] - df['tasacion_usd']).abs().mean()))} · sesgo USD {num(float((df['tasacion_usd'] - df['precio_usd']).mean()))}"
+    return f"{num(len(df))} autos\nerror USD {num(float((df['precio_usd'] - df['tasacion_usd']).abs().mean()))} · sesgo USD {num(float((df['tasacion_usd'] - df['precio_usd']).mean()))}"
 
 
 g_r.altair_chart(real_vs_predicho(en_pesos, "#2f6fc0", "Avisos publicados en pesos", txt_rp(en_pesos)), width="stretch")
@@ -795,7 +796,7 @@ de categorías, imputación, escalado, `TargetEncoder` y logaritmo del objetivo)
     imp = imp.reset_index(drop=True)
     notas = alt.Chart(pd.DataFrame({"columna": [imp["columna"].iloc[0]], "v": [imp["sube_mae"].iloc[0]],
                                     "t": [f"+{usd(imp['sube_mae'].iloc[0])}: lo que más pesa"]})).mark_text(
-        align="left", dx=6, fontWeight="bold", color="#C8602F").encode(y=alt.Y("columna:N", sort=list(imp["columna"])), x="v:Q", text="t:N")
+        align="right", dx=-6, fontWeight="bold", color="white").encode(y=alt.Y("columna:N", sort=list(imp["columna"])), x="v:Q", text="t:N")
     st.altair_chart((g_imp + notas).properties(height=26 * len(imp)), width="stretch")
     st.caption(f"Si se desordena el año, el error en test sube {usd(imp['sube_mae'].iloc[0])}: es lo que más usa el modelo, "
                "igual que lo que mostró la sección anterior.")
