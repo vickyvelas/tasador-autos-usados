@@ -514,6 +514,27 @@ with st.expander("Cómo lo sabemos"):
 3. **¿Hay datos suficientes para separar por lugar?** No: el {num(UB['pct_top_provincias'] * 100, 0)} % de los autos está en
    Mendoza, Córdoba y Buenos Aires, y {UB['sin_coordenadas']} de las {UB['n_ciudades']} ciudades tienen pocos autos y no pudimos ubicarlas en el mapa.
 
+**Gráfico:** el precio mediano de las ciudades con más avisos contra la mediana de todo el mercado (línea naranja).
+""")
+    med_glob = float(AUTOS["precio_usd"].median())
+    top_c = UBIC.nlargest(8, "autos").assign(ciudad=lambda d: d["ubicacion_corregida"].str.replace(", ", " · ", regex=False))
+    b_c = alt.Chart(top_c).mark_bar(color=AZUL).encode(
+        y=alt.Y("ciudad:N", sort="-x", title=None, axis=alt.Axis(labelLimit=220, labelOverlap=False)),
+        x=alt.X("mediana_usd:Q", title="Precio mediano de publicación (USD)", axis=alt.Axis(format="$,.0f")),
+        tooltip=[alt.Tooltip("ciudad:N", title="Ciudad"), alt.Tooltip("autos:Q", title="Autos"),
+                 alt.Tooltip("mediana_usd:Q", title="Mediana (USD)", format=",.0f")])
+    t_c = b_c.mark_text(align="left", dx=3, color="#3d3d3a").encode(text=alt.Text("mediana_usd:Q", format="$,.0f"))
+    r_c = alt.Chart(pd.DataFrame({"m": [med_glob]})).mark_rule(color=NARANJA, strokeDash=[5, 3], size=2).encode(x="m:Q")
+    st.altair_chart((b_c + t_c + r_c).properties(height=260, title=f"Precio mediano por ciudad vs. mediana del mercado ({usd(med_glob)})"),
+                    width="stretch")
+    st.caption("Las ciudades grandes quedan cerca de la mediana global: la localización no introduce diferencias sistemáticas en el precio.")
+    st.markdown("**La tabla completa de las pruebas** (error medio de validación cruzada; Δ = cuánto sube respecto de la referencia):")
+    tabla_cp = pd.DataFrame(M["columnas_probadas"]).rename(columns={"variante": "Variante", "mae": "MAE (USD)",
+                                                                    "desvio": "Desvío", "delta": "Δ vs referencia"})
+    tabla_cp["Δ en desvíos"] = tabla_cp["Δ vs referencia"] / CPV["referencia (todas)"]["desvio"]
+    st.dataframe(tabla_cp.style.format({"MAE (USD)": "{:,.1f}", "Desvío": "{:,.1f}", "Δ vs referencia": "{:,.1f}", "Δ en desvíos": "{:,.1f}"}),
+                 hide_index=True, width="stretch")
+    st.markdown(f"""
 **Decisión:** la ubicación no entra al modelo. Las ciudades tienen precios medianos parecidos y lo que cambia el precio es qué auto es.
 Las coordenadas del mapa son aproximadas (por ciudad) y están en `app_data/ubicaciones.csv`; el η² y las pruebas con provincia y ciudad se calculan en `build_app.py`.
 """)
