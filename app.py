@@ -532,32 +532,33 @@ with st.expander("Ejemplos: el mismo auto en distintas provincias"):
     st.markdown("Elegí un auto con su año y mirá cuánto cuesta publicado en cada provincia. Si la ubicación importara, las barras "
                 "cambiarían mucho de una provincia a otra; si no, quedan parecidas (lo que sí cambia de un aviso a otro es el kilometraje o la versión).")
     ej = AUTOS.dropna(subset=["provincia"]).groupby(["marca", "modelo", "fabricado_en", "provincia"]).agg(
-        autos=("precio_usd", "size"), mediana=("precio_usd", "median"), km=("kilometraje", "median")).reset_index()
-    ej = ej[ej["autos"] >= 2]
+        autos=("precio_usd", "size"), mediana=("precio_usd", "median"), p25=("precio_usd", lambda v: v.quantile(0.25)),
+        p75=("precio_usd", lambda v: v.quantile(0.75)), km=("kilometraje", "median")).reset_index()
+    ej = ej[ej["autos"] >= 4]   # sólo provincias con al menos 4 avisos de ese auto y año
     cobertura = ej.groupby(["marca", "modelo", "fabricado_en"]).agg(provs=("provincia", "nunique"), autos=("autos", "sum")).reset_index()
-    cobertura = cobertura[cobertura["provs"] >= 3].sort_values(["provs", "autos"], ascending=False).head(12)
+    cobertura = cobertura[cobertura["provs"] >= 3].sort_values("autos", ascending=False)
     if cobertura.empty:
-        st.info("Todavía no hay un auto con al menos 2 avisos en 3 provincias distintas.")
+        st.info("Todavía no hay un auto con al menos 4 avisos en 3 provincias distintas.")
     else:
-        cobertura["etiqueta"] = cobertura.apply(lambda r: f"{r['marca']} {r['modelo']} {int(r['fabricado_en'])} ({int(r['provs'])} provincias, {int(r['autos'])} autos)", axis=1)
+        cobertura["etiqueta"] = cobertura.apply(lambda r: f"{r['marca']} {r['modelo']} {int(r['fabricado_en'])} ({int(r['autos'])} autos)", axis=1)
         elegida = st.selectbox("Auto de ejemplo", list(cobertura["etiqueta"]))
         c = cobertura[cobertura["etiqueta"] == elegida].iloc[0]
         d_ej = ej[(ej["marca"] == c["marca"]) & (ej["modelo"] == c["modelo"]) & (ej["fabricado_en"] == c["fabricado_en"])].sort_values("mediana")
-        gb = alt.Chart(d_ej).mark_bar(color=AZUL).encode(
-            y=alt.Y("provincia:N", sort="-x", title=None, axis=alt.Axis(labelLimit=200)),
-            x=alt.X("mediana:Q", title="Precio mediano publicado (USD)", scale=alt.Scale(domain=[0, float(d_ej["mediana"].max()) * 1.25]),
-                    axis=alt.Axis(format="$,.0f")),
-            tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Avisos"),
-                     alt.Tooltip("mediana:Q", title="Mediana (USD)", format=",.0f"), alt.Tooltip("km:Q", title="Km mediano", format=",.0f")])
-        tx = gb.mark_text(align="left", dx=4, color=TINTA).encode(text=alt.Text("mediana:Q", format="$,.0f"))
-        st.altair_chart((gb + tx).properties(height=40 * len(d_ej) + 40), width="stretch")
         dif = (d_ej["mediana"].max() / d_ej["mediana"].min() - 1) * 100
+        ye = alt.Y("provincia:N", sort="-x", title=None, axis=alt.Axis(labelLimit=200))
+        xe = alt.X("p25:Q", title="Precio publicado (USD): punto = mediana, barra = de p25 a p75", scale=alt.Scale(zero=False),
+                   axis=alt.Axis(format="$,.0f"))
+        tip = [alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Avisos"),
+               alt.Tooltip("mediana:Q", title="Mediana (USD)", format=",.0f"), alt.Tooltip("km:Q", title="Km mediano", format=",.0f")]
+        rango = alt.Chart(d_ej).mark_rule(color=GRIS, strokeWidth=6).encode(y=ye, x=xe, x2="p75:Q", tooltip=tip)
+        punto = alt.Chart(d_ej).mark_circle(color=AZUL, size=160).encode(y=ye, x=alt.X("mediana:Q", scale=alt.Scale(zero=False)), tooltip=tip)
+        st.altair_chart((rango + punto + sticker(f"diferencia entre provincias: {num(dif)} %", px(8), px(10), "#C8602F", size=12)).properties(
+            height=60 * len(d_ej) + 50), width="stretch")
         st.dataframe(d_ej.rename(columns={"provincia": "Provincia", "autos": "Avisos", "mediana": "Precio mediano (USD)", "km": "Km mediano"})
                      [["Provincia", "Avisos", "Precio mediano (USD)", "Km mediano"]].style.format(
                          {"Precio mediano (USD)": "{:,.0f}", "Km mediano": "{:,.0f}"}), hide_index=True, width="stretch")
-        st.caption(f"De la provincia más barata a la más cara hay {num(dif)} % de diferencia en este ejemplo. Son pocos avisos por provincia, así que "
-                   "parte de la diferencia es azar o kilometraje: a nivel general, la provincia explica "
-                   f"sólo {num(UB['eta2_provincia'] * 100, 1)} % del precio.")
+        st.caption(f"Las diferencias son del orden del error del tasador (± {num(TEST['rel_mediano'] * 100, 1)} %) y se explican más por los km que por el lugar. "
+                   f"A nivel general, la provincia explica sólo {num(UB['eta2_provincia'] * 100, 1)} % del precio.")
 with st.expander("Cómo lo sabemos"):
     st.markdown(f"""
 #### Hipótesis H4: descarte de la ubicación geográfica
