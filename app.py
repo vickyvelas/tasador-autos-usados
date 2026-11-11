@@ -417,7 +417,8 @@ t = (mapa_df["mediana_usd"] - UBIC_OK["mediana_usd"].min()) / (UBIC_OK["mediana_
 mapa_df = mapa_df.assign(
     r=(mapa_df["autos"] ** 0.5) * 2500 + 3000,
     rojo=(254 + (181 - 254) * t).round().astype(int), verde=(215 + (96 - 215) * t).round().astype(int),
-    azul=(170 + (58 - 170) * t).round().astype(int), mediana_txt=mapa_df["mediana_usd"].map(usd))
+    azul=(170 + (58 - 170) * t).round().astype(int), mediana_txt=mapa_df["mediana_usd"].map(usd),
+    nota_ubic=mapa_df["aproximada"].map(lambda v: "(ubicación aproximada)" if v else ""))
 capa_prov = pdk.Layer("GeoJsonLayer", GEO, stroked=True, filled=True, get_fill_color=[238, 241, 245],
                      get_line_color=[120, 130, 145], line_width_min_pixels=1)   # sólo Argentina, sin mapa base del mundo
 capa_ciu = pdk.Layer("ScatterplotLayer", mapa_df, get_position=["longitud", "latitud"], get_radius="r",
@@ -496,7 +497,7 @@ barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
 col_barras.altair_chart(barras.properties(height=250, title="Autos por provincia"), width="stretch")
 col_barras.markdown(LEYENDA, unsafe_allow_html=True)
-col_barras.caption(f"Cada círculo es una ciudad: pasá el mouse para ver sus autos. {UB['sin_coordenadas']} ciudades chicas no tienen coordenadas propias y se dibujan en el centro de su provincia.")
+col_barras.caption(f"Cada círculo es una ciudad: pasá el mouse para ver sus autos. {int(UBIC['aproximada'].sum())} ciudades chicas tienen ubicación aproximada (cabecera del departamento o centro de la provincia).")
 st.markdown(
     "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
     "parecidos. Lo que cambia el precio es *qué auto es* (marca, modelo, año), no *dónde* se publica.")
@@ -517,7 +518,7 @@ Provincia ({num(UB['eta2_provincia'] * 100, 1)} %) y ciudad ({num(UB['eta2_ciuda
    {usd(c_prov['mae'])} (+{usd(c_prov['delta'])}) con la provincia y a {usd(c_ciu['mae'])} (+{usd(c_ciu['delta'])}) con provincia y ciudad.
    El ruido de la validación es de ± {usd(CPV['referencia (todas)']['desvio'])}: no mejora, incluso empeora un poco.
 3. **¿Hay datos suficientes para separar por lugar?** No: el {num(UB['pct_top_provincias'] * 100, 0)} % de los autos está en
-   Mendoza, Córdoba y Buenos Aires, y {UB['sin_coordenadas']} de las {UB['n_ciudades']} ciudades tienen pocos autos y las dibujamos en el centro de su provincia.
+   Mendoza, Córdoba y Buenos Aires, y {int(UBIC['aproximada'].sum())} de las {UB['n_ciudades']} ciudades están ubicadas de forma aproximada en el mapa (son departamentos o localidades chicas).
 
 **Gráfico:** el precio mediano de las ciudades con más avisos contra la mediana de todo el mercado (línea naranja).
 """, unsafe_allow_html=True)

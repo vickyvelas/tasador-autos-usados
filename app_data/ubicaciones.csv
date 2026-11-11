@@ -1,10 +1,10 @@
 ubicacion_corregida,autos,mediana_usd,provincia,latitud,longitud,aproximada,mas_publicados,mas_caro,mas_barato
 "Buenos Aires, Almirante Brown",4,8292.0,Buenos Aires,-36.677391,-60.558475,True,Chery Fulwin (1) · USD 7.000<br>Chevrolet Corsa (1) · USD 2.236<br>Ford Focus (1) · USD 9.585,Toyota Etios 2014 · USD 10.096,Chevrolet Corsa 1996 · USD 2.236
 "Buenos Aires, Avellaneda",8,7508.0,Buenos Aires,-34.6615337,-58.3685508,False,Chrysler Neon (1) · USD 3.131<br>Chrysler PT Cruiser (1) · USD 9.500<br>Citroen C3 Aircross (1) · USD 8.000,Honda CRV 2017 · USD 19.000,Chrysler Neon 1999 · USD 3.131
-"Buenos Aires, Ayacucho",1,2556.0,Buenos Aires,-37.1506,-60.0256,True,Renault Clio (1) · USD 2.556,Renault Clio 1995 · USD 2.556,Renault Clio 1995 · USD 2.556
+"Buenos Aires, Ayacucho",1,2556.0,Buenos Aires,-37.153,-58.488,False,Renault Clio (1) · USD 2.556,Renault Clio 1995 · USD 2.556,Renault Clio 1995 · USD 2.556
 "Buenos Aires, Bahía Blanca",1,8307.0,Buenos Aires,-38.7278292,-62.3102038,False,Peugeot 408 (1) · USD 8.307,Peugeot 408 2012 · USD 8.307,Peugeot 408 2012 · USD 8.307
 "Buenos Aires, Berazategui",2,8626.0,Buenos Aires,-34.7907633,-58.2514432,False,Chevrolet Agile (1) · USD 7.668<br>Chevrolet Spin (1) · USD 9.585,Chevrolet Spin 2017 · USD 9.585,Chevrolet Agile 2013 · USD 7.668
-"Buenos Aires, Berisso",1,4984.0,Buenos Aires,-37.1506,-60.0256,True,Fiat Uno Evo (1) · USD 4.984,Fiat Uno Evo 2013 · USD 4.984,Fiat Uno Evo 2013 · USD 4.984
+"Buenos Aires, Berisso",1,4984.0,Buenos Aires,-34.869,-57.883,False,Fiat Uno Evo (1) · USD 4.984,Fiat Uno Evo 2013 · USD 4.984,Fiat Uno Evo 2013 · USD 4.984
 "Buenos Aires, Capital",154,10192.0,Buenos Aires,-34.9205,-57.9536,False,Peugeot 208 (8) · USD 15.450<br>Volkswagen Suran (7) · USD 8.243<br>Ford Focus (5) · USD 10.160,Mercedes Benz Clase SLK 2013 · USD 66.900,Chrysler Neon 1998 · USD 1.789
 "Buenos Aires, Ensenada",1,7029.0,Buenos Aires,-34.8568638,-57.8940982,False,Fiat Punto (1) · USD 7.029,Fiat Punto 2013 · USD 7.029,Fiat Punto 2013 · USD 7.029
 "Buenos Aires, Escobar",3,9585.0,Buenos Aires,-34.3579356,-58.7645942,False,Nissan March (1) · USD 9.585<br>Renault Duster (1) · USD 10.000<br>Renault Sandero (1) · USD 9.265,Renault Duster 2014 · USD 10.000,Renault Sandero 2018 · USD 9.265
@@ -23,16 +23,16 @@ ubicacion_corregida,autos,mediana_usd,provincia,latitud,longitud,aproximada,mas_
 "Buenos Aires, Malvinas Argentinas",3,10799.0,Buenos Aires,-36.677391,-60.558475,True,Chevrolet Tracker (1) · USD 10.799<br>Renault Logan (1) · USD 10.863<br>Renault Sandero (1) · USD 6.390,Renault Logan 2017 · USD 10.863,Renault Sandero 2011 · USD 6.390
 "Buenos Aires, Merlo",1,13163.0,Buenos Aires,-34.6695037,-58.7216326,False,Fiat Cronos (1) · USD 13.163,Fiat Cronos 2023 · USD 13.163,Fiat Cronos 2023 · USD 13.163
 "Buenos Aires, Monte",1,8000.0,Buenos Aires,-36.677391,-60.558475,True,Chevrolet Cruze (1) · USD 8.000,Chevrolet Cruze 2015 · USD 8.000,Chevrolet Cruze 2015 · USD 8.000
-"Buenos Aires, Monte Hermoso",1,12141.0,Buenos Aires,-37.1506,-60.0256,True,Chevrolet Onix (1) · USD 12.141,Chevrolet Onix 2020 · USD 12.141,Chevrolet Onix 2020 · USD 12.141
+"Buenos Aires, Monte Hermoso",1,12141.0,Buenos Aires,-38.984,-61.305,False,Chevrolet Onix (1) · USD 12.141,Chevrolet Onix 2020 · USD 12.141,Chevrolet Onix 2020 · USD 12.141
 "Buenos Aires, Moreno",2,9000.0,Buenos Aires,-33.3142651,-60.2549897,False,Ford Focus (1) · USD 10.000<br>Kia Sorento (1) · USD 8.000,Ford Focus 2015 · USD 10.000,Kia Sorento 2008 · USD 8.000
 "Buenos Aires, Morón",1,2236.0,Buenos Aires,-34.6609361,-58.6449514,False,Chevrolet Monza (1) · USD 2.236,Chevrolet Monza 1992 · USD 2.236,Chevrolet Monza 1992 · USD 2.236
 "Buenos Aires, Necochea",13,14377.0,Buenos Aires,-38.5563756,-58.7383498,False,Chery Tiggo 4 (1) · USD 31.000<br>Chery Tiggo 7 (1) · USD 29.000<br>Chevrolet Aveo (1) · USD 7.987,Toyota Hilux SW4 2025 · USD 59.000,Peugeot 207 2012 · USD 7.540
 "Buenos Aires, Pergamino",2,16981.0,Buenos Aires,-33.9200428,-60.5600152,False,Fiat Cronos (1) · USD 12.300<br>Mercedes Benz Clase A (1) · USD 21.661,Mercedes Benz Clase A 2018 · USD 21.661,Fiat Cronos 2021 · USD 12.300
 "Buenos Aires, Pilar",5,11500.0,Buenos Aires,-34.4760968,-58.8940934,False,Chevrolet Prisma (1) · USD 11.500<br>Ford Fiesta (1) · USD 4.153<br>Honda HR-V (1) · USD 18.000,Nissan Kicks 2022 · USD 20.000,Ford Fiesta 2006 · USD 4.153
-"Buenos Aires, Pinamar",1,12500.0,Buenos Aires,-37.1506,-60.0256,True,Mitsubishi Montero (1) · USD 12.500,Mitsubishi Montero 2001 · USD 12.500,Mitsubishi Montero 2001 · USD 12.500
+"Buenos Aires, Pinamar",1,12500.0,Buenos Aires,-37.11,-56.854,False,Mitsubishi Montero (1) · USD 12.500,Mitsubishi Montero 2001 · USD 12.500,Mitsubishi Montero 2001 · USD 12.500
 "Buenos Aires, Presidente Perón",1,6390.0,Buenos Aires,-35.6291052,-61.3608312,False,Chrysler PT Cruiser (1) · USD 6.390,Chrysler PT Cruiser 2011 · USD 6.390,Chrysler PT Cruiser 2011 · USD 6.390
 "Buenos Aires, Quilmes",6,9585.0,Buenos Aires,-34.7454296,-58.2561817,False,Chevrolet Onix (1) · USD 11.182<br>Chevrolet Prisma (1) · USD 8.307<br>Citroen C3 Aircross (1) · USD 10.863,Ford EcoSport 2018 · USD 15.500,Peugeot 207 2013 · USD 4.792
-"Buenos Aires, San Fernando",1,11500.0,Buenos Aires,-37.1506,-60.0256,True,Chevrolet Onix (1) · USD 11.500,Chevrolet Onix 2018 · USD 11.500,Chevrolet Onix 2018 · USD 11.500
+"Buenos Aires, San Fernando",1,11500.0,Buenos Aires,-34.447,-58.57,False,Chevrolet Onix (1) · USD 11.500,Chevrolet Onix 2018 · USD 11.500,Chevrolet Onix 2018 · USD 11.500
 "Buenos Aires, San Isidro",73,11438.0,Buenos Aires,-34.4945778,-58.5472451,False,Toyota Corolla (7) · USD 13.994<br>Ford EcoSport (4) · USD 11.470<br>Renault Sandero (4) · USD 9.553,Ford Mustang 2025 · USD 97.000,Chevrolet Corsa II 2007 · USD 6.000
 "Buenos Aires, San Miguel",1,3834.0,Buenos Aires,-34.5292824,-58.7194522,False,Ford Ka (1) · USD 3.834,Ford Ka 2011 · USD 3.834,Ford Ka 2011 · USD 3.834
 "Buenos Aires, San Nicolás",1,14058.0,Buenos Aires,-33.3657998,-60.19955,False,Chevrolet Onix (1) · USD 14.058,Chevrolet Onix 2021 · USD 14.058,Chevrolet Onix 2021 · USD 14.058
@@ -40,30 +40,30 @@ ubicacion_corregida,autos,mediana_usd,provincia,latitud,longitud,aproximada,mas_
 "Buenos Aires, Tigre",4,9521.0,Buenos Aires,-34.4194856,-58.5788368,False,Citroen C4 Lounge (1) · USD 12.500<br>Peugeot 207 (1) · USD 6.070<br>Renault Duster (1) · USD 12.141,Citroen C4 Lounge 2018 · USD 12.500,Peugeot 207 2009 · USD 6.070
 "Buenos Aires, Tres de Febrero",3,7668.0,Buenos Aires,-36.677391,-60.558475,True,Chevrolet Corsa (1) · USD 3.300<br>Ford Ka (1) · USD 10.000<br>Renault Duster (1) · USD 7.668,Ford Ka 2019 · USD 10.000,Chevrolet Corsa 2006 · USD 3.300
 "Buenos Aires, Vicente López",8,5655.0,Buenos Aires,-34.5346548,-58.4677309,False,BMW Serie 3 (1) · USD 21.800<br>Chevrolet 400 (1) · USD 5.000<br>Ford Ka (1) · USD 8.000,BMW Serie 3 2016 · USD 21.800,Chevrolet 400 1964 · USD 5.000
-"Buenos Aires, Villa Gesell",1,7500.0,Buenos Aires,-37.1506,-60.0256,True,Subaru Forester (1) · USD 7.500,Subaru Forester 2001 · USD 7.500,Subaru Forester 2001 · USD 7.500
+"Buenos Aires, Villa Gesell",1,7500.0,Buenos Aires,-37.256,-56.968,False,Subaru Forester (1) · USD 7.500,Subaru Forester 2001 · USD 7.500,Subaru Forester 2001 · USD 7.500
 "Buenos Aires, Zárate",1,9904.0,Buenos Aires,-34.1497828,-59.0128397,False,Nissan March (1) · USD 9.904,Nissan March 2017 · USD 9.904,Nissan March 2017 · USD 9.904
 "Catamarca, Capital",1,9904.0,Catamarca,-28.4696,-65.7795,False,Renault Duster (1) · USD 9.904,Renault Duster 2017 · USD 9.904,Renault Duster 2017 · USD 9.904
 "Chaco, Capital",2,8786.0,Chaco,-27.4606,-58.9839,False,Chevrolet Cobalt (1) · USD 6.709<br>Ford EcoSport (1) · USD 10.863,Ford EcoSport 2017 · USD 10.863,Chevrolet Cobalt 2013 · USD 6.709
-"Chaco, Mayor Luis Jorge Fontana",1,13419.0,Chaco,-26.07275,-60.9008,True,Chevrolet Captiva (1) · USD 13.419,Chevrolet Captiva 2017 · USD 13.419,Chevrolet Captiva 2017 · USD 13.419
+"Chaco, Mayor Luis Jorge Fontana",1,13419.0,Chaco,-27.573,-60.715,True,Chevrolet Captiva (1) · USD 13.419,Chevrolet Captiva 2017 · USD 13.419,Chevrolet Captiva 2017 · USD 13.419
 "Corrientes, Capital",1,20000.0,Corrientes,-27.4692,-58.8306,False,Peugeot 2008 (1) · USD 20.000,Peugeot 2008 2023 · USD 20.000,Peugeot 2008 2023 · USD 20.000
 "Corrientes, Monte Caseros",1,20000.0,Corrientes,-30.2501929,-57.6593899,False,Audi A5 (1) · USD 20.000,Audi A5 2008 · USD 20.000,Audi A5 2008 · USD 20.000
-"Córdoba, Calamuchita",1,7668.0,Córdoba,-32.257000000000005,-63.771550000000005,True,Ford Fiesta KD (1) · USD 7.668,Ford Fiesta KD 2016 · USD 7.668,Ford Fiesta KD 2016 · USD 7.668
+"Córdoba, Calamuchita",1,7668.0,Córdoba,-32.069,-64.537,True,Ford Fiesta KD (1) · USD 7.668,Ford Fiesta KD 2016 · USD 7.668,Ford Fiesta KD 2016 · USD 7.668
 "Córdoba, Capital",1666,11438.0,Córdoba,-31.4201,-64.1888,False,Peugeot 208 (64) · USD 12.684<br>Renault Sandero (58) · USD 10.032<br>Fiat Cronos (53) · USD 14.377,BMW Serie 4 2023 · USD 67.000,Renault 19 1994 · USD 958
 "Córdoba, Colón",7,5431.0,Córdoba,-32.144802,-63.80197,True,Renault Clio (2) · USD 5.048<br>Chevrolet Celta (1) · USD 5.431<br>Chevrolet Corsa (1) · USD 1.278,Citroen Basalt 2026 · USD 19.169,Chevrolet Corsa 1997 · USD 1.278
 "Córdoba, General San Martín",2,7029.0,Córdoba,-32.144802,-63.80197,True,Audi A4 (1) · USD 8.946<br>Ford EcoSport (1) · USD 5.112,Audi A4 2006 · USD 8.946,Ford EcoSport 2010 · USD 5.112
 "Córdoba, Ischilín",1,10351.0,Córdoba,-30.4228163,-64.3537171,False,Toyota Corolla (1) · USD 10.351,Toyota Corolla 2011 · USD 10.351,Toyota Corolla 2011 · USD 10.351
 "Córdoba, Punilla",100,12588.0,Córdoba,-31.416514,-64.4858142,False,Ford Ka (5) · USD 7.980<br>Citroen C3 (4) · USD 8.810<br>Ford EcoSport (4) · USD 13.348,Chevrolet Camaro 2014 · USD 64.900,Ford Fiesta 2005 · USD 5.041
 "Córdoba, Río Cuarto",15,9265.0,Córdoba,-33.0930708,-64.3254163,False,Peugeot 308 (2) · USD 9.904<br>Renault Clio (2) · USD 7.859<br>Chevrolet Cruze (1) · USD 15.527,Chevrolet Cruze 2018 · USD 15.527,Chevrolet Agile 2010 · USD 5.176
-"Córdoba, Río Primero",1,8626.0,Córdoba,-32.257000000000005,-63.771550000000005,True,Chevrolet Spin (1) · USD 8.626,Chevrolet Spin 2015 · USD 8.626,Chevrolet Spin 2015 · USD 8.626
+"Córdoba, Río Primero",1,8626.0,Córdoba,-31.152,-63.402,True,Chevrolet Spin (1) · USD 8.626,Chevrolet Spin 2015 · USD 8.626,Chevrolet Spin 2015 · USD 8.626
 "Córdoba, Río Segundo",6,8323.0,Córdoba,-31.6574267,-63.9161883,False,Chevrolet Classic (1) · USD 7.348<br>Fiat Punto (1) · USD 9.297<br>Ford EcoSport (1) · USD 13.674,Ford EcoSport 2018 · USD 13.674,Volkswagen Gol 2008 · USD 4.601
-"Córdoba, San Alberto",1,6901.0,Córdoba,-32.257000000000005,-63.771550000000005,True,Volkswagen Suran (1) · USD 6.901,Volkswagen Suran 2010 · USD 6.901,Volkswagen Suran 2010 · USD 6.901
-"Córdoba, San Justo",4,11981.0,Córdoba,-32.257000000000005,-63.771550000000005,True,Chery Tiggo 5 (1) · USD 10.863<br>Chevrolet Cruze (1) · USD 9.265<br>Nissan Versa (1) · USD 13.099,Renault Captur 2017 · USD 14.058,Chevrolet Cruze 2015 · USD 9.265
+"Córdoba, San Alberto",1,6901.0,Córdoba,-31.715,-65.016,True,Volkswagen Suran (1) · USD 6.901,Volkswagen Suran 2010 · USD 6.901,Volkswagen Suran 2010 · USD 6.901
+"Córdoba, San Justo",4,11981.0,Córdoba,-31.428,-62.083,True,Chery Tiggo 5 (1) · USD 10.863<br>Chevrolet Cruze (1) · USD 9.265<br>Nissan Versa (1) · USD 13.099,Renault Captur 2017 · USD 14.058,Chevrolet Cruze 2015 · USD 9.265
 "Córdoba, Santa María",32,15783.0,Córdoba,-32.144802,-63.80197,True,Peugeot 2008 (3) · USD 26.134<br>Ford Focus (2) · USD 12.585<br>MG ZS (2) · USD 27.668,Renault Boreal 2026 · USD 39.169,Chevrolet Corsa 2005 · USD 3.450
 "Córdoba, Tercero Arriba",11,10000.0,Córdoba,-32.0236819,-64.1963609,False,Chevrolet Cruze (1) · USD 15.016<br>Fiat Cronos (1) · USD 13.738<br>Ford Focus (1) · USD 8.946,Renault Koleos 2018 · USD 21.406,Peugeot 307 2010 · USD 7.029
 "Entre Ríos, Capital",4,10543.0,Entre Ríos,-31.7333,-60.5297,False,Honda HR-V (1) · USD 15.335<br>Peugeot 207 (1) · USD 5.751<br>Renault Logan (1) · USD 4.792,Toyota Corolla 2017 · USD 16.294,Renault Logan 2007 · USD 4.792
-"Entre Ríos, Federación",1,14696.0,Entre Ríos,-32.0989,-59.2868,True,Peugeot 208 (1) · USD 14.696,Peugeot 208 2023 · USD 14.696,Peugeot 208 2023 · USD 14.696
+"Entre Ríos, Federación",1,14696.0,Entre Ríos,-30.986,-57.919,False,Peugeot 208 (1) · USD 14.696,Peugeot 208 2023 · USD 14.696,Peugeot 208 2023 · USD 14.696
 "Entre Ríos, Gualeguaychú",1,10500.0,Entre Ríos,-33.0250778,-58.5229129,False,Audi A3 (1) · USD 10.500,Audi A3 2007 · USD 10.500,Audi A3 2007 · USD 10.500
-"Entre Ríos, Villaguay",1,8500.0,Entre Ríos,-32.0989,-59.2868,True,Peugeot 407 (1) · USD 8.500,Peugeot 407 2009 · USD 8.500,Peugeot 407 2009 · USD 8.500
+"Entre Ríos, Villaguay",1,8500.0,Entre Ríos,-31.868,-59.027,False,Peugeot 407 (1) · USD 8.500,Peugeot 407 2009 · USD 8.500,Peugeot 407 2009 · USD 8.500
 "Jujuy, Capital",2,14377.0,Jujuy,-24.1858,-65.2995,False,Peugeot 408 (1) · USD 7.668<br>Renault Duster (1) · USD 21.086,Renault Duster 2024 · USD 21.086,Peugeot 408 2015 · USD 7.668
 "Mendoza, Capital",1149,10224.0,Mendoza,-32.8895,-68.8458,False,Peugeot 208 (50) · USD 12.780<br>Renault Sandero (34) · USD 10.096<br>Ford EcoSport (33) · USD 9.904,Audi RS3 2025 · USD 130.000,Renault 11 1989 · USD 1.597
 "Mendoza, General Alvear",13,12460.0,Mendoza,-34.9738431,-67.684383,False,Audi A4 (1) · USD 23.000<br>Chevrolet Cruze (1) · USD 14.058<br>Fiat Cronos (1) · USD 12.460,Toyota Camry 2018 · USD 37.000,Peugeot 207 2013 · USD 6.709
@@ -84,39 +84,39 @@ ubicacion_corregida,autos,mediana_usd,provincia,latitud,longitud,aproximada,mas_
 "Mendoza, Tunuyán",34,9105.0,Mendoza,-33.5856358,-69.0199798,False,Chevrolet Cruze (2) · USD 8.946<br>Toyota Etios (2) · USD 11.182<br>Volkswagen Gol Trend (2) · USD 7.636,Hyundai H1 2016 · USD 32.000,Chevrolet Corsa 1999 · USD 2.875
 "Mendoza, Tupungato",24,11342.0,Mendoza,-33.3686033,-69.1459598,False,Ford EcoSport (3) · USD 7.668<br>Chevrolet Spin (2) · USD 19.489<br>Volkswagen Gol Trend (2) · USD 11.885,Toyota Hilux SW4 2013 · USD 28.754,Renault Symbol 2009 · USD 4.473
 "Misiones, Capital",2,15176.0,Misiones,-27.3671,-55.8961,False,Chevrolet Tracker (1) · USD 17.252<br>Peugeot 208 (1) · USD 13.099,Chevrolet Tracker 2023 · USD 17.252,Peugeot 208 2023 · USD 13.099
-"Misiones, Oberá",1,5815.0,Misiones,-26.8289,-54.8464,True,Chevrolet Aveo (1) · USD 5.815,Chevrolet Aveo 2012 · USD 5.815,Chevrolet Aveo 2012 · USD 5.815
-"Misiones, San Ignacio",1,15974.0,Misiones,-26.8289,-54.8464,True,Citroen C4 Cactus (1) · USD 15.974,Citroen C4 Cactus 2019 · USD 15.974,Citroen C4 Cactus 2019 · USD 15.974
+"Misiones, Oberá",1,5815.0,Misiones,-27.485,-55.12,False,Chevrolet Aveo (1) · USD 5.815,Chevrolet Aveo 2012 · USD 5.815,Chevrolet Aveo 2012 · USD 5.815
+"Misiones, San Ignacio",1,15974.0,Misiones,-27.258,-55.539,False,Citroen C4 Cactus (1) · USD 15.974,Citroen C4 Cactus 2019 · USD 15.974,Citroen C4 Cactus 2019 · USD 15.974
 "Neuquén, Confluencia",6,9105.0,Neuquén,-38.9526392,-68.026023,False,Chevrolet Prisma (1) · USD 6.070<br>Citroen C4 Picasso (1) · USD 11.821<br>Kia Cerato (1) · USD 17.500,Toyota Corolla 2025 · USD 25.559,Peugeot 307 2007 · USD 5.176
-"Neuquén, Los Lagos",1,7029.0,Neuquén,-38.605,-69.98155,True,Peugeot 308 (1) · USD 7.029,Peugeot 308 2014 · USD 7.029,Peugeot 308 2014 · USD 7.029
+"Neuquén, Los Lagos",1,7029.0,Neuquén,-40.762,-71.646,True,Peugeot 308 (1) · USD 7.029,Peugeot 308 2014 · USD 7.029,Peugeot 308 2014 · USD 7.029
 "Neuquén, Lácar",2,7641.0,Neuquén,-40.1352663,-71.2924867,False,Chevrolet Classic (1) · USD 8.882<br>Honda Civic (1) · USD 6.400,Chevrolet Classic 2015 · USD 8.882,Honda Civic 2006 · USD 6.400
-"Neuquén, Pehuenches",1,18000.0,Neuquén,-38.605,-69.98155,True,Volkswagen Vento (1) · USD 18.000,Volkswagen Vento 2012 · USD 18.000,Volkswagen Vento 2012 · USD 18.000
+"Neuquén, Pehuenches",1,18000.0,Neuquén,-37.39,-68.93,True,Volkswagen Vento (1) · USD 18.000,Volkswagen Vento 2012 · USD 18.000,Volkswagen Vento 2012 · USD 18.000
 "Río Negro, Bariloche",1,2236.0,Río Negro,-41.1507675,-71.2977284,False,Fiat Uno (1) · USD 2.236,Fiat Uno 1997 · USD 2.236,Fiat Uno 1997 · USD 2.236
-"Salta, Anta",1,10224.0,Salta,-24.2078,-65.45555,True,Toyota Etios (1) · USD 10.224,Toyota Etios 2018 · USD 10.224,Toyota Etios 2018 · USD 10.224
+"Salta, Anta",1,10224.0,Salta,-25.12,-64.13,True,Toyota Etios (1) · USD 10.224,Toyota Etios 2018 · USD 10.224,Toyota Etios 2018 · USD 10.224
 "Salta, Capital",19,15016.0,Salta,-24.7821,-65.4232,False,Volkswagen Virtus (2) · USD 17.380<br>Chevrolet Captiva (1) · USD 10.799<br>Chevrolet Spin (1) · USD 15.272,Nissan X-Trail 2024 · USD 37.700,Volkswagen UP 2015 · USD 7.029
-"San Juan, Angaco",1,19169.0,San Juan,-30.50675,-68.61545000000001,True,Toyota Hilux SW4 (1) · USD 19.169,Toyota Hilux SW4 2008 · USD 19.169,Toyota Hilux SW4 2008 · USD 19.169
-"San Juan, Calingasta",1,5111.0,San Juan,-30.50675,-68.61545000000001,True,Chevrolet Classic (1) · USD 5.111,Chevrolet Classic 2013 · USD 5.111,Chevrolet Classic 2013 · USD 5.111
+"San Juan, Angaco",1,19169.0,San Juan,-31.425,-68.4,True,Toyota Hilux SW4 (1) · USD 19.169,Toyota Hilux SW4 2008 · USD 19.169,Toyota Hilux SW4 2008 · USD 19.169
+"San Juan, Calingasta",1,5111.0,San Juan,-31.33,-69.42,True,Chevrolet Classic (1) · USD 5.111,Chevrolet Classic 2013 · USD 5.111,Chevrolet Classic 2013 · USD 5.111
 "San Juan, Capital",325,14696.0,San Juan,-31.5375,-68.5364,False,Toyota Corolla (21) · USD 15.335<br>Toyota Yaris (13) · USD 22.300<br>Peugeot 208 (12) · USD 13.578,Mercedes Benz Clase C 2026 · USD 115.000,Chevrolet Corsa II 2006 · USD 4.409
 "San Juan, Caucete",2,7821.0,San Juan,-31.5877833,-67.6612481,False,Chevrolet Prisma (1) · USD 9.585<br>Renault Clio (1) · USD 6.058,Chevrolet Prisma 2018 · USD 9.585,Renault Clio 2011 · USD 6.058
-"San Juan, Chimbas",2,8147.0,San Juan,-30.50675,-68.61545000000001,True,Fiat Palio (1) · USD 8.307<br>Renault Duster (1) · USD 7.987,Fiat Palio 2016 · USD 8.307,Renault Duster 2013 · USD 7.987
+"San Juan, Chimbas",2,8147.0,San Juan,-31.484,-68.509,False,Fiat Palio (1) · USD 8.307<br>Renault Duster (1) · USD 7.987,Fiat Palio 2016 · USD 8.307,Renault Duster 2013 · USD 7.987
 "San Juan, Iglesia",1,5431.0,San Juan,-30.2115647,-69.1402013,False,Ford EcoSport (1) · USD 5.431,Ford EcoSport 2004 · USD 5.431,Ford EcoSport 2004 · USD 5.431
 "San Juan, Pocito",1,11182.0,San Juan,-31.5968876,-68.5331124,False,Toyota Corolla (1) · USD 11.182,Toyota Corolla 2012 · USD 11.182,Toyota Corolla 2012 · USD 11.182
 "San Juan, Rawson",28,13163.0,San Juan,-31.577267,-68.5304827,False,Hyundai HB20 (3) · USD 20.128<br>Toyota Hilux SW4 (3) · USD 32.588<br>Peugeot 208 (2) · USD 10.671,Hyundai Tucson 2026 · USD 55.900,Peugeot 3008 2013 · USD 7.540
 "San Juan, Rivadavia",52,12364.0,San Juan,-31.5475275,-68.5534856,False,Ford Ka (4) · USD 10.160<br>Toyota Corolla (4) · USD 11.821<br>Toyota Hilux SW4 (3) · USD 41.500,Mercedes Benz Clase GLB 2025 · USD 69.800,Fiat Duna 1995 · USD 3.706
 "San Juan, Santa Lucía",4,17634.0,San Juan,-31.5117315,-68.4777532,False,Audi A4 (1) · USD 23.000<br>Chevrolet Celta (1) · USD 5.879<br>Jeep Wrangler (1) · USD 35.000,Jeep Wrangler 1998 · USD 35.000,Chevrolet Celta 2013 · USD 5.879
-"San Luis, Ayacucho",1,9500.0,San Luis,-33.9172,-66.13235,True,Honda Fit (1) · USD 9.500,Honda Fit 2009 · USD 9.500,Honda Fit 2009 · USD 9.500
+"San Luis, Ayacucho",1,9500.0,San Luis,-32.6,-66.13,True,Honda Fit (1) · USD 9.500,Honda Fit 2009 · USD 9.500,Honda Fit 2009 · USD 9.500
 "San Luis, Capital",54,11502.0,San Luis,-33.295,-66.3356,False,Peugeot 208 (5) · USD 11.182<br>Chevrolet Onix (3) · USD 9.265<br>Volkswagen Vento (3) · USD 13.738,Toyota Hilux SW4 2024 · USD 52.396,Chevrolet Corsa 2009 · USD 5.872
 San Martin,69,16754.0,Buenos Aires,-34.5771577,-58.5377237,False,Peugeot 208 (8) · USD 16.332<br>Chevrolet Onix (4) · USD 14.546<br>Chevrolet Cruze (4) · USD 15.176,Jeep Commander 2024 · USD 31.284,Ford Ka 2019 · USD 9.968
 "Santa Fe, Capital",11,9000.0,Santa Fe,-31.6333,-60.7,False,Alfa Romeo Giulia (1) · USD 42.000<br>Audi Q3 (1) · USD 34.000<br>Chevrolet Agile (1) · USD 4.856,Alfa Romeo Giulia 2019 · USD 42.000,Chevrolet Corsa II 2011 · USD 4.153
 "Santa Fe, Caseros",1,8307.0,Santa Fe,-30.3109575,-61.2338527,False,Fiat Palio (1) · USD 8.307,Fiat Palio 2014 · USD 8.307,Fiat Palio 2014 · USD 8.307
 "Santa Fe, Constitución",1,10000.0,Santa Fe,-30.708818,-60.950678,True,Renault Torino (1) · USD 10.000,Renault Torino 1974 · USD 10.000,Renault Torino 1974 · USD 10.000
-"Santa Fe, Garay",1,9904.0,Santa Fe,-31.19255,-60.88235,True,Nissan Note (1) · USD 9.904,Nissan Note 2016 · USD 9.904,Nissan Note 2016 · USD 9.904
-"Santa Fe, Las Colonias",1,3323.0,Santa Fe,-31.19255,-60.88235,True,Peugeot 206 (1) · USD 3.323,Peugeot 206 2008 · USD 3.323,Peugeot 206 2008 · USD 3.323
+"Santa Fe, Garay",1,9904.0,Santa Fe,-31.103,-60.089,True,Nissan Note (1) · USD 9.904,Nissan Note 2016 · USD 9.904,Nissan Note 2016 · USD 9.904
+"Santa Fe, Las Colonias",1,3323.0,Santa Fe,-31.449,-60.931,True,Peugeot 206 (1) · USD 3.323,Peugeot 206 2008 · USD 3.323,Peugeot 206 2008 · USD 3.323
 "Santa Fe, Rosario",14,8307.0,Santa Fe,-32.9444894,-60.64132,False,Peugeot 208 (2) · USD 11.885<br>Chevrolet Cobalt (1) · USD 3.514<br>Chevrolet Onix (1) · USD 8.946,Shineray SWM 2026 · USD 23.642,Chevrolet Cobalt 2013 · USD 3.514
 "Santa Fe, San Jerónimo",2,7827.0,Santa Fe,-31.6572683,-60.7114341,False,Citroen C4 Lounge (1) · USD 9.585<br>Peugeot 207 (1) · USD 6.070,Citroen C4 Lounge 2016 · USD 9.585,Peugeot 207 2011 · USD 6.070
 "Santa Fe, San Lorenzo",1,4792.0,Santa Fe,-30.708818,-60.950678,True,Chevrolet Corsa II (1) · USD 4.792,Chevrolet Corsa II 2008 · USD 4.792,Chevrolet Corsa II 2008 · USD 4.792
-"Santa Fe, Vera",1,7029.0,Santa Fe,-31.19255,-60.88235,True,Chevrolet Classic (1) · USD 7.029,Chevrolet Classic 2012 · USD 7.029,Chevrolet Classic 2012 · USD 7.029
-"Tierra Del Fuego, Capital",2,23515.0,Tierra Del Fuego,-53.857299999999995,-66.2072,True,Citroen Basalt (1) · USD 18.530<br>Toyota Hilux SW4 (1) · USD 28.500,Toyota Hilux SW4 2012 · USD 28.500,Citroen Basalt 2025 · USD 18.530
+"Santa Fe, Vera",1,7029.0,Santa Fe,-29.458,-60.216,False,Chevrolet Classic (1) · USD 7.029,Chevrolet Classic 2012 · USD 7.029,Chevrolet Classic 2012 · USD 7.029
+"Tierra Del Fuego, Capital",2,23515.0,Tierra Del Fuego,-54.801,-68.303,True,Citroen Basalt (1) · USD 18.530<br>Toyota Hilux SW4 (1) · USD 28.500,Toyota Hilux SW4 2012 · USD 28.500,Citroen Basalt 2025 · USD 18.530
 "Tierra Del Fuego, Río Grande",1,13000.0,Tierra Del Fuego,-53.7814905,-67.7602088,False,Jeep Cherokee (1) · USD 13.000,Jeep Cherokee 2011 · USD 13.000,Jeep Cherokee 2011 · USD 13.000
 Tortuguitas,111,16556.0,Buenos Aires,-34.4705116,-58.7587082,False,Peugeot 208 (13) · USD 16.326<br>Chevrolet Onix (5) · USD 15.080<br>Citroen C3 (5) · USD 15.783,Chevrolet S-10 2026 · USD 37.380,Fiat Palio 2016 · USD 8.096
 "Tucumán, Capital",3,11502.0,Tucumán,-26.8083,-65.2176,False,Ford EcoSport (1) · USD 11.502<br>Ford Focus (1) · USD 12.332<br>Renault Fluence (1) · USD 7.029,Ford Focus 2018 · USD 12.332,Renault Fluence 2013 · USD 7.029
-"Tucumán, Famaillá",1,8626.0,Tucumán,-27.03675,-65.32935,True,Citroen C4 Lounge (1) · USD 8.626,Citroen C4 Lounge 2015 · USD 8.626,Citroen C4 Lounge 2015 · USD 8.626
+"Tucumán, Famaillá",1,8626.0,Tucumán,-27.054,-65.402,False,Citroen C4 Lounge (1) · USD 8.626,Citroen C4 Lounge 2015 · USD 8.626,Citroen C4 Lounge 2015 · USD 8.626

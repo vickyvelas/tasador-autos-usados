@@ -756,7 +756,7 @@
   "eta2_marca": 0.296900625810519,
   "n_ciudades": 121,
   "n_provincias": 17,
-  "sin_coordenadas": 27,
+  "sin_coordenadas": 0,
   "top_provincias": {
    "Mendoza": 5949,
    "Córdoba": 1847,
