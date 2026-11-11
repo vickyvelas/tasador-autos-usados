@@ -810,6 +810,9 @@ with tab_probar:
     if n_mod < 10:
         avisos.append(f"Hay sólo {n_mod} avisos de {marca} {modelo}: con tan pocos autos el error en test fue de "
                       "varios miles de dólares. Tomalo como orientación.")
+    if n_mod >= 3 and not (ref_m["fabricado_en"].min() <= anio <= ref_m["fabricado_en"].max()):
+        avisos.append(f"No hay {marca} {modelo} de {anio} en los datos: los autos de este modelo van de "
+                      f"{int(ref_m['fabricado_en'].min())} a {int(ref_m['fabricado_en'].max())}. La tasación es una extrapolación.")
     for col, v, nombre in [("fabricado_en", anio, "El año"), ("kilometraje", km_v, "El kilometraje"),
                            ("motor_lt", motor, "El motor"), ("potencia_hp", hp, "La potencia")]:
         p01, p99 = REAL[col]
