@@ -110,6 +110,10 @@ a.idx small { display:none; }
 .panel .v { font-size:2.2rem; font-weight:700; line-height:1.1; }
 .panel .r { font-size:1.02rem; font-weight:700; margin-top:.5rem; }
 .panel .s { font-size:.82rem; opacity:.85; margin-top:.2rem; }
+.panel .nota { background:rgba(255,255,255,.12); border-radius:8px; padding:.5rem .7rem; font-size:.78rem; margin:.6rem 0; }
+.panel .barra { position:relative; height:8px; background:rgba(255,255,255,.28); border-radius:6px; margin:.8rem 0 .3rem 0; }
+.panel .punto { position:absolute; top:-5px; width:18px; height:18px; border-radius:50%; background:#fff; border:3px solid #b5603a; transform:translateX(-50%); }
+.panel .ext { display:flex; justify-content:space-between; font-size:.72rem; opacity:.8; margin-bottom:.5rem; }
 .panel table { width:100%; font-size:.85rem; margin-top:.4rem; border-collapse:collapse; }
 .panel td { padding:.3rem .2rem; border-top:1px solid rgba(255,255,255,.25); }
 </style>
@@ -668,7 +672,9 @@ with tab_probar:
     REAL = {c: AUTOS.loc[AUTOS[c] > 0, c].quantile([0.01, 0.99]).tolist() for c in
             ["fabricado_en", "kilometraje", "motor_lt", "potencia_hp"]}
     cuenta = AUTOS.groupby(["marca", "modelo"]).size().rename("n").reset_index()
-    c_a, c_b = st.columns(2)
+    # Formulario a la izquierda (izq) y panel de tasación a la derecha (der).
+    izq, der = st.columns([1.5, 1])
+    c_a, c_b = izq.columns(2)
     marcas_p = alfabetico(AUTOS["marca"].unique())
     marca = c_a.selectbox("Marca", marcas_p, index=marcas_p.index("Volkswagen") if "Volkswagen" in marcas_p else 0)
     opciones = cuenta[cuenta["marca"] == marca].copy()
@@ -681,16 +687,17 @@ with tab_probar:
         v = ref_m[col].median()
         return float(v) if pd.notna(v) else por_defecto
 
-    c1, c2, c3 = st.columns(3)
+    c1, c2 = izq.columns(2)
     anio = c1.slider("Año de fabricación", int(R["fabricado_en"][2]), int(R["fabricado_en"][3]),
                      int(np.clip(round(tipico("fabricado_en", 2018)), R["fabricado_en"][2], R["fabricado_en"][3])))
     km_v = c2.number_input("Kilometraje", min_value=0, max_value=500000,
                            value=int(round(tipico("kilometraje", 80000), -3)), step=5000)
+    c3, c4 = izq.columns(2)
     motor = c3.number_input("Motor (litros)", min_value=0.6, max_value=float(R["motor_lt"][3]),
                             value=float(np.clip(round(tipico("motor_lt", 1.6), 1), 0.6, R["motor_lt"][3])), step=0.1, format="%.1f")
-    c4, c5, c6 = st.columns(3)
     hp = c4.number_input("Potencia (HP)", min_value=40.0, max_value=float(R["potencia_hp"][3]),
                          value=float(np.clip(round(tipico("potencia_hp", 110)), 40, R["potencia_hp"][3])), step=5.0, format="%.0f")
+    c5, c6 = izq.columns(2)
     caja_p = c5.selectbox("Caja", ["Automática", "Manual"],
                           index=0 if (ref_m["caja"] == "automatico").mean() > 0.5 else 1)
     comb_opts = {"Diésel": "diesel", "Eléctrico": "electrico", "GNC": "gnc", "Híbrido": "hibrido", "Nafta": "nafta"}  # A-Z
@@ -700,7 +707,7 @@ with tab_probar:
     TRACS = {"Delantera": "delantera", "Trasera": "trasera", "4x4": "4x4"}
     trac_moda = ref_m["trac"].mode()
     trac_def = list(TRACS.values()).index(trac_moda.iloc[0]) if len(trac_moda) and trac_moda.iloc[0] in TRACS.values() else 0
-    trac = st.radio("Tracción", list(TRACS), index=trac_def, horizontal=True)
+    trac = izq.radio("Tracción", list(TRACS), index=trac_def, horizontal=True)
 
     # El caso nuevo, con las MISMAS columnas que recibió el modelo al entrenar (sin precio). IngenieriaAutos lo limpia
     # igual que a los datos de entrenamiento. Consumo en blanco = el modelo usa la mediana. "moneda" y "clave" son relleno.
@@ -734,28 +741,36 @@ with tab_probar:
     if anio >= 2025 and km_v > 60000:
         avisos.append("Un auto tan nuevo con tantos kilómetros es raro en los datos.")
 
-    r1, r2 = st.columns([1, 1.4])
-    with r1:
-        # Percentil: de todos los autos publicados, qué porcentaje cuesta menos que esta tasación.
-        pct = float((AUTOS["precio_usd"] < precio).mean() * 100)
-        # Comparables: los 4 avisos del mismo modelo más parecidos en año y km (con su precio real y la tasación del modelo).
-        comp_html = ""
-        if len(ref_m):
-            cerca = ref_m.assign(dist=(ref_m["fabricado_en"] - anio).abs() * 10000 + (ref_m["kilometraje"] - km_v).abs() / 10).nsmallest(4, "dist")
-            filas = "".join(
-                f"<tr><td>{r.marca} {r.modelo} · {int(r.fabricado_en)} · {num(r.kilometraje)} km</td>"
-                f"<td style='text-align:right'>{usd(r.precio_usd)} real<br>{usd(r.tasacion_usd)} tasado</td></tr>"
-                for r in cerca.itertuples())
-            comp_html = f"<div class='r' style='margin-top:.9rem'>Comparables en los datos</div><table>{filas}</table>"
-        st.markdown(
-            f"<div class='panel'><div class='t'>Tasación estimada</div><div class='v'>{usd(precio)}</div>"
-            f"<div class='s'>≈ ARS {num(precio * M['tipo_cambio'])} (cotización de referencia {num(M['tipo_cambio'])} ARS/USD)</div>"
-            f"<div class='r'>Rango probable: {usd(precio * (1 - margen))} a {usd(precio * (1 + margen))} (± {num(margen * 100, 1)} %)</div>"
-            f"<div class='s'>Error mediano en test para modelos con {tramo_te} avisos; {marca} {modelo} tiene {n_train_mod} en entrenamiento.</div>"
-            f"<div class='r'>Percentil {num(pct)} del mercado ({num(len(AUTOS))} autos)</div>{comp_html}</div>",
-            unsafe_allow_html=True)
-        for a_ in avisos:
-            st.warning(a_)
+    # ---- Panel de tasación (a la derecha del formulario) ----
+    # Percentil: de todos los autos publicados, qué porcentaje cuesta menos que esta tasación.
+    pct = float((AUTOS["precio_usd"] < precio).mean() * 100)
+    p_min, p_max = float(AUTOS["precio_usd"].min()), float(AUTOS["precio_usd"].max())
+    # Posición en la barra: escala logarítmica entre el auto más barato y el más caro publicados.
+    pos = float(np.clip((np.log(precio) - np.log(p_min)) / (np.log(p_max) - np.log(p_min)), 0, 1)) * 100
+    lo, hi, tc = precio * (1 - margen), precio * (1 + margen), M["tipo_cambio"]
+    # Comparables: los 4 avisos del mismo modelo más parecidos en año y km (con su precio real y la tasación del modelo).
+    comp_html = ""
+    if len(ref_m):
+        cerca = ref_m.assign(dist=(ref_m["fabricado_en"] - anio).abs() * 10000 + (ref_m["kilometraje"] - km_v).abs() / 10).nsmallest(4, "dist")
+        filas = "".join(
+            f"<tr><td>{r.marca} {r.modelo} · {int(r.fabricado_en)} · {num(r.kilometraje)} km</td>"
+            f"<td style='text-align:right'>{usd(r.precio_usd)} real<br>{usd(r.tasacion_usd)} tasado</td></tr>"
+            for r in cerca.itertuples())
+        comp_html = f"<div class='r' style='margin-top:.9rem'>Comparables en los datos</div><table>{filas}</table>"
+    der.markdown(
+        f"<div class='panel'><div class='t'>Tasación estimada</div><div class='v'>{usd(precio)}</div>"
+        f"<div class='s'>≈ ARS {num(precio * tc)} (cotización de referencia {num(tc)} ARS/USD)</div>"
+        f"<div class='r'>Rango sugerido: {usd(lo)} a {usd(hi)} (± {num(margen * 100, 1)} %)</div>"
+        f"<div class='s'>En pesos: ARS {num(lo * tc)} a ARS {num(hi * tc)}</div>"
+        f"<div class='nota'>Margen proporcional al valor: el error mediano en test para modelos con {tramo_te} avisos. "
+        f"{marca} {modelo} tiene {n_train_mod} en entrenamiento.</div>"
+        f"<div class='barra'><div class='punto' style='left:{pos:.1f}%'></div></div>"
+        f"<div class='ext'><span>{usd(p_min)}</span><span>{usd(p_max)}</span></div>"
+        f"<div class='r'>Percentil {num(pct)} del mercado ({num(len(AUTOS))} autos)</div>{comp_html}</div>",
+        unsafe_allow_html=True)
+    for a_ in avisos:
+        izq.warning(a_)
+    r2 = st.container()
     with r2:
         if len(ref_m):
             otros = alt.Chart(ref_m).mark_circle(color=GRIS, opacity=0.6, size=40).encode(
