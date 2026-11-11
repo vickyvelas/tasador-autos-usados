@@ -1,7 +1,7 @@
-# Versiones fijas: con estas el modelo da los mismos números que el notebook (test 1.428 USD)
+# scikit-learn y pandas fijos (el modelo guardado depende de scikit-learn 1.6.1). numpy 2.1 o 2.2: tienen versión para Python 3.12 y 3.13
 streamlit==1.67.0
 altair==6.3.0
 scikit-learn==1.6.1
 pandas==2.2.3
-numpy==2.0.2
+numpy>=2.1.0,<2.3
 joblib==1.6.0
