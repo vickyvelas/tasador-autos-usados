@@ -502,6 +502,11 @@ st.markdown(
     "parecidos. Lo que cambia el precio es *qué auto es* (marca, modelo, año), no *dónde* se publica.")
 with st.expander("Cómo lo sabemos"):
     st.markdown(f"""
+#### Hipótesis H4: descarte de la ubicación geográfica
+**Criterio de la cátedra:** una variable con η² menor a 0,05 está en la **zona roja** y no aporta señal.
+Provincia ({num(UB['eta2_provincia'] * 100, 1)} %) y ciudad ({num(UB['eta2_ciudad'] * 100, 1)} %) quedan las dos por debajo: 
+<span style="background:#c0392b;color:#fff;border-radius:6px;padding:1px 8px;font-size:.8rem;font-weight:600">ZONA ROJA</span>
+
 **Cómo probamos la hipótesis de la ubicación.** Hicimos tres comprobaciones:
 
 1. **¿Cuánto del precio explica cada variable?** Con η² (la parte de la variación del precio que explica un grupo):
@@ -515,7 +520,7 @@ with st.expander("Cómo lo sabemos"):
    Mendoza, Córdoba y Buenos Aires, y {UB['sin_coordenadas']} de las {UB['n_ciudades']} ciudades tienen pocos autos y no pudimos ubicarlas en el mapa.
 
 **Gráfico:** el precio mediano de las ciudades con más avisos contra la mediana de todo el mercado (línea naranja).
-""")
+""", unsafe_allow_html=True)
     med_glob = float(AUTOS["precio_usd"].median())
     top_c = UBIC.nlargest(8, "autos").assign(ciudad=lambda d: d["ubicacion_corregida"].str.replace(", ", " · ", regex=False))
     b_c = alt.Chart(top_c).mark_bar(color=AZUL).encode(
@@ -535,6 +540,12 @@ with st.expander("Cómo lo sabemos"):
     st.dataframe(tabla_cp.style.format({"MAE (USD)": "{:,.1f}", "Desvío": "{:,.1f}", "Δ vs referencia": "{:,.1f}", "Δ en desvíos": "{:,.1f}"}),
                  hide_index=True, width="stretch")
     st.markdown(f"""
+**Por qué no la dejamos aunque sume algo:** hay {UB['n_ciudades']} ciudades y decenas de ellas aportan sólo 1 o 2 avisos. Con tantas
+categorías el modelo memorizaría casos sueltos en lugar de aprender patrones del auto (sobreajuste).
+
+**Cómo se construyó la tabla:** se parte del HistGradientBoosting de referencia y se quita (o agrega) una columna por vez, con la misma
+validación cruzada agrupada por vehículo (GroupKFold). Una diferencia menor a un desvío no es evidencia de nada.
+
 **Decisión:** la ubicación no entra al modelo. Las ciudades tienen precios medianos parecidos y lo que cambia el precio es qué auto es.
 Las coordenadas del mapa son aproximadas (por ciudad) y están en `app_data/ubicaciones.csv`; el η² y las pruebas con provincia y ciudad se calculan en `build_app.py`.
 """)
