@@ -74,6 +74,8 @@ def num(x, dec=0):
 st.markdown("""
 <style>
 [data-testid="stSidebar"] { background: linear-gradient(180deg, #e8f1fc 0%, #f4f8fd 100%); }
+.ficha { background:#1d4f91; color:#fff; border-radius:14px; padding:.8rem 1rem; font-size:.82rem; margin-bottom:1rem; line-height:1.5; }
+.ficha ul { margin:.4rem 0 0 0; padding-left:1.1rem; }
 .idx-titulo { font-weight:800; font-size:1.15rem; color:#1d4f91; margin:0 0 .6rem 0; }
 .idx-grupo { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:#6b7a90; margin:1rem 0 .35rem 2px; font-weight:700; }
 a.idx { display:flex; align-items:center; gap:.65rem; background:#fff; border:1px solid #d6e4f7; border-left:5px solid var(--c);
@@ -168,6 +170,10 @@ def idx(destino, icono, titulo, sub, color):
 
 
 st.sidebar.markdown(
+    '<div class="ficha"><b>Ciencia de Datos</b> · UTN FRM · 2026<br>Proyecto Integrador<br>'
+    'Comisión <b>5K09</b> · Grupo <b>03</b>'
+    '<ul><li>García, Nicolás</li><li>Ramos, Ignacio</li><li>Velasco, Victoria</li><li>Via, Tomás</li>'
+    '<li>Villanueva, Sergio</li></ul></div>'
     '<div class="idx-titulo">🧭 Índice</div>'
     + idx("portada", "🏁", "Portada", "La idea en una línea", "#1d4f91")
     + '<div class="idx-grupo">El tallo · la historia</div>'
@@ -192,7 +198,7 @@ st.sidebar.caption("Dentro de cada sección, el desplegable *Cómo lo sabemos* t
 st.caption("Proyecto integrador · Ciencia de Datos · UTN FRM · 2026 · grupo 5K09-03")
 ancla("portada")
 st.markdown(
-    f'''<div class="hero"><h1>🚗 ¿Cuánto vale un auto usado?</h1>
+    f'''<div class="hero"><div style="opacity:.85;font-size:.85rem;letter-spacing:.06em;margin-bottom:.3rem">CIENCIA DE DATOS · UTN FRM · 2026 · COMISIÓN 5K09 · GRUPO 03</div><h1>🚗 ¿Cuánto vale un auto usado?</h1>
     <p>Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio con un error típico de
     <b>{num(TEST['rel_mediano'] * 100, 1)} %</b>: <b>{num(PISO['mae'] / TEST['mae'], 1)} veces menos error</b>
     que tasar todo al precio mediano.</p></div>''', unsafe_allow_html=True)

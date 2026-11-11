@@ -1,6 +1,6 @@
 # ¿Cuánto vale un auto usado? · Tasador de autos usados
 
-Proyecto integrador de Ciencia de Datos · UTN FRM · 2026 · grupo 5K09-03
+Proyecto integrador de Ciencia de Datos · UTN FRM · 2026 · comisión 5K09, grupo 03
 (García Nicolás, Ramos Ignacio, Velasco Victoria, Via Tomás, Villanueva Sergio).
 
 **App publicada:** _(pegar acá la URL de Streamlit Community Cloud)_
