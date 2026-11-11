@@ -450,25 +450,25 @@ col_mapa, col_barras = st.columns([3, 2])
 # Botones de zoom: suman o restan un nivel al zoom de partida (que ya encuadra la provincia elegida o el país).
 if st.session_state.get("zoom_prov") != tuple(sel_prov):
     st.session_state["zoom_prov"], st.session_state["dz"] = tuple(sel_prov), 0.0   # al cambiar de provincia, vuelve al encuadre
-b1, b2, b3, _ = col_mapa.columns([1, 1, 1.6, 2])
-if b1.button("Acercar +", key="z_mas"):
+c_map, c_btn = col_mapa.columns([12, 1.3], gap="small")   # botones al costado, mapa al lado
+if c_btn.button("＋", key="z_mas", help="Acercar", width="stretch"):
     st.session_state["dz"] = min(st.session_state["dz"] + 1, 5)
-if b2.button("Alejar −", key="z_menos"):
+if c_btn.button("－", key="z_menos", help="Alejar", width="stretch"):
     st.session_state["dz"] = max(st.session_state["dz"] - 1, -1.5)
-if b3.button("Ver todo", key="z_reset"):
+if c_btn.button("⤢", key="z_reset", help="Volver a ver el país entero", width="stretch"):
     st.session_state["dz"] = 0.0
 vista.zoom = max(float(vista.zoom) + st.session_state["dz"], 2.2)
 # scrollZoom apagado: con la rueda se baja la página; el zoom va con los botones + / − o pellizcando; se arrastra para mover
 vista_mapa = pdk.View("MapView", controller={"scrollZoom": False, "dragPan": True, "doubleClickZoom": True, "touchZoom": True})
-col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], views=[vista_mapa], initial_view_state=vista, map_provider=None,
+c_map.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], views=[vista_mapa], initial_view_state=vista, map_provider=None,
                                tooltip={"html": "<b>{ubicacion_corregida}</b><br>{autos} autos · mediana {mediana_txt}"
                                         "<br><br><b>Más publicados</b><br>{mas_publicados}"
                                         "<br><br><b>Más caro:</b> {mas_caro}<br><b>Más barato:</b> {mas_barato}",
                                         "style": {"backgroundColor": "#22364d", "color": "white", "fontSize": "12px", "whiteSpace": "pre-line"}}),
-                      height=520)
+                      height=480)
 # Referencias del mapa: tamaño = cantidad de autos de la ciudad, color = precio mediano de sus autos.
 p_lo, p_hi = UBIC_OK["mediana_usd"].min(), UBIC_OK["mediana_usd"].max()
-col_mapa.markdown(
+LEYENDA = (
     "<div style='display:flex;flex-wrap:wrap;gap:1.4rem;align-items:center;font-size:.8rem;color:#3d3d3a;margin:.2rem 0 1rem 0'>"
     "<div><b>Cantidad de autos</b><br>"
     "<span style='display:inline-flex;align-items:flex-end;gap:.5rem;margin-top:.2rem'>"
@@ -479,7 +479,7 @@ col_mapa.markdown(
     "<span style='display:block;width:170px;height:10px;border-radius:5px;margin-top:.3rem;background:linear-gradient(90deg,rgb(254,215,170),rgb(181,96,58))'></span>"
     f"<span style='display:flex;justify-content:space-between;width:170px'><span>{usd(p_lo)}</span><span>{usd(p_hi)}</span></span></div>"
     "<div><span style='display:inline-block;width:14px;height:10px;background:#eef1f5;border:1px solid #78828f;vertical-align:middle'></span> Provincia</div>"
-    "</div>", unsafe_allow_html=True)
+    "</div>")
 # Si se eligió una sola provincia: tabla con sus autos (ordenable haciendo clic en las columnas).
 if len(sel_prov) == 1:
     de_prov = AUTOS[AUTOS["provincia"] == sel_prov[0]]
@@ -492,11 +492,11 @@ if len(sel_prov) == 1:
         hide_index=True, width="stretch", height=260)
 por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().sort_values("autos", ascending=False).head(8))
 barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
-    y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),
+    y=alt.Y("provincia:N", sort="-x", title=None, axis=alt.Axis(labelOverlap=False)), x=alt.X("autos:Q", title="Autos publicados"),
     tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
-col_barras.altair_chart(barras.properties(height=320, title="Autos por provincia"), width="stretch")
-col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color más oscuro = precio mediano más alto. Zoom con los botones «Acercar +» y «Alejar −» de arriba del mapa (o doble clic / pellizcando); se arrastra para moverlo. "
-                   f"Faltan {UB['sin_coordenadas']} ciudades sin coordenadas (con pocos autos cada una).")
+col_barras.altair_chart(barras.properties(height=250, title="Autos por provincia"), width="stretch")
+col_barras.markdown(LEYENDA, unsafe_allow_html=True)
+col_barras.caption(f"Cada círculo es una ciudad: pasá el mouse para ver sus autos. Faltan {UB['sin_coordenadas']} ciudades sin coordenadas (pocos autos cada una).")
 st.markdown(
     "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
     "parecidos. Lo que cambia el precio es *qué auto es* (marca, modelo, año), no *dónde* se publica.")
