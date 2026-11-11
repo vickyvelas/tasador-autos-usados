@@ -105,6 +105,10 @@ a.idx small { display:none; }
 .kicker { font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#2c5f8f; margin:.4rem 0 -.6rem 0; }
 .kicker.copa { color:#b5603a; }
 .concl { border-left:4px solid #2c5f8f; background:#f6f8fa; border-radius:0 8px 8px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
+.explica { background:#f4f7fb; border-left:5px solid #2c5f8f; border-radius:8px; padding:.75rem 1rem; font-size:.92rem; line-height:1.45; }
+.explica .t { display:block; font-weight:700; color:#2c5f8f; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; margin-top:.55rem; }
+.explica .t:first-child { margin-top:0; }
+.explica p { margin:.15rem 0 0 0; }
 .alerta {background:#fdecea; border:2px solid #c0392b; color:#8a1c12; border-radius:10px; padding:.6rem .8rem;
   margin-bottom:.6rem; font-size:.9rem; font-weight:500; animation:parp 1.4s ease-in-out 3;}
 @keyframes parp {50% {box-shadow:0 0 0 6px rgba(192,57,43,.35);}}
@@ -133,6 +137,15 @@ def kpi(valor, etiqueta, color="azul", pie=""):
     """Tarjeta grande de color sólido: el dato clave de la portada."""
     return (f'<div class="kpi" style="background:{TARJ[color][0]}"><div class="v">{valor}</div>'
             f'<div class="l">{etiqueta}</div><div class="s">{pie}</div></div>')
+
+
+def explica(que, por_que, mirar, conclusion):
+    """Cuadro que le explica al usuario, paso a paso, qué muestra el gráfico y por qué lo elegimos."""
+    return ('<div class="explica">'
+            f'<span class="t">Qué estás viendo</span><p>{que}</p>'
+            f'<span class="t">Por qué elegimos este gráfico</span><p>{por_que}</p>'
+            f'<span class="t">Qué mirar</span><p>{mirar}</p>'
+            f'<span class="t">Qué nos dice</span><p><b>{conclusion}</b></p></div>')
 
 
 def dato(valor, etiqueta, color="azul"):
@@ -238,12 +251,6 @@ ancla("datos")
 st.markdown('<div class="kicker">Los datos</div>', unsafe_allow_html=True)
 st.subheader(f"Los datos · La mitad de los autos cuesta menos de {usd(M['precio_mediano'])}, "
              f"pero el 10 % más caro pasa los {usd(p90)}")
-d1, d2, d3, d4 = st.columns(4)
-d1.markdown(dato(num(N_AUTOS), "autos usados, ya limpios", "verde"), unsafe_allow_html=True)
-d2.markdown(dato(usd(M["precio_mediano"]), "precio mediano", "azul"), unsafe_allow_html=True)
-d3.markdown(dato(usd(p90), "piso del 10 % más caro", "naranja"), unsafe_allow_html=True)
-d4.markdown(dato(num(M["ubicacion"]["n_ciudades"]), f"ciudades en {M['ubicacion']['n_provincias']} provincias", "violeta"),
-            unsafe_allow_html=True)
 # Fuentes de los datos, con sus logos (app_data/logos/). Los autos por fuente salen de metricas.json.
 import base64
 carone_b64 = base64.b64encode((DATA / "logos" / "carone.svg").read_bytes()).decode()   # el logo de CarOne es blanco: va sobre un chip oscuro
@@ -264,11 +271,15 @@ mediana = alt.Chart(pd.DataFrame({"m": [M["precio_mediano"]]})).mark_rule(
     color=AZUL, strokeDash=[4, 4], size=2).encode(x="m:Q")
 etiqueta = alt.Chart(pd.DataFrame({"m": [M["precio_mediano"]], "t": [f"mediana {usd(M['precio_mediano'])}"]})).mark_text(
     align="left", dx=6, dy=-120, color=AZUL, fontWeight="bold").encode(x="m:Q", text="t:N")
-st.altair_chart((hist + mediana + etiqueta).properties(height=320), width="stretch")
-st.markdown(
-    f"**Qué mirar:** casi todos los autos están entre {usd(p10)} y {usd(p90)}, con una cola larga hacia "
-    f"los caros (se cortó en USD 80.000 para que se lea). Por esa asimetría el modelo aprende sobre el "
-    f"**logaritmo** del precio, y los errores se miden en porcentaje además de en dólares.")
+g_h, e_h = st.columns([2.2, 1], gap="large")
+g_h.altair_chart((hist + mediana + etiqueta).properties(height=340), width="stretch")
+e_h.markdown(explica(
+    "Cada barra cuenta cuántos autos cuestan entre dos precios (en tramos de USD 2.000): cuanto más alta, más autos. "
+    "La línea punteada marca el precio del medio, la mediana.",
+    "Un histograma es la forma más simple de ver cómo se reparten los precios: dónde hay muchos autos y dónde pocos.",
+    f"Casi todos los autos están entre {usd(p10)} y {usd(p90)}. A la derecha queda una cola larga de autos caros "
+    "(el gráfico se corta en USD 80.000 para que se lea).",
+    "Hay muchos autos baratos y pocos muy caros: ahí es donde después le va a costar más al modelo."), unsafe_allow_html=True)
 
 with st.expander("Cómo lo sabemos"):
     st.markdown(f"""
@@ -316,11 +327,6 @@ dep = M["depreciacion_anual"]
 ancla("hallazgos")
 st.markdown('<div class="kicker">Lo que encontramos</div>', unsafe_allow_html=True)
 st.subheader(f"Lo que encontramos · Un auto pierde cerca del {num(dep * 100)} % de su valor por cada año de antigüedad")
-h1, h2, h3 = st.columns(3)
-h1.markdown(dato(f"−{num(dep * 100)} % por año", "lo que pierde un auto de su valor", "naranja"), unsafe_allow_html=True)
-h2.markdown(dato(num(M["fuga"]["spearman_anio"], 2), "correlación año ↔ precio (Spearman)", "azul"), unsafe_allow_html=True)
-h3.markdown(dato(f"+{usd(CP['sin fabricado_en']['delta'])}", "de error si el modelo no conoce el año", "verde"),
-            unsafe_allow_html=True)
 por_anio = pd.DataFrame(M["mediana_por_anio"]).rename(columns={"fabricado_en": "anio", "median": "mediana", "size": "autos"})
 # Nube de puntos: un punto por auto (con un poquito de desplazamiento horizontal para que no se tapen).
 # La línea es la mediana por año. Eje de precio logarítmico: una recta ahí significa pérdida porcentual constante.
@@ -337,11 +343,17 @@ linea = alt.Chart(por_anio[por_anio["anio"].between(2000, 2026)]).mark_line(
     tooltip=[alt.Tooltip("anio:Q", title="Año"), alt.Tooltip("mediana:Q", title="Precio mediano", format=",.0f"),
              alt.Tooltip("autos:Q", title="Autos")],
 )
-st.altair_chart((puntos + linea).properties(height=360), width="stretch")
-st.markdown(
-    "**Qué mirar:** la línea es el precio mediano de cada año. En escala logarítmica es casi recta: el auto no "
-    "pierde una cantidad fija de dólares por año sino un **porcentaje** parecido. La nube gris muestra que para "
-    "un mismo año los precios varían mucho: lo que explica esa diferencia es la marca, el modelo y la ficha.")
+g_a, e_a = st.columns([2.2, 1], gap="large")
+g_a.altair_chart((puntos + linea).properties(height=380), width="stretch")
+e_a.markdown(explica(
+    "Cada punto gris es un auto: cuanto más a la derecha, más nuevo; cuanto más arriba, más caro. "
+    "La línea negra une el precio del medio de cada año.",
+    "Un gráfico de puntos sirve para ver si dos cosas van juntas. Probamos con el año y el precio. "
+    "El precio va en escala logarítmica para que una pérdida de porcentaje parecido se vea como una recta.",
+    "La línea baja hacia los autos más viejos y es casi recta: el auto no pierde dólares fijos por año, "
+    f"pierde cerca de {num(dep * 100)} % de su valor. Para un mismo año los precios varían mucho: eso lo explican la marca, el modelo y la ficha.",
+    f"El año es lo que más pesa: la correlación con el precio es {num(M['fuga']['spearman_anio'], 2)} y, si el modelo no lo conoce, "
+    f"el error sube {usd(CP['sin fabricado_en']['delta'])}."), unsafe_allow_html=True)
 
 with st.expander("Cómo lo sabemos"):
     km = CP["sin kilometraje"]
@@ -388,15 +400,6 @@ st.markdown(
     f"Se la dimos al modelo y **no movió la aguja**: con la provincia el error pasó de {usd(CPV['referencia (todas)']['mae'])} a "
     f"{usd(c_prov['mae'])}, y con provincia y ciudad a {usd(c_ciu['mae'])}. Son diferencias de dólares, mucho menores que el "
     f"ruido de la validación (± {usd(CPV['referencia (todas)']['desvio'])}). Por eso la ubicación **no entra al modelo**.")
-u1, u2, u3, u4 = st.columns(4)
-u1.markdown(dato(f"{num(UB['eta2_provincia'] * 100, 1)} %", "del precio lo explica la provincia", "violeta"), unsafe_allow_html=True)
-u2.markdown(dato(f"{num(UB['eta2_marca'] * 100, 0)} %", "del precio lo explica la marca", "azul"), unsafe_allow_html=True)
-u3.markdown(dato(f"{num(UB['pct_top_provincias'] * 100, 0)} %", "de los autos, en Mendoza, Córdoba y Buenos Aires", "naranja"),
-            unsafe_allow_html=True)
-u4.markdown(dato(f"{'+' if c_prov['delta'] >= 0 else '−'}{usd(abs(c_prov['delta']))}", "de error al sumar la provincia", "gris"),
-            unsafe_allow_html=True)
-
-
 @st.cache_data
 def cargar_mapa(version):   # version = fecha de los archivos: si cambian, se vuelve a leer y no queda un caché viejo
     ub = pd.read_csv(DATA / "ubicaciones.csv")
@@ -407,6 +410,13 @@ def cargar_mapa(version):   # version = fecha de los archivos: si cambian, se vu
 
 UBIC, GEO = cargar_mapa((DATA / "ubicaciones.csv").stat().st_mtime_ns + len(list(pd.read_csv(DATA / "ubicaciones.csv", nrows=0).columns)))
 UBIC_OK = UBIC.dropna(subset=["latitud", "longitud"])
+st.markdown(explica(
+    "Un círculo por ciudad: cuanto más grande, más autos se publican ahí; cuanto más oscuro, más caro es el precio del medio. "
+    "Podés elegir una provincia para acercarte, y pasar el mouse por un círculo para ver sus autos.",
+    "Para saber si el precio cambia según dónde se vende, lo más directo es mirarlo sobre un mapa.",
+    f"Casi todos los autos están en Mendoza y Córdoba, y los colores de las ciudades grandes son parecidos: no hay zonas mucho más caras. "
+    f"La provincia explica sólo {num(UB['eta2_provincia'] * 100, 1)} % del precio; la marca, {num(UB['eta2_marca'] * 100, 0)} %.",
+    f"Se lo dimos al modelo y no mejoró (+{usd(abs(c_prov['delta']))}): descartamos la ubicación."), unsafe_allow_html=True)
 provs = alfabetico(UBIC_OK["provincia"].unique())
 sel_prov = st.multiselect("Provincias en el mapa", provs, placeholder="Todas las provincias")
 mapa_df = UBIC_OK[UBIC_OK["provincia"].isin(sel_prov)] if sel_prov else UBIC_OK
@@ -562,11 +572,6 @@ ancla("modelo")
 st.markdown('<div class="kicker">El modelo</div>', unsafe_allow_html=True)
 st.subheader(f"El modelo · El tasador se equivoca en promedio {usd(TEST['mae'])} por auto, "
              f"{num(veces, 1)} veces menos que tasar todo a la mediana")
-m1, m2, m3, m4 = st.columns(4)
-m1.markdown(dato(usd(TEST["mae"]), "error promedio en test", "azul"), unsafe_allow_html=True)
-m2.markdown(dato(f"{num(TEST['rel_mediano'] * 100, 1)} %", "error relativo mediano", "verde"), unsafe_allow_html=True)
-m3.markdown(dato(f"{num(veces, 1)}×", "mejor que el piso (mediana)", "naranja"), unsafe_allow_html=True)
-m4.markdown(dato(usd(AJ["mae"]), f"validación cruzada (± {usd(AJ['desvio'])})", "gris"), unsafe_allow_html=True)
 # Barras con el error de cada modelo en validación cruzada (con barra de ± 1 desvío). Gris = piso, azul = elegido.
 comp = pd.DataFrame(M["comparacion"])
 NOMBRES = {"Piso (mediana)": "Piso: tasar todo a la mediana", "Lineal (Ridge)": "Regresión lineal (Ridge)",
@@ -587,11 +592,13 @@ barras = base.mark_bar().encode(
              alt.Tooltip("desvio:Q", title="Desvío", format=",.0f")])
 bigotes = base.mark_rule(color=TINTA).encode(x="lo:Q", x2="hi:Q")
 textos = base.mark_text(align="left", dx=8, color=TINTA).encode(x="hi:Q", text="txt:N")
-st.altair_chart((barras + bigotes + textos).properties(height=230), width="stretch")
-st.markdown(
-    f"**Qué mirar:** la barra gris es lo que se logra sin aprender nada. Los árboles (boosting) le ganan al modelo "
-    f"lineal por varios desvíos. El elegido, en azul, es el boosting con la grilla ajustada: "
-    f"{usd(AJ['mae'])} ± {num(AJ['desvio'])} en validación y **{usd(TEST['mae'])} en test**, que es el número honesto.")
+g_c, e_c = st.columns([2.2, 1], gap="large")
+g_c.altair_chart((barras + bigotes + textos).properties(height=260), width="stretch")
+e_c.markdown(explica(
+    "Cada barra es el error promedio, en dólares, de una forma de tasar. Barra más corta = mejor. La rayita negra es la variación entre pruebas.",
+    "Para elegir un modelo hay que compararlos a todos con la misma regla. La barra gris es el piso: tasar todos los autos con el precio del medio, sin aprender nada.",
+    f"Todos le ganan al piso y el boosting ajustado (azul oscuro) tiene la barra más corta: {usd(AJ['mae'])} en la validación cruzada.",
+    f"Elegimos el boosting ajustado. En autos que nunca vio (test) se equivoca {usd(TEST['mae'])}, {num(veces, 1)} veces menos que el piso."), unsafe_allow_html=True)
 
 # Real vs. predicho en el test (como en el Colab): cada punto es un auto que el modelo nunca vio; la diagonal es la predicción perfecta.
 test_df = AUTOS[AUTOS["conjunto"] == "test"].copy()
@@ -599,24 +606,49 @@ def _r2(y, p):
     return 1 - ((y - p) ** 2).sum() / ((y - y.mean()) ** 2).sum()
 r2_test = _r2(test_df["precio_usd"], test_df["tasacion_usd"])
 r2_log = _r2(np.log(test_df["precio_usd"]), np.log(test_df["tasacion_usd"]))
-gc1, gc2 = st.columns(2)   # los dos gráficos del test, lado a lado
-gc1.markdown("##### Precio real contra precio predicho, en el test")
-gc1.markdown(f"En el test, el boosting logra un **MAE de {usd(TEST['mae'])}** y un **R² de {num(r2_test, 2)}** en dólares ({num(r2_log, 2)} en escala logarítmica, la del gráfico). La diagonal es la predicción "
-            "perfecta: los puntos se abren en la cola alta, sobre todo en los avisos en dólares.")
+st.markdown("##### Precio real contra precio predicho, en el test")
 lim_rp = [float(min(test_df["precio_usd"].min(), test_df["tasacion_usd"].min())) * 0.9,
           float(max(test_df["precio_usd"].max(), test_df["tasacion_usd"].max())) * 1.1]
 esc_rp = alt.Scale(type="log", domain=lim_rp)
-pts_rp = alt.Chart(test_df).mark_circle(size=22, opacity=0.6).encode(
-    x=alt.X("precio_usd:Q", scale=esc_rp, title="Precio real (USD, escala log)", axis=alt.Axis(format="$,.0f", values=[1000, 2000, 5000, 10000, 20000, 50000, 100000])),
-    y=alt.Y("tasacion_usd:Q", scale=esc_rp, title="Precio predicho (USD, escala log)", axis=alt.Axis(format="$,.0f", values=[1000, 2000, 5000, 10000, 20000, 50000, 100000])),
-    color=alt.Color("moneda:N", title="Moneda original", legend=alt.Legend(orient="top-left", direction="horizontal"), scale=alt.Scale(domain=["ARS", "USD"], range=["#4a86d8", "#e08a60"])),
-    tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("fabricado_en:Q", title="Año", format="d"),
-             alt.Tooltip("precio_usd:Q", title="Real", format=",.0f"), alt.Tooltip("tasacion_usd:Q", title="Predicho", format=",.0f")])
+VAL_RP = [1000, 2000, 5000, 10000, 20000, 50000, 100000]
 diag_rp = alt.Chart(pd.DataFrame({"a": lim_rp, "b": lim_rp})).mark_line(color="#555", strokeDash=[5, 4]).encode(x="a:Q", y="b:Q")
-gc1.altair_chart((pts_rp + diag_rp).properties(height=380), width="stretch")
-gc2.markdown("##### Dónde se equivoca el modelo, por tramo de precio")
-gc2.markdown(f"**Test, una sola vez: {usd(TEST['mae'])}.** Dónde se equivoca: el error en dólares crece con el precio, "
-            "pero en porcentaje se mantiene parecido.")
+mas10 = alt.Chart(pd.DataFrame({"a": lim_rp, "b": [v * 1.1 for v in lim_rp]})).mark_line(color="#999", strokeDash=[2, 3]).encode(x="a:Q", y="b:Q")
+menos10 = alt.Chart(pd.DataFrame({"a": lim_rp, "b": [v * 0.9 for v in lim_rp]})).mark_line(color="#999", strokeDash=[2, 3]).encode(x="a:Q", y="b:Q")
+
+
+def real_vs_predicho(df, color, titulo):
+    pts = alt.Chart(df).mark_circle(size=26, opacity=0.6, color=color).encode(
+        x=alt.X("precio_usd:Q", scale=esc_rp, title="Precio real (USD, escala log)", axis=alt.Axis(format="$,.0f", values=VAL_RP)),
+        y=alt.Y("tasacion_usd:Q", scale=esc_rp, title="Precio predicho (USD, escala log)", axis=alt.Axis(format="$,.0f", values=VAL_RP)),
+        tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("fabricado_en:Q", title="Año", format="d"),
+                 alt.Tooltip("precio_usd:Q", title="Real", format=",.0f"), alt.Tooltip("tasacion_usd:Q", title="Predicho", format=",.0f")])
+    return (pts + diag_rp + mas10 + menos10).properties(height=330, title=titulo)
+
+
+en_pesos, en_dolares = test_df[test_df["moneda"] == "ARS"], test_df[test_df["moneda"] == "USD"]
+
+
+def resumen_rp(df):
+    return (float((df["precio_usd"] - df["tasacion_usd"]).abs().mean()),
+            float(((df["tasacion_usd"] / df["precio_usd"] - 1).abs() <= 0.10).mean() * 100), _r2(np.log(df["precio_usd"]), np.log(df["tasacion_usd"])))
+
+
+mae_p, dentro_p, r2l_p = resumen_rp(en_pesos)
+mae_d, dentro_d, r2l_d = resumen_rp(en_dolares)
+g_r, e_r = st.columns([2.2, 1], gap="large")
+g_r.altair_chart(real_vs_predicho(en_pesos, "#4a86d8", f"Avisos publicados en pesos ({num(len(en_pesos))} autos de test)"), width="stretch")
+g_r.altair_chart(real_vs_predicho(en_dolares, "#e08a60", f"Avisos publicados en dólares ({num(len(en_dolares))} autos de test)"), width="stretch")
+e_r.markdown(explica(
+    "Cada punto es un auto del test, que el modelo nunca vio. A la derecha, más caro era de verdad; arriba, más caro lo tasó el modelo. "
+    "Arriba están los avisos en pesos y abajo los avisos en dólares, con los mismos ejes.",
+    "Si el modelo acertara siempre, todos los puntos caerían sobre la línea punteada oscura. Así se ve de un vistazo cuánto se aleja cada uno. "
+    "Las líneas finas marcan ±10 %.",
+    f"En pesos, {num(dentro_p)} % de los autos queda dentro de ±10 % y el error promedio es {usd(mae_p)}. "
+    f"En dólares, sólo {num(dentro_d)} % queda dentro de ±10 % y el error promedio es {usd(mae_d)}: los puntos se abren mucho más.",
+    f"Con avisos en dólares hay más dispersión. Sirve para saber cuándo fiarse menos de la tasación. R² total: {num(r2_test, 2)} en dólares, {num(r2_log, 2)} en escala logarítmica."),
+    unsafe_allow_html=True)
+
+st.markdown("##### Dónde se equivoca el modelo, por tramo de precio")
 # Dónde se equivoca, como en el Colab: por cada tramo de precio del test, DOS barras con su propio eje:
 #   azul   = error promedio en dólares (MAE)            -> eje de la IZQUIERDA
 #   naranja = error relativo mediano, en %              -> eje de la DERECHA
@@ -642,10 +674,16 @@ t_mae = base_mae.mark_text(dy=-6, color=TINTA).encode(y="mae:Q", text="mae_txt:N
 g_rel = base_rel.mark_bar(color=NAR_REL).encode(y=y_rel, tooltip=[
     alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("rel_pct:Q", title="Error relativo mediano (%)", format=".1f")])
 t_rel = base_rel.mark_text(dy=-6, color=TINTA).encode(y="rel_pct:Q", text="rel_txt:N")
-gc2.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=380),
-                width="stretch")
-gc2.caption("Cada tramo tiene ~20 % de los autos de test. Azul (eje izquierdo): cuántos dólares se equivoca en promedio. "
-           "Naranja (eje derecho): cuánto se equivoca en porcentaje del precio.")
+g_t, e_t = st.columns([2.2, 1], gap="large")
+g_t.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=360), width="stretch")
+e_t.markdown(explica(
+    "Ordenamos los autos del test del más barato al más caro y los partimos en 5 grupos con la misma cantidad. En cada grupo, "
+    "la barra azul (eje izquierdo) son los dólares que el modelo se equivoca en promedio, y la naranja (eje derecho) es el porcentaje del precio.",
+    "Equivocarse USD 1.000 es poco en un auto de 30.000 y mucho en uno de 3.000. Por eso lo miramos de las dos formas, con un eje para cada una.",
+    f"En dólares el error crece con el precio, de {usd(tramo['mae'].iloc[0])} a {usd(tramo['mae'].iloc[-1])}. En porcentaje queda parecido, entre "
+    f"{num(tramo['rel_pct'].min(), 1)} % y {num(tramo['rel_pct'].max(), 1)} %.",
+    "Los autos caros son los que más se le escapan al modelo en dólares: por eso la app avisa cuando una tasación cae en el 10 % más caro."),
+    unsafe_allow_html=True)
 
 
 with st.expander("Cómo lo sabemos"):
@@ -725,8 +763,13 @@ st.header("Ahora vos")
 tab_exp, tab_probar = st.tabs(["Explorá los autos", "Probá el tasador"])
 
 with tab_exp:
-    st.markdown("Cada punto es un auto publicado. El color compara su precio con lo que dijo el tasador "
-                "(una tasación hecha **sin haber visto ese auto**). Pasá el mouse para ver el detalle o hacé clic en un punto.")
+    st.markdown(explica(
+        "Cada punto es un auto publicado. El color compara su precio con lo que dijo el tasador, que lo tasó <b>sin haber visto ese auto</b>: "
+        "verde = publicado más de 10 % por debajo de la tasación, gris = en precio, naranja = más de 10 % por encima.",
+        "Un gráfico de puntos deja ver miles de autos a la vez y cambiar qué se compara. Vos elegís qué va en cada eje.",
+        "Probá con el año en el eje X y el precio en el Y: es la caída de valor. Cambiá al kilometraje o la potencia y mirá qué cambia. "
+        "Pasá el mouse por un punto para ver el auto y hacé clic para abrir su ficha.",
+        "Ahora la pregunta es tuya: filtrá, cambiá los ejes y buscá autos que se alejen de la tasación."), unsafe_allow_html=True)
     # Controles que achican el universo. Cada uno filtra el DataFrame `d` que alimenta tanto las 4 métricas
     # de arriba como el gráfico: marca (multiselect), año y precio (sliders) y caja (radio).
     f1, f2, f3, f4 = st.columns([2, 2, 2, 1.4])
@@ -758,24 +801,59 @@ with tab_exp:
     # Detalle a pedido: al hacer clic en un punto se guarda su fila y abajo aparece la ficha con la tasación del modelo.
     clic = alt.selection_point(name="auto", fields=["idx"], on="click", nearest=True, empty=False)
     dd = d.reset_index(names="idx")
-    # Desplazamiento horizontal fijo por auto (no al azar en cada dibujo): así los puntos no se mueven entre un clic y otro.
-    dd["anio_j"] = dd["fabricado_en"] + (((dd["idx"] * 2654435761) % 1000) / 1000 - 0.5) * 0.7
-    disp = alt.Chart(dd).mark_circle(size=36, opacity=0.65).encode(
-        x=alt.X("anio_j:Q", title="Año de fabricación", axis=alt.Axis(format="d"),
-                scale=alt.Scale(domain=[rango_anio[0] - 0.5, rango_anio[1] + 0.5])),
-        y=alt.Y("precio_usd:Q", scale=ESCALA_PRECIO, axis=eje("Precio publicado (USD, escala log)", MARCAS_PRECIO)),
+    dd["dif_pct"] = dd["dif"] * 100
+    # Variables que se pueden poner en cada eje (selectores al costado del gráfico).
+    X_OPC = {"Año de fabricación": "fabricado_en", "Kilometraje": "kilometraje", "Potencia (HP)": "potencia_hp", "Motor (litros)": "motor_lt"}
+    Y_OPC = {"Precio publicado (USD)": "precio_usd", "Tasación del modelo (USD)": "tasacion_usd", "Diferencia con la tasación (%)": "dif_pct"}
+    col_sel, col_graf = st.columns([1, 4], gap="medium")
+    nom_x = col_sel.selectbox("Eje horizontal (X)", list(X_OPC), index=0)
+    nom_y = col_sel.selectbox("Eje vertical (Y)", list(Y_OPC), index=0)
+    ver_todo = col_sel.checkbox("Ver todo el rango del eje X", value=False,
+                                help="Por defecto el gráfico se acerca a donde hay más autos. Marcá esto para ver también los extremos.")
+    vx, vy = X_OPC[nom_x], Y_OPC[nom_y]
+    # Zoom a la zona más densa: para el año, la ventana de 10 años con más autos (se calcula de los datos); para el resto, del percentil 2 al 98.
+    if len(dd):
+        if vx == "fabricado_en":
+            cuenta = dd["fabricado_en"].round().astype(int).value_counts().sort_index()
+            anios = range(int(cuenta.index.min()), int(cuenta.index.max()) + 1)
+            cuenta = cuenta.reindex(anios, fill_value=0)
+            ventana = cuenta.rolling(10).sum().dropna()
+            ini = int(ventana.idxmax() - 9) if len(ventana) else int(cuenta.index.min())
+            zoom_x = [ini - 0.5, ini + 9.5] if len(ventana) else [dd[vx].min() - 0.5, dd[vx].max() + 0.5]
+        else:
+            lo, hi = dd[vx].quantile(0.02), dd[vx].quantile(0.98)
+            pad = (hi - lo) * 0.03
+            zoom_x = [float(lo - pad), float(hi + pad)]
+        todo_x = [float(dd[vx].min()) - (0.5 if vx == "fabricado_en" else 0), float(dd[vx].max()) + (0.5 if vx == "fabricado_en" else 0)]
+    else:
+        zoom_x = todo_x = [0, 1]
+    dominio_x = todo_x if ver_todo else zoom_x
+    if vx == "fabricado_en":   # desplazamiento horizontal fijo por auto: los puntos no se mueven entre un clic y otro
+        dd["x_graf"] = dd[vx] + (((dd["idx"] * 2654435761) % 1000) / 1000 - 0.5) * 0.7
+    else:
+        dd["x_graf"] = dd[vx]
+    y_escala = ESCALA_PRECIO if vy != "dif_pct" else alt.Scale(zero=False)
+    y_eje = eje(nom_y + (", escala log" if vy != "dif_pct" else ""), MARCAS_PRECIO if vy != "dif_pct" else None)
+    disp = alt.Chart(dd).mark_circle(size=36, opacity=0.65, clip=True).encode(
+        x=alt.X("x_graf:Q", title=nom_x, axis=alt.Axis(format="d" if vx == "fabricado_en" else ",.1f" if vx == "motor_lt" else ",.0f"),
+                scale=alt.Scale(domain=dominio_x, nice=False)),
+        y=alt.Y(f"{vy}:Q", scale=y_escala, axis=y_eje),
         color=alt.Color("veredicto:N", scale=ESCALA_VEREDICTO, title=None,
                         legend=alt.Legend(orient="top")),
         size=alt.condition(clic, alt.value(160), alt.value(36)),
         tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("version:N", title="Versión"),
-                 alt.Tooltip("fabricado_en:Q", title="Año"),
+                 alt.Tooltip("fabricado_en:Q", title="Año", format="d"),
                  alt.Tooltip("kilometraje:Q", title="Km", format=",.0f"),
                  alt.Tooltip("precio_usd:Q", title="Precio publicado (USD)", format=",.0f"),
                  alt.Tooltip("tasacion_usd:Q", title="Tasación del modelo (USD)", format=",.0f"),
                  alt.Tooltip("dif_txt:N", title="Diferencia vs tasación"),
                  alt.Tooltip("fuente:N", title="Fuente")],
     ).add_params(clic).properties(height=460)
-    evento = st.altair_chart(disp, width="stretch", on_select="rerun", key="explora")
+    evento = col_graf.altair_chart(disp, width="stretch", on_select="rerun", key="explora")
+    if not ver_todo and len(dd):
+        col_graf.caption("El gráfico está acercado a donde hay más autos"
+                         + (f" (los 10 años con más autos, {int(zoom_x[0] + 0.5)} a {int(zoom_x[1] - 0.5)})" if vx == "fabricado_en" else "")
+                         + ". Marcá «Ver todo el rango del eje X» para ver los extremos.")
 
     elegido = None
     try:
