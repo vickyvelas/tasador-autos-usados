@@ -426,6 +426,20 @@ vista_mapa = pdk.View("MapView", controller={"scrollZoom": False, "dragPan": Tru
 col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], views=[vista_mapa], initial_view_state=vista, map_provider=None,
                                tooltip={"text": "{ubicacion_corregida}\n{autos} autos · mediana {mediana_txt}"}),
                       height=520)
+# Referencias del mapa: tamaño = cantidad de autos de la ciudad, color = precio mediano de sus autos.
+p_lo, p_hi = UBIC_OK["mediana_usd"].min(), UBIC_OK["mediana_usd"].max()
+col_mapa.markdown(
+    "<div style='display:flex;flex-wrap:wrap;gap:1.4rem;align-items:center;font-size:.8rem;color:#3d3d3a;margin:.2rem 0 1rem 0'>"
+    "<div><b>Cantidad de autos</b><br>"
+    "<span style='display:inline-flex;align-items:flex-end;gap:.5rem;margin-top:.2rem'>"
+    "<span style='text-align:center'><span style='display:block;width:8px;height:8px;border-radius:50%;background:#d9a07a;margin:0 auto'></span>10</span>"
+    "<span style='text-align:center'><span style='display:block;width:16px;height:16px;border-radius:50%;background:#d9a07a;margin:0 auto'></span>100</span>"
+    "<span style='text-align:center'><span style='display:block;width:30px;height:30px;border-radius:50%;background:#d9a07a;margin:0 auto'></span>1.000</span></span></div>"
+    "<div><b>Precio mediano de la ciudad</b><br>"
+    "<span style='display:block;width:170px;height:10px;border-radius:5px;margin-top:.3rem;background:linear-gradient(90deg,rgb(254,215,170),rgb(181,96,58))'></span>"
+    f"<span style='display:flex;justify-content:space-between;width:170px'><span>{usd(p_lo)}</span><span>{usd(p_hi)}</span></span></div>"
+    "<div><span style='display:inline-block;width:14px;height:10px;background:#eef1f5;border:1px solid #78828f;vertical-align:middle'></span> Provincia</div>"
+    "</div>", unsafe_allow_html=True)
 por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().sort_values("autos", ascending=False).head(8))
 barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),
