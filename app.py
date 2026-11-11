@@ -202,7 +202,6 @@ st.sidebar.markdown(
     '<line x1="35" y1="138" x2="85" y2="138" stroke="#b5603a" stroke-width="4" stroke-linecap="round"/>'
     '<circle cx="82" cy="30" r="5" fill="#b5603a"/></svg></div>', unsafe_allow_html=True)
 st.sidebar.caption("Dentro de cada sección, el desplegable *Cómo lo sabemos* tiene la evidencia técnica.")
-st.caption("Proyecto integrador · Ciencia de Datos · UTN FRM · 2026 · Comisión 5K09 · Grupo 03")
 st.caption("Integrantes: García Nicolás · Ramos Ignacio · Velasco Victoria · Via Tomás · Villanueva Sergio")
 ancla("portada")
 st.markdown(
@@ -411,21 +410,24 @@ mapa_df = mapa_df.assign(
     r=(mapa_df["autos"] ** 0.5) * 2500 + 3000,
     rojo=(254 + (181 - 254) * t).round().astype(int), verde=(215 + (96 - 215) * t).round().astype(int),
     azul=(170 + (58 - 170) * t).round().astype(int), mediana_txt=mapa_df["mediana_usd"].map(usd))
-capa_prov = pdk.Layer("GeoJsonLayer", GEO, stroked=True, filled=False, get_line_color=[90, 100, 115], line_width_min_pixels=1)
+capa_prov = pdk.Layer("GeoJsonLayer", GEO, stroked=True, filled=True, get_fill_color=[238, 241, 245],
+                     get_line_color=[120, 130, 145], line_width_min_pixels=1)   # sólo Argentina, sin mapa base del mundo
 capa_ciu = pdk.Layer("ScatterplotLayer", mapa_df, get_position=["longitud", "latitud"], get_radius="r",
                      get_fill_color=["rojo", "verde", "azul", 210], get_line_color=[255, 255, 255], line_width_min_pixels=1,
                      stroked=True, pickable=True, radius_min_pixels=3, radius_max_pixels=45)
 vista = pdk.ViewState(latitude=-33.5, longitude=-65.5, zoom=3.6 if not sel_prov else 5.2)
 col_mapa, col_barras = st.columns([3, 2])
-col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], initial_view_state=vista, map_style="light",
+# scrollZoom apagado: con la rueda se baja la página; el zoom va con los botones + / − o pellizcando; se arrastra para mover
+vista_mapa = pdk.View("MapView", controller={"scrollZoom": False, "dragPan": True, "doubleClickZoom": True, "touchZoom": True})
+col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], views=[vista_mapa], initial_view_state=vista, map_provider=None,
                                tooltip={"text": "{ubicacion_corregida}\n{autos} autos · mediana {mediana_txt}"}),
                       height=520)
 por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().sort_values("autos", ascending=False).head(8))
 barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),
     tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
-col_barras.altair_chart(barras.properties(height=320, title="Dónde están los autos (8 provincias con más)"), width="stretch")
-col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color más oscuro = precio mediano más alto. Se puede hacer zoom con la rueda del mouse y arrastrar el mapa. "
+col_barras.altair_chart(barras.properties(height=320, title="Autos por provincia"), width="stretch")
+col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color más oscuro = precio mediano más alto. Zoom con los botones + y − (o pellizcando) y se arrastra para moverlo. "
                    f"Faltan {UB['sin_coordenadas']} ciudades sin coordenadas (con pocos autos cada una).")
 st.markdown(
     "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
@@ -473,6 +475,40 @@ st.markdown(
     f"lineal por varios desvíos. El elegido, en azul, es el boosting con la grilla ajustada: "
     f"{usd(AJ['mae'])} ± {num(AJ['desvio'])} en validación y **{usd(TEST['mae'])} en test**, que es el número honesto.")
 
+st.markdown("##### Dónde se equivoca el modelo, por tramo de precio")
+st.markdown(f"**Test, una sola vez: {usd(TEST['mae'])}.** Dónde se equivoca: el error en dólares crece con el precio, "
+            "pero en porcentaje se mantiene parecido.")
+# Dónde se equivoca, como en el Colab: por cada tramo de precio del test, DOS barras con su propio eje:
+#   azul   = error promedio en dólares (MAE)            -> eje de la IZQUIERDA
+#   naranja = error relativo mediano, en %              -> eje de la DERECHA
+# xOffset las pone una al lado de la otra; resolve_scale(y="independent") da un eje vertical a cada una.
+tramo = pd.DataFrame(TEST["por_tramo"])
+orden_tramo = list(tramo["tramo"])
+tramo["rel_pct"] = tramo["rel"] * 100
+tramo["mae_txt"] = tramo["mae"].map(lambda v: num(v))
+tramo["rel_txt"] = tramo["rel"].map(lambda v: num(v * 100, 1) + "%")
+NAR_REL = "#C8602F"  # el naranja del gráfico del Colab
+series = ["MAE (USD)", "Error relativo mediano (%)"]
+desfase = alt.XOffset("serie:N", scale=alt.Scale(domain=series))
+x_tramo = alt.X("tramo:N", sort=orden_tramo, title="Tramo de mercado (USD)", axis=alt.Axis(labelAngle=0))
+base_mae = alt.Chart(tramo.assign(serie=series[0])).encode(x=x_tramo, xOffset=desfase)
+base_rel = alt.Chart(tramo.assign(serie=series[1])).encode(x=x_tramo, xOffset=desfase)
+y_mae = alt.Y("mae:Q", axis=alt.Axis(title="MAE absoluto (USD)", titleColor=AZUL, labelColor=AZUL,
+                                     labelExpr=PUNTOS_MIL, orient="left"))
+y_rel = alt.Y("rel_pct:Q", axis=alt.Axis(title="Error relativo mediano (%)", titleColor=NAR_REL,
+                                         labelColor=NAR_REL, orient="right"))
+g_mae = base_mae.mark_bar(color=AZUL).encode(y=y_mae, tooltip=[
+    alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("mae:Q", title="MAE (USD)", format=",.0f")])
+t_mae = base_mae.mark_text(dy=-6, color=TINTA).encode(y="mae:Q", text="mae_txt:N")
+g_rel = base_rel.mark_bar(color=NAR_REL).encode(y=y_rel, tooltip=[
+    alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("rel_pct:Q", title="Error relativo mediano (%)", format=".1f")])
+t_rel = base_rel.mark_text(dy=-6, color=TINTA).encode(y="rel_pct:Q", text="rel_txt:N")
+st.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=300),
+                width="stretch")
+st.caption("Cada tramo tiene ~20 % de los autos de test. Azul (eje izquierdo): cuántos dólares se equivoca en promedio. "
+           "Naranja (eje derecho): cuánto se equivoca en porcentaje del precio.")
+
+
 with st.expander("Cómo lo sabemos"):
     st.markdown(f"""
 **Métrica: MAE en dólares.** Se lee directo ("me equivoco X dólares por auto") y el costo de equivocarse en una
@@ -504,38 +540,6 @@ de categorías, imputación, escalado, `TargetEncoder` y logaritmo del objetivo)
     st.dataframe(top, hide_index=True, width="stretch")
     st.caption("Las cinco quedan dentro de un desvío entre sí: el ajuste mejora poco y el modelo no depende de una "
                "combinación exacta. El error en train es menor que en validación (hay algo de sobreajuste, esperable en boosting).")
-
-    st.markdown(f"**Test, una sola vez: {usd(TEST['mae'])}.** Dónde se equivoca: el error en dólares crece con el precio, "
-                "pero en porcentaje se mantiene parecido.")
-    # Dónde se equivoca, como en el Colab: por cada tramo de precio del test, DOS barras con su propio eje:
-    #   azul   = error promedio en dólares (MAE)            -> eje de la IZQUIERDA
-    #   naranja = error relativo mediano, en %              -> eje de la DERECHA
-    # xOffset las pone una al lado de la otra; resolve_scale(y="independent") da un eje vertical a cada una.
-    tramo = pd.DataFrame(TEST["por_tramo"])
-    orden_tramo = list(tramo["tramo"])
-    tramo["rel_pct"] = tramo["rel"] * 100
-    tramo["mae_txt"] = tramo["mae"].map(lambda v: num(v))
-    tramo["rel_txt"] = tramo["rel"].map(lambda v: num(v * 100, 1) + "%")
-    NAR_REL = "#C8602F"  # el naranja del gráfico del Colab
-    series = ["MAE (USD)", "Error relativo mediano (%)"]
-    desfase = alt.XOffset("serie:N", scale=alt.Scale(domain=series))
-    x_tramo = alt.X("tramo:N", sort=orden_tramo, title="Tramo de mercado (USD)", axis=alt.Axis(labelAngle=0))
-    base_mae = alt.Chart(tramo.assign(serie=series[0])).encode(x=x_tramo, xOffset=desfase)
-    base_rel = alt.Chart(tramo.assign(serie=series[1])).encode(x=x_tramo, xOffset=desfase)
-    y_mae = alt.Y("mae:Q", axis=alt.Axis(title="MAE absoluto (USD)", titleColor=AZUL, labelColor=AZUL,
-                                         labelExpr=PUNTOS_MIL, orient="left"))
-    y_rel = alt.Y("rel_pct:Q", axis=alt.Axis(title="Error relativo mediano (%)", titleColor=NAR_REL,
-                                             labelColor=NAR_REL, orient="right"))
-    g_mae = base_mae.mark_bar(color=AZUL).encode(y=y_mae, tooltip=[
-        alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("mae:Q", title="MAE (USD)", format=",.0f")])
-    t_mae = base_mae.mark_text(dy=-6, color=TINTA).encode(y="mae:Q", text="mae_txt:N")
-    g_rel = base_rel.mark_bar(color=NAR_REL).encode(y=y_rel, tooltip=[
-        alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("rel_pct:Q", title="Error relativo mediano (%)", format=".1f")])
-    t_rel = base_rel.mark_text(dy=-6, color=TINTA).encode(y="rel_pct:Q", text="rel_txt:N")
-    st.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=300),
-                    width="stretch")
-    st.caption("Cada tramo tiene ~20 % de los autos de test. Azul (eje izquierdo): cuántos dólares se equivoca en promedio. "
-               "Naranja (eje derecho): cuánto se equivoca en porcentaje del precio.")
 
     te = pd.DataFrame(M["target_encoder"])
     sm = TEST["sesgo_moneda"]
