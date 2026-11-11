@@ -74,16 +74,19 @@ def num(x, dec=0):
 st.markdown("""
 <style>
 [data-testid="stSidebar"] { background:#f4f6f9; }
-.ficha { background:#22364d; color:#fff; border-radius:14px; padding:.8rem 1rem; font-size:.82rem; margin-bottom:1rem; line-height:1.5; }
-.ficha ul { margin:.4rem 0 0 0; padding-left:1.1rem; }
-.idx-titulo { font-weight:700; font-size:1rem; letter-spacing:.06em; text-transform:uppercase; color:#2c3e50; margin:0 0 .6rem 0; }
-.idx-grupo { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:#6b7a90; margin:1rem 0 .35rem 2px; font-weight:700; }
-a.idx { display:flex; align-items:center; gap:.65rem; background:#fff; border:1px solid #e1e6ec; border-left:3px solid var(--c);
-        border-radius:12px; padding:.55rem .8rem; margin:.3rem 0; text-decoration:none !important; color:#25324a !important;
+.ficha { background:#22364d; color:#fff; border-radius:10px; padding:.55rem .8rem; font-size:.74rem; margin-bottom:.6rem; line-height:1.4; }
+.ficha ul { margin:.3rem 0 0 0; padding-left:1rem; font-size:.72rem; }
+.ficha li { margin:0; }
+.idx-titulo { font-weight:700; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; color:#2c3e50; margin:0 0 .3rem 0; }
+.idx-grupo { font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:#6b7a90; margin:.6rem 0 .2rem 2px; font-weight:700; }
+a.idx { display:flex; align-items:center; gap:.5rem; font-size:.86rem; background:#fff; border:1px solid #e1e6ec; border-left:3px solid var(--c);
+        border-radius:8px; padding:.3rem .65rem; margin:.15rem 0; text-decoration:none !important; color:#25324a !important;
         font-weight:600; box-shadow:none; transition:all .15s ease; }
+a.idx.act { background:var(--c); color:#fff !important; font-weight:700; }
+a.idx.act small { opacity:.9; }
 a.idx:hover { background:#eef2f6; transform:translateX(3px); }
 a.idx .ic { font-size:1.2rem; }
-a.idx small { display:block; font-weight:400; opacity:.75; font-size:.72rem; }
+a.idx small { display:none; }
 .hero { background:#22364d; border-radius:10px; padding:1.6rem 1.8rem; color:#fff; margin-bottom:1rem; }
 .hero h1 { color:#fff; margin:0; padding:0; font-size:2.2rem; font-weight:700; }
 .hero p { margin:.5rem 0 0 0; font-size:1.1rem; opacity:.95; }
@@ -94,6 +97,12 @@ a.idx small { display:block; font-weight:400; opacity:.75; font-size:.72rem; }
 .dato { border-radius:8px; padding:.7rem 1rem; background:var(--bg); border:1px solid #e1e6ec; border-left:4px solid var(--bd); margin:.25rem 0 .75rem 0; }
 .dato .v { font-size:1.4rem; font-weight:700; color:var(--tx); line-height:1.15; }
 .dato .l { font-size:.85rem; color:#3d3d3a; }
+@media (max-height: 820px) { .copa-menu { display:none; } }
+@media (max-width: 820px) {
+  .hero { padding:1rem 1.1rem; } .hero h1 { font-size:1.5rem; } .hero p { font-size:.95rem; }
+  .kpi .v { font-size:1.5rem; } .kpi { margin-bottom:.5rem; } .dato .v { font-size:1.15rem; }
+  .concl { font-size:1rem; padding:.7rem .9rem; } .panel .v { font-size:1.8rem; }
+}
 .kicker { font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#2c5f8f; margin:.4rem 0 -.6rem 0; }
 .kicker.copa { color:#b5603a; }
 .concl { border-left:4px solid #2c5f8f; background:#f6f8fa; border-radius:0 8px 8px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
@@ -181,14 +190,13 @@ st.sidebar.markdown(
     + idx("hallazgos", "", "2 · Lo que encontramos", "Año, km y ubicación", "#2c5f8f")
     + idx("modelo", "", "3 · El modelo", "Qué tan bien tasa", "#2c5f8f")
     + '<div class="idx-grupo">La copa · ahora vos</div>'
-    + idx("explora", "", "Explorá los autos", "Filtrá y mirá cada uno", "#b5603a")
-    + idx("proba", "", "Probá el tasador", "Cargá tu auto", "#b5603a")
+    + idx("explora", "", "Explorá y probá", "Filtrá los autos y tasá el tuyo", "#b5603a")
     + '<div class="idx-grupo">Más</div>'
     + idx("pie", "", "Repositorio", "Cómo regenerar todo", "#6b7280"),
     unsafe_allow_html=True)
 # La copa de martini del modelo "tallo y copa": el tallo se lee en orden, la copa la maneja quien visita.
 st.sidebar.markdown(
-    '<div style="text-align:center;margin-top:1.2rem"><svg width="120" height="150" viewBox="0 0 120 150">'
+    '<div class="copa-menu" style="text-align:center;margin-top:.6rem"><svg width="70" height="88" viewBox="0 0 120 150">'
     '<polygon points="10,10 110,10 60,80" fill="#dde6ef" stroke="#2c5f8f" stroke-width="3"/>'
     '<polygon points="22,22 98,22 60,70" fill="#2c5f8f" opacity=".5"/>'
     '<line x1="60" y1="80" x2="60" y2="135" stroke="#b5603a" stroke-width="4"/>'
@@ -391,12 +399,14 @@ mapa_df = UBIC_OK[UBIC_OK["provincia"].isin(sel_prov)] if sel_prov else UBIC_OK
 contorno = alt.Chart(alt.Data(values=GEO["features"])).mark_geoshape(fill="#eef1f5", stroke="#b8c0cc", strokeWidth=0.6)
 puntos_mapa = alt.Chart(mapa_df).mark_circle(opacity=0.8, stroke="white", strokeWidth=0.7).encode(
     longitude="longitud:Q", latitude="latitud:Q",
-    size=alt.Size("autos:Q", scale=alt.Scale(range=[40, 2200]), legend=alt.Legend(title="Autos")),
-    color=alt.Color("mediana_usd:Q", scale=alt.Scale(scheme="oranges"), legend=alt.Legend(title="Precio mediano (USD)")),
+    size=alt.Size("autos:Q", scale=alt.Scale(type="sqrt", range=[25, 1100]),
+                  legend=alt.Legend(title="Autos", orient="bottom", values=[10, 100, 1000], direction="horizontal")),
+    color=alt.Color("mediana_usd:Q", scale=alt.Scale(scheme="oranges"),
+                    legend=alt.Legend(title="Precio mediano (USD)", orient="bottom", direction="horizontal", gradientLength=160)),
     tooltip=[alt.Tooltip("ubicacion_corregida:N", title="Ciudad"), alt.Tooltip("autos:Q", title="Autos"),
              alt.Tooltip("mediana_usd:Q", title="Precio mediano (USD)", format=",.0f")])
-col_mapa, col_barras = st.columns([3, 2])
-col_mapa.altair_chart((contorno + puntos_mapa).project("mercator").properties(height=560), width="stretch")
+col_mapa, col_barras = st.columns([2, 3])
+col_mapa.altair_chart((contorno + puntos_mapa).project("mercator").properties(height=520), width="stretch")
 por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().sort_values("autos", ascending=False).head(8))
 barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),
@@ -554,7 +564,6 @@ st.divider()
 # =========================================================================
 # COPA · Explorá (panorama + filtros + detalle) y Probá el tasador (caso nuevo).
 ancla("explora")
-ancla("proba")
 st.markdown('<div class="kicker copa">La copa · tu turno</div>', unsafe_allow_html=True)
 st.header("Ahora vos")
 tab_exp, tab_probar = st.tabs(["Explorá los autos", "Probá el tasador"])
@@ -750,3 +759,29 @@ ancla("pie")
 st.divider()
 st.caption(f"Datos: cosecha del {M['fecha_datos']} del pipeline de Airflow del grupo. Modelo: HistGradientBoosting "
            f"con objetivo logarítmico, semilla {M['semilla']}, regenerado con build_app.py.")
+
+# Resaltado del índice según la parte de la página donde estás (scroll-spy). Un componente HTML de altura 0 corre un
+# poco de JavaScript en la página principal: mira qué ancla (`ancla("...")`) quedó más cerca del borde de arriba y
+# marca con la clase "act" el link del índice que le corresponde.
+import streamlit.components.v1 as components
+components.html("""
+<script>
+const doc = window.parent.document;
+function marcar() {
+  const links = [...doc.querySelectorAll('a.idx')];
+  let actual = null;
+  for (const l of links) {
+    const el = doc.getElementById(l.getAttribute('href').slice(1));
+    if (el && el.getBoundingClientRect().top <= 140) actual = l;   // la última ancla que ya pasó el borde de arriba
+  }
+  const sc = doc.querySelector('[data-testid="stMain"]');
+  if (sc && sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 5) actual = links[links.length - 1];  // al final de todo: el último
+  links.forEach(l => l.classList.toggle('act', l === (actual || links[0])));
+}
+if (!window.parent.__idxSpy) {
+  window.parent.__idxSpy = true;
+  doc.addEventListener('scroll', marcar, true);
+}
+setInterval(marcar, 400);   // también al volver a dibujarse la página
+marcar();
+</script>""", height=0)
