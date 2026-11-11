@@ -198,6 +198,8 @@ def main(ruta_datos: str):
     pred_oof = cross_val_predict(T.pipeline_hgb(**mejores), X_train, y_train, cv=cv, groups=g_train, n_jobs=-1)
     autos = info[["fuente", "marca", "modelo", "version", "fabricado_en", "kilometraje", "precio", "moneda",
                   "motor_lt", "potencia_hp", "transmision", "traccion", "combustible", "precio_usd", "url"]].copy()
+    autos["ubicacion"] = info["ubicacion_c"]   # ciudad y provincia (ya corregidas) para el mapa y la tabla de la app
+    autos["provincia"] = info["provincia"]
     ing = T.IngenieriaAutos().transform(X)
     autos["caja"] = ing["transmision"]
     autos["comb"] = ing["combustible"]
@@ -252,6 +254,20 @@ def main(ruta_datos: str):
     coords = pd.read_csv(AQUI / "data" / "ubicaciones_coordenadas.csv")
     ub = ub.merge(coords, on="ubicacion_corregida", how="left")
     ub["mediana_usd"] = ub["mediana_usd"].round(0)
+    # Qué autos hay en cada ciudad (para el cartel del mapa): los 3 modelos más publicados con su cantidad y precio
+    # mediano, y el auto más caro y el más barato. Los nombres son los de mostrar (marca y modelo unificados).
+    nombre = info["marca"] + " " + info["modelo"]
+
+    def resumen_ciudad(idx):
+        g = info.loc[idx.index].assign(nombre=nombre.loc[idx.index])
+        top = g.groupby("nombre")["precio_usd"].agg(["size", "median"]).sort_values("size", ascending=False).head(3)
+        txt = "<br>".join(f"{n} ({int(r['size'])}) · USD {r['median']:,.0f}".replace(",", ".") for n, r in top.iterrows())
+        caro, barato = g.loc[g["precio_usd"].idxmax()], g.loc[g["precio_usd"].idxmin()]
+        fmt = lambda r: f"{r['nombre']} {int(r['fabricado_en'])} · USD {r['precio_usd']:,.0f}".replace(",", ".")
+        return pd.Series({"mas_publicados": txt, "mas_caro": fmt(caro), "mas_barato": fmt(barato)})
+
+    ub = ub.merge(info.groupby("ubicacion_c").apply(resumen_ciudad, include_groups=False).reset_index()
+                  .rename(columns={"ubicacion_c": "ubicacion_corregida"}), on="ubicacion_corregida", how="left")
     ub.to_csv(SALIDA / "ubicaciones.csv", index=False, encoding="utf-8")
     (SALIDA / "provincias.geojson").write_bytes((AQUI / "data" / "provincias.geojson").read_bytes())
     por_prov = info["provincia"].value_counts()

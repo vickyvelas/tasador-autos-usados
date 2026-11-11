@@ -419,12 +419,37 @@ capa_prov = pdk.Layer("GeoJsonLayer", GEO, stroked=True, filled=True, get_fill_c
 capa_ciu = pdk.Layer("ScatterplotLayer", mapa_df, get_position=["longitud", "latitud"], get_radius="r",
                      get_fill_color=["rojo", "verde", "azul", 210], get_line_color=[255, 255, 255], line_width_min_pixels=1,
                      stroked=True, pickable=True, radius_min_pixels=3, radius_max_pixels=45)
-vista = pdk.ViewState(latitude=-39.0, longitude=-64.5, zoom=3.15 if not sel_prov else 4.6)   # el país entero entra en 520 px de alto
+# Vista inicial: todo el país o, si se eligió una o más provincias, un zoom que las encuadra (caja de sus límites).
+ALIAS_GEO = {"Capital Federal": "Ciudad Autónoma de Buenos Aires"}
+
+
+def puntos_de(geom):
+    """Todos los puntos [lon, lat] de un MultiPolygon del geojson."""
+    return [p for poligono in geom["coordinates"] for anillo in poligono for p in anillo]
+
+
+if sel_prov:
+    nombres = {ALIAS_GEO.get(p, p) for p in sel_prov}
+    pts = [p for f in GEO["features"] if f["properties"]["nombre"] in nombres for p in puntos_de(f["geometry"])]
+    if not pts:   # si el nombre no coincide, se usan las ciudades elegidas
+        pts = mapa_df[["longitud", "latitud"]].values.tolist()
+    lons, lats = [p[0] for p in pts], [p[1] for p in pts]
+    # centro = medio de la caja; zoom = el que deja entrar la caja completa en el mapa (≈ 550 × 520 px)
+    lat0, lon0 = (min(lats) + max(lats)) / 2, (min(lons) + max(lons)) / 2
+    ancho, alto = max(max(lons) - min(lons), 0.3), max(max(lats) - min(lats), 0.3)
+    z_ancho = np.log2(386 * 0.7 / ancho)
+    z_alto = np.log2(365 * 0.7 * np.cos(np.radians(lat0)) / alto)
+    vista = pdk.ViewState(latitude=lat0, longitude=lon0, zoom=float(np.clip(min(z_ancho, z_alto), 3.15, 8)))
+else:
+    vista = pdk.ViewState(latitude=-39.0, longitude=-64.5, zoom=3.15)   # el país entero entra en 520 px de alto
 col_mapa, col_barras = st.columns([3, 2])
 # scrollZoom apagado: con la rueda se baja la página; el zoom va con los botones + / − o pellizcando; se arrastra para mover
 vista_mapa = pdk.View("MapView", controller={"scrollZoom": False, "dragPan": True, "doubleClickZoom": True, "touchZoom": True})
 col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], views=[vista_mapa], initial_view_state=vista, map_provider=None,
-                               tooltip={"text": "{ubicacion_corregida}\n{autos} autos · mediana {mediana_txt}"}),
+                               tooltip={"html": "<b>{ubicacion_corregida}</b><br>{autos} autos · mediana {mediana_txt}"
+                                        "<br><br><b>Más publicados</b><br>{mas_publicados}"
+                                        "<br><br><b>Más caro:</b> {mas_caro}<br><b>Más barato:</b> {mas_barato}",
+                                        "style": {"backgroundColor": "#22364d", "color": "white", "fontSize": "12px"}}),
                       height=520)
 # Referencias del mapa: tamaño = cantidad de autos de la ciudad, color = precio mediano de sus autos.
 p_lo, p_hi = UBIC_OK["mediana_usd"].min(), UBIC_OK["mediana_usd"].max()
@@ -440,6 +465,16 @@ col_mapa.markdown(
     f"<span style='display:flex;justify-content:space-between;width:170px'><span>{usd(p_lo)}</span><span>{usd(p_hi)}</span></span></div>"
     "<div><span style='display:inline-block;width:14px;height:10px;background:#eef1f5;border:1px solid #78828f;vertical-align:middle'></span> Provincia</div>"
     "</div>", unsafe_allow_html=True)
+# Si se eligió una sola provincia: tabla con sus autos (ordenable haciendo clic en las columnas).
+if len(sel_prov) == 1:
+    de_prov = AUTOS[AUTOS["provincia"] == sel_prov[0]]
+    st.markdown(f"**Autos publicados en {sel_prov[0]}** ({num(len(de_prov))})")
+    st.dataframe(de_prov.assign(Ciudad=de_prov["ubicacion"].str.split(", ").str[-1])[
+        ["Ciudad", "marca", "modelo", "fabricado_en", "kilometraje", "precio_usd", "tasacion_usd"]]
+        .rename(columns={"marca": "Marca", "modelo": "Modelo", "fabricado_en": "Año", "kilometraje": "Km",
+                         "precio_usd": "Precio (USD)", "tasacion_usd": "Tasación (USD)"})
+        .sort_values("Precio (USD)", ascending=False),
+        hide_index=True, width="stretch", height=260)
 por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().sort_values("autos", ascending=False).head(8))
 barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),

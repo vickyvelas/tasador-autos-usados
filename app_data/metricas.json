@@ -55,7 +55,7 @@
   {
    "modelo": "Random forest",
    "mae": 1518.0331878077072,
-   "desvio": 100.28342098257566
+   "desvio": 100.28342098257583
   },
   {
    "modelo": "HistGradientBoosting",
