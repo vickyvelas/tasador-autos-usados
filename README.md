@@ -40,9 +40,6 @@ DeRuedas (HTML)    ───┘                                                 
 
 Una "copa de martini":
 
-- **Portada:** la idea central y tres números (error en test, error del piso, autos analizados).
-- **Los datos:** distribución de precios. En *Cómo lo sabemos*: el pipeline (fuentes, bronce, plata, calidad),
-  qué es una fila, los filtros paso por paso con las filas que quedan y las columnas descartadas por fuga.
 - **Índice lateral:** con la ficha del grupo y links a cada sección; marca en cuál estás mientras bajás la página.
 - **Portada:** la idea central y tres números (error en test, error del piso, autos analizados).
 - **Los datos:** distribución de precios. En *Cómo lo sabemos*: el pipeline (fuentes, bronce, plata, calidad),
