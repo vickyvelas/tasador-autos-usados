@@ -447,6 +447,17 @@ if sel_prov:
 else:
     vista = pdk.ViewState(latitude=-39.0, longitude=-64.5, zoom=3.15)   # el país entero entra en 520 px de alto
 col_mapa, col_barras = st.columns([3, 2])
+# Botones de zoom: suman o restan un nivel al zoom de partida (que ya encuadra la provincia elegida o el país).
+if st.session_state.get("zoom_prov") != tuple(sel_prov):
+    st.session_state["zoom_prov"], st.session_state["dz"] = tuple(sel_prov), 0.0   # al cambiar de provincia, vuelve al encuadre
+b1, b2, b3, _ = col_mapa.columns([1, 1, 1.6, 2])
+if b1.button("Acercar +", key="z_mas"):
+    st.session_state["dz"] = min(st.session_state["dz"] + 1, 5)
+if b2.button("Alejar −", key="z_menos"):
+    st.session_state["dz"] = max(st.session_state["dz"] - 1, -1.5)
+if b3.button("Ver todo", key="z_reset"):
+    st.session_state["dz"] = 0.0
+vista.zoom = max(float(vista.zoom) + st.session_state["dz"], 2.2)
 # scrollZoom apagado: con la rueda se baja la página; el zoom va con los botones + / − o pellizcando; se arrastra para mover
 vista_mapa = pdk.View("MapView", controller={"scrollZoom": False, "dragPan": True, "doubleClickZoom": True, "touchZoom": True})
 col_mapa.pydeck_chart(pdk.Deck(layers=[capa_prov, capa_ciu], views=[vista_mapa], initial_view_state=vista, map_provider=None,
@@ -484,7 +495,7 @@ barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
     y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),
     tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
 col_barras.altair_chart(barras.properties(height=320, title="Autos por provincia"), width="stretch")
-col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color más oscuro = precio mediano más alto. Zoom con los botones + y − (o pellizcando) y se arrastra para moverlo. "
+col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color más oscuro = precio mediano más alto. Zoom con los botones «Acercar +» y «Alejar −» de arriba del mapa (o doble clic / pellizcando); se arrastra para moverlo. "
                    f"Faltan {UB['sin_coordenadas']} ciudades sin coordenadas (con pocos autos cada una).")
 st.markdown(
     "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
