@@ -68,6 +68,53 @@ def num(x, dec=0):
     return s.replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+# --- diseño: estilos de las tarjetas, el índice lateral y el encabezado ---------------------------------------
+# Todo el CSS está acá. Los colores de las tarjetas siguen la paleta de arriba (azul = modelo, gris = piso,
+# verde = autos/datos, naranja = hallazgo/alerta), así que un color significa lo mismo en tarjetas y gráficos.
+st.markdown("""
+<style>
+[data-testid="stSidebar"] { background: linear-gradient(180deg, #e8f1fc 0%, #f4f8fd 100%); }
+.idx-titulo { font-weight:800; font-size:1.15rem; color:#1d4f91; margin:0 0 .6rem 0; }
+.idx-grupo { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:#6b7a90; margin:1rem 0 .35rem 2px; font-weight:700; }
+a.idx { display:flex; align-items:center; gap:.65rem; background:#fff; border:1px solid #d6e4f7; border-left:5px solid var(--c);
+        border-radius:12px; padding:.55rem .8rem; margin:.3rem 0; text-decoration:none !important; color:#25324a !important;
+        font-weight:600; box-shadow:0 1px 3px rgba(30,70,130,.08); transition:all .15s ease; }
+a.idx:hover { background:var(--c); color:#fff !important; transform:translateX(4px); box-shadow:0 4px 10px rgba(30,70,130,.22); }
+a.idx .ic { font-size:1.2rem; }
+a.idx small { display:block; font-weight:400; opacity:.75; font-size:.72rem; }
+.hero { background:linear-gradient(120deg,#1d4f91 0%,#2a78d6 55%,#3fa7e0 100%); border-radius:18px; padding:1.6rem 1.8rem; color:#fff; margin-bottom:1rem; }
+.hero h1 { color:#fff; margin:0; padding:0; font-size:2.4rem; }
+.hero p { margin:.5rem 0 0 0; font-size:1.1rem; opacity:.95; }
+.kpi { border-radius:16px; padding:1rem 1.2rem; color:#fff; box-shadow:0 3px 10px rgba(0,0,0,.12); height:100%; }
+.kpi .v { font-size:2rem; font-weight:800; line-height:1.1; }
+.kpi .l { font-size:.9rem; opacity:.95; margin-top:.25rem; }
+.kpi .s { font-size:.75rem; opacity:.8; margin-top:.35rem; }
+.dato { border-radius:14px; padding:.8rem 1rem; background:var(--bg); border:1px solid var(--bd); border-left:6px solid var(--bd); margin:.25rem 0 .75rem 0; }
+.dato .v { font-size:1.5rem; font-weight:800; color:var(--tx); line-height:1.15; }
+.dato .l { font-size:.85rem; color:#3d3d3a; }
+</style>
+""", unsafe_allow_html=True)
+
+# Colores de las tarjetas: (fondo/borde, texto)
+TARJ = {"azul": ("#2a78d6", "#2a78d6"), "verde": ("#1a9e77", "#1a9e77"), "naranja": ("#d95926", "#d95926"),
+        "gris": ("#6b7280", "#6b7280"), "violeta": ("#7a4fd0", "#7a4fd0")}
+TARJ_SUAVE = {"azul": ("#eaf2fd", "#2a78d6"), "verde": ("#e6f6f0", "#1a9e77"), "naranja": ("#fcefe8", "#d95926"),
+              "gris": ("#f1f2f4", "#6b7280"), "violeta": ("#f1ecfb", "#7a4fd0")}
+
+
+def kpi(valor, etiqueta, color="azul", pie=""):
+    """Tarjeta grande de color sólido: el dato clave de la portada."""
+    return (f'<div class="kpi" style="background:{TARJ[color][0]}"><div class="v">{valor}</div>'
+            f'<div class="l">{etiqueta}</div><div class="s">{pie}</div></div>')
+
+
+def dato(valor, etiqueta, color="azul"):
+    """Cuadro suave que destaca un número dentro de una sección."""
+    bg, c = TARJ_SUAVE[color]
+    return (f'<div class="dato" style="--bg:{bg};--bd:{c};--tx:{c}"><div class="v">{valor}</div>'
+            f'<div class="l">{etiqueta}</div></div>')
+
+
 # Carga de lo que generó build_app.py. La app NO calcula nada del modelo: sólo lee app_data/.
 @st.cache_data
 def cargar():
@@ -105,33 +152,39 @@ N_AUTOS = M["pasos"][-1]["filas"]
 # =========================================================================
 # PORTADA: la idea central en una oración + tres números que la sostienen (error en test, piso, cantidad de autos).
 # ÍNDICE: menú lateral para navegar. Cada link apunta a un ancla (`ancla("id")`) puesta justo antes de la sección.
-st.sidebar.markdown("### 🧭 Índice")
+def idx(destino, icono, titulo, sub, color):
+    return (f'<a class="idx" href="#{destino}" target="_self" style="--c:{color}"><span class="ic">{icono}</span>'
+            f'<span>{titulo}<small>{sub}</small></span></a>')
+
+
 st.sidebar.markdown(
-    "- [Portada](#portada)\n"
-    "- **El tallo: la historia**\n"
-    "  - [1 · Los datos](#datos)\n"
-    "  - [2 · Lo que encontramos](#hallazgos)\n"
-    "  - [3 · El modelo](#modelo)\n"
-    "- **La copa: ahora vos**\n"
-    "  - [Explorá los autos](#ahora-vos)\n"
-    "  - [Probá el tasador](#ahora-vos)\n"
-    "- [Repositorio y cómo regenerar](#pie)")
+    '<div class="idx-titulo">🧭 Índice</div>'
+    + idx("portada", "🏁", "Portada", "La idea en una línea", "#1d4f91")
+    + '<div class="idx-grupo">El tallo · la historia</div>'
+    + idx("datos", "🗂️", "1 · Los datos", "De dónde salen y cómo se limpian", "#2a78d6")
+    + idx("hallazgos", "🔍", "2 · Lo que encontramos", "Año, km y ubicación", "#2a78d6")
+    + idx("modelo", "🤖", "3 · El modelo", "Qué tan bien tasa", "#2a78d6")
+    + '<div class="idx-grupo">La copa · ahora vos</div>'
+    + idx("explora", "🔎", "Explorá los autos", "Filtrá y mirá cada uno", "#d95926")
+    + idx("proba", "🧮", "Probá el tasador", "Cargá tu auto", "#d95926")
+    + '<div class="idx-grupo">Más</div>'
+    + idx("pie", "📦", "Repositorio", "Cómo regenerar todo", "#6b7280"),
+    unsafe_allow_html=True)
 st.sidebar.caption("Dentro de cada sección, el desplegable *Cómo lo sabemos* tiene la evidencia técnica.")
 st.caption("Proyecto integrador · Ciencia de Datos · UTN FRM · 2026 · grupo 5K09-03")
 ancla("portada")
-st.title("¿Cuánto vale un auto usado?")
 st.markdown(
-    f"#### Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio de un auto usado "
-    f"con un error típico de **{num(TEST['rel_mediano'] * 100, 1)} %**, "
-    f"{num(PISO['mae'] / TEST['mae'], 1)} veces menos error que tasar todo al precio mediano."
-)
+    f'''<div class="hero"><h1>🚗 ¿Cuánto vale un auto usado?</h1>
+    <p>Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio con un error típico de
+    <b>{num(TEST['rel_mediano'] * 100, 1)} %</b>: <b>{num(PISO['mae'] / TEST['mae'], 1)} veces menos error</b>
+    que tasar todo al precio mediano.</p></div>''', unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
-c1.metric("Error promedio en autos nuevos para el modelo (test)", usd(TEST["mae"]),
-          help="MAE sobre el 20 % de autos que el modelo nunca vio, medido una sola vez.")
-c2.metric("Error si tasáramos todo a la mediana (piso)", usd(PISO["mae"]),
-          help="DummyRegressor con la mediana, misma validación.")
-c3.metric("Autos usados analizados", num(N_AUTOS),
-          help=f"Publicaciones de CarOne y DeRuedas, cosecha del {M['fecha_datos']}.")
+c1.markdown(kpi(usd(TEST["mae"]), "Error promedio del tasador (test)", "azul",
+                "En el 20 % de autos que el modelo nunca vio, medido una sola vez"), unsafe_allow_html=True)
+c2.markdown(kpi(usd(PISO["mae"]), "Error si tasáramos todo a la mediana (piso)", "gris",
+                "El número a vencer: sin modelo, mismo método de validación"), unsafe_allow_html=True)
+c3.markdown(kpi(num(N_AUTOS), "Autos usados analizados", "verde",
+                f"CarOne y DeRuedas, cosecha del {M['fecha_datos']}"), unsafe_allow_html=True)
 st.caption("Integrantes: García Nicolás · Ramos Ignacio · Velasco Victoria · Via Tomás · Villanueva Sergio")
 st.divider()
 
@@ -143,6 +196,12 @@ p10, p90 = M["precio_p10_p90"]
 ancla("datos")
 st.subheader(f"Los datos · La mitad de los autos cuesta menos de {usd(M['precio_mediano'])}, "
              f"pero el 10 % más caro pasa los {usd(p90)}")
+d1, d2, d3, d4 = st.columns(4)
+d1.markdown(dato(num(N_AUTOS), "autos usados, ya limpios", "verde"), unsafe_allow_html=True)
+d2.markdown(dato(usd(M["precio_mediano"]), "precio mediano", "azul"), unsafe_allow_html=True)
+d3.markdown(dato(usd(p90), "piso del 10 % más caro", "naranja"), unsafe_allow_html=True)
+d4.markdown(dato(num(M["ubicacion"]["n_ciudades"]), f"ciudades en {M['ubicacion']['n_provincias']} provincias", "violeta"),
+            unsafe_allow_html=True)
 # Histograma de precios: marca de barras, x = precio en tramos de USD 2.000, y = cantidad de autos (count).
 # Se cortó en USD 80.000 para que se lea; la línea azul punteada es la mediana.
 hist = alt.Chart(AUTOS[AUTOS["precio_usd"] <= 80000]).mark_bar(color=TINTA, opacity=0.85).encode(
@@ -206,6 +265,11 @@ st.divider()
 dep = M["depreciacion_anual"]
 ancla("hallazgos")
 st.subheader(f"Lo que encontramos · Un auto pierde cerca del {num(dep * 100)} % de su valor por cada año de antigüedad")
+h1, h2, h3 = st.columns(3)
+h1.markdown(dato(f"−{num(dep * 100)} % por año", "lo que pierde un auto de su valor", "naranja"), unsafe_allow_html=True)
+h2.markdown(dato(num(M["fuga"]["spearman_anio"], 2), "correlación año ↔ precio (Spearman)", "azul"), unsafe_allow_html=True)
+h3.markdown(dato(f"+{usd(CP['sin fabricado_en']['delta'])}", "de error si el modelo no conoce el año", "verde"),
+            unsafe_allow_html=True)
 por_anio = pd.DataFrame(M["mediana_por_anio"]).rename(columns={"fabricado_en": "anio", "median": "mediana", "size": "autos"})
 # Nube de puntos: un punto por auto (con un poquito de desplazamiento horizontal para que no se tapen).
 # La línea es la mediana por año. Eje de precio logarítmico: una recta ahí significa pérdida porcentual constante.
@@ -261,6 +325,59 @@ vez, con la misma validación cruzada agrupada. Si el error sube menos que el de
     st.dataframe(cp[["Variante", "Error en validación", "Cuánto sube", "¿Más que el ruido?"]], hide_index=True,
                  width="stretch")
 
+
+# ---- HIPÓTESIS DESCARTADA · LA UBICACIÓN --------------------------------------------------------------------
+# Los números salen de build_app.py (paso 8: el boosting con provincia y con ciudad, y el η² de cada una) y el mapa
+# de app_data/ubicaciones.csv (cada ciudad con sus coordenadas, cuántos autos tiene y su precio mediano).
+UB = M["ubicacion"]
+CPV = {c["variante"]: c for c in M["columnas_probadas"]}
+c_prov, c_ciu = CPV["con provincia"], CPV["con provincia y ciudad"]
+st.markdown("### 📍 Hipótesis que descartamos: «el precio depende de dónde se vende el auto»")
+st.markdown(
+    f"Se la dimos al modelo y **no movió la aguja**: con la provincia el error pasó de {usd(CPV['referencia (todas)']['mae'])} a "
+    f"{usd(c_prov['mae'])}, y con provincia y ciudad a {usd(c_ciu['mae'])}. Son diferencias de dólares, mucho menores que el "
+    f"ruido de la validación (± {usd(CPV['referencia (todas)']['desvio'])}). Por eso la ubicación **no entra al modelo**.")
+u1, u2, u3, u4 = st.columns(4)
+u1.markdown(dato(f"{num(UB['eta2_provincia'] * 100, 1)} %", "del precio lo explica la provincia", "violeta"), unsafe_allow_html=True)
+u2.markdown(dato(f"{num(UB['eta2_marca'] * 100, 0)} %", "del precio lo explica la marca", "azul"), unsafe_allow_html=True)
+u3.markdown(dato(f"{num(UB['pct_top_provincias'] * 100, 0)} %", "de los autos, en Mendoza, Córdoba y Buenos Aires", "naranja"),
+            unsafe_allow_html=True)
+u4.markdown(dato(f"{'+' if c_prov['delta'] >= 0 else '−'}{usd(abs(c_prov['delta']))}", "de error al sumar la provincia", "gris"),
+            unsafe_allow_html=True)
+
+
+@st.cache_data
+def cargar_mapa():
+    ub = pd.read_csv(DATA / "ubicaciones.csv")
+    geo = json.loads((DATA / "provincias.geojson").read_text(encoding="utf-8"))
+    return ub, geo
+
+
+UBIC, GEO = cargar_mapa()
+UBIC_OK = UBIC.dropna(subset=["latitud", "longitud"])
+provs = alfabetico(UBIC_OK["provincia"].unique())
+sel_prov = st.multiselect("Provincias en el mapa", provs, placeholder="Todas las provincias")
+mapa_df = UBIC_OK[UBIC_OK["provincia"].isin(sel_prov)] if sel_prov else UBIC_OK
+contorno = alt.Chart(alt.Data(values=GEO["features"])).mark_geoshape(fill="#eef1f5", stroke="#b8c0cc", strokeWidth=0.6)
+puntos_mapa = alt.Chart(mapa_df).mark_circle(opacity=0.8, stroke="white", strokeWidth=0.7).encode(
+    longitude="longitud:Q", latitude="latitud:Q",
+    size=alt.Size("autos:Q", scale=alt.Scale(range=[40, 2200]), legend=alt.Legend(title="Autos")),
+    color=alt.Color("mediana_usd:Q", scale=alt.Scale(scheme="oranges"), legend=alt.Legend(title="Precio mediano (USD)")),
+    tooltip=[alt.Tooltip("ubicacion_corregida:N", title="Ciudad"), alt.Tooltip("autos:Q", title="Autos"),
+             alt.Tooltip("mediana_usd:Q", title="Precio mediano (USD)", format=",.0f")])
+col_mapa, col_barras = st.columns([3, 2])
+col_mapa.altair_chart((contorno + puntos_mapa).project("mercator").properties(height=560), width="stretch")
+por_prov = (UBIC.groupby("provincia").agg(autos=("autos", "sum")).reset_index().sort_values("autos", ascending=False).head(8))
+barras = alt.Chart(por_prov).mark_bar(color=AZUL).encode(
+    y=alt.Y("provincia:N", sort="-x", title=None), x=alt.X("autos:Q", title="Autos publicados"),
+    tooltip=[alt.Tooltip("provincia:N", title="Provincia"), alt.Tooltip("autos:Q", title="Autos")])
+col_barras.altair_chart(barras.properties(height=320, title="Dónde están los autos (8 provincias con más)"), width="stretch")
+col_barras.caption(f"Cada círculo es una ciudad: tamaño = cantidad de autos, color = precio mediano. "
+                   f"Faltan {UB['sin_coordenadas']} ciudades sin coordenadas (con pocos autos cada una).")
+st.markdown(
+    "**Qué mirar:** casi todo el mercado está en Mendoza y Córdoba, y los precios medianos de las ciudades grandes son "
+    "parecidos. Lo que cambia el precio es *qué auto es* (marca, modelo, año), no *dónde* se publica.")
+
 st.divider()
 
 # =========================================================================
@@ -271,6 +388,11 @@ veces = PISO["mae"] / TEST["mae"]
 ancla("modelo")
 st.subheader(f"El modelo · El tasador se equivoca en promedio {usd(TEST['mae'])} por auto, "
              f"{num(veces, 1)} veces menos que tasar todo a la mediana")
+m1, m2, m3, m4 = st.columns(4)
+m1.markdown(dato(usd(TEST["mae"]), "error promedio en test", "azul"), unsafe_allow_html=True)
+m2.markdown(dato(f"{num(TEST['rel_mediano'] * 100, 1)} %", "error relativo mediano", "verde"), unsafe_allow_html=True)
+m3.markdown(dato(f"{num(veces, 1)}×", "mejor que el piso (mediana)", "naranja"), unsafe_allow_html=True)
+m4.markdown(dato(usd(AJ["mae"]), f"validación cruzada (± {usd(AJ['desvio'])})", "gris"), unsafe_allow_html=True)
 # Barras con el error de cada modelo en validación cruzada (con barra de ± 1 desvío). Gris = piso, azul = elegido.
 comp = pd.DataFrame(M["comparacion"])
 NOMBRES = {"Piso (mediana)": "Piso: tasar todo a la mediana", "Lineal (Ridge)": "Regresión lineal (Ridge)",
@@ -400,7 +522,8 @@ st.divider()
 # COPA · EXPLORÁ Y PROBÁ
 # =========================================================================
 # COPA · Explorá (panorama + filtros + detalle) y Probá el tasador (caso nuevo).
-ancla("ahora-vos")
+ancla("explora")
+ancla("proba")
 st.header("Ahora vos")
 tab_exp, tab_probar = st.tabs(["🔎 Explorá los autos", "🧮 Probá el tasador"])
 

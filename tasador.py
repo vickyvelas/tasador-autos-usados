@@ -6,7 +6,8 @@ con el mismo nombre de módulo).
 
 Mapa del archivo (de arriba hacia abajo):
   constantes            semilla, tipo de cambio, columnas que usa el modelo y reglas de texto
-  norm_text / normalizar_categorica   cómo se unifican "CITROEN" y "Citroën", "AUTOMÁTICO" y "automatic", etc.
+  norm_text / normalizar_categorica   cómo se unifican "AUTOMÁTICO" y "automatic", etc.
+  clave_marca / clave_modelo          cómo se unifican "CITROEN" y "Citroën", "Eco sport" y "EcoSport", "Leapmotors" y "Leapmotor"
   IngenieriaAutos       primer paso del Pipeline: limpia las categorías adentro del modelo (sin fuga)
   limpiar()             la limpieza del notebook: precio en dólares, filtros, clave de vehículo y duplicados
   preprocesador()       ColumnTransformer: qué se le hace a cada tipo de columna
@@ -59,6 +60,73 @@ def normalizar_categorica(v, reglas):
     return np.nan
 
 
+# --- marcas y modelos escritos distinto en los portales ---------------------------------------------
+# CarOne escribe CITROEN / CRUZE y DeRuedas Citroen / Cruze; además hay variantes como "Eco sport" y "EcoSport",
+# "Up" y "Up!", "Leapmotor" y "Leapmotors". Para el modelo y para la clave del vehículo, marca y modelo se reducen
+# a una clave: minúsculas, sin tildes y sin espacios ni signos. Dos escrituras de la misma cosa dan la misma clave.
+# Lo que la clave sola no resuelve (un plural, una abreviatura, un nombre incompleto) va en estas tablas.
+MARCA_ALIAS = {"leapmotors": "leapmotor", "vw": "volkswagen", "mercedes": "mercedesbenz", "chevy": "chevrolet"}
+MODELO_ALIAS = {("renault", "stepway"): "sanderostepway"}  # (marca, modelo) -> modelo; "Stepway" es el Sandero Stepway
+
+
+def _sin_signos(v):
+    return re.sub(r"[^a-z0-9]", "", norm_text(v))
+
+
+def clave_marca(v):
+    """'CITROËN', 'Citroen' -> 'citroen' · 'Mercedes-Benz' -> 'mercedesbenz' · 'Leapmotors' -> 'leapmotor'."""
+    k = _sin_signos(v)
+    return MARCA_ALIAS.get(k, k)
+
+
+def clave_modelo(marca, modelo):
+    """'Eco sport', 'EcoSport' -> 'ecosport' · 'Up!', 'up' -> 'up' (la marca sólo se usa para los alias)."""
+    k = _sin_signos(modelo)
+    return MODELO_ALIAS.get((clave_marca(marca), k), k)
+
+
+# --- ubicación (NO entra al modelo; sólo se usa para la prueba de la hipótesis y el mapa) -------------------------
+def arreglar_codificacion(v):
+    """'CÃ³rdoba' -> 'Córdoba': la cosecha de DeRuedas guardó texto UTF-8 leído como Latin-1."""
+    if pd.isna(v):
+        return v
+    v = str(v).strip()
+    try:
+        return v.encode("latin1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return v
+
+
+def provincia_de(ubicacion):
+    """'Mendoza, Godoy Cruz' -> 'Mendoza'. Las ubicaciones de CarOne sin provincia ('San Martin') son de Buenos Aires."""
+    if pd.isna(ubicacion):
+        return "Sin especificar"
+    v = re.sub(r"\s+", " ", str(ubicacion)).strip()
+    if v in ("SanMartin", "San Martin", "San Martín", "Tortuguitas"):
+        return "Buenos Aires"
+    prov = v.split(",")[0].strip().title()
+    if "Capital Federal" in prov or prov in ("Caba", "Cap. Federal", "Ciudad De Buenos Aires"):
+        return "Capital Federal"
+    if "Bs" in prov or "Buenos Aires" in prov:
+        return "Buenos Aires"
+    return prov
+
+
+def eta_cuadrado(y, grupos):
+    """Qué parte de la variación del precio explican los grupos (0 = nada, 1 = todo). ANOVA de un factor."""
+    d = pd.DataFrame({"y": y, "g": grupos}).dropna()
+    entre = d.groupby("g")["y"].agg(["mean", "size"])
+    ss_entre = (entre["size"] * (entre["mean"] - d["y"].mean()) ** 2).sum()
+    return float(ss_entre / ((d["y"] - d["y"].mean()) ** 2).sum())
+
+
+def claves_marca_modelo(df):
+    """Dos Series alineadas con df: clave de marca y clave de modelo (lo que usan el Pipeline y la clave del vehículo)."""
+    marcas = df["marca"].map(clave_marca)
+    modelos = pd.Series([clave_modelo(a, b) for a, b in zip(df["marca"], df["modelo"])], index=df.index)
+    return marcas, modelos
+
+
 class IngenieriaAutos(BaseEstimator, TransformerMixin):
     """Primer paso del Pipeline. Está adentro del Pipeline (y no como limpieza previa) para que se
     aplique igual al entrenar, al validar y cuando alguien carga un auto en la app.
@@ -76,8 +144,9 @@ class IngenieriaAutos(BaseEstimator, TransformerMixin):
         X_new["combustible"] = X_new["combustible"].apply(lambda v: normalizar_categorica(v, REGLAS_COMB))
         # marca_n y modelo_n: la marca y el modelo normalizados. modelo_n lleva la marca adelante para que
         # un "Cruze" de Chevrolet no se mezcle con otro "Cruze". Es la columna que va al TargetEncoder.
-        X_new["marca_n"] = X_new["marca"].apply(norm_text)
-        X_new["modelo_n"] = X_new["marca_n"] + " " + X_new["modelo"].apply(norm_text)
+        marca_n, modelo_n = claves_marca_modelo(X_new)
+        X_new["marca_n"] = marca_n
+        X_new["modelo_n"] = marca_n + " " + modelo_n
         # estas columnas ya cumplieron su función (o no deben entrar al modelo): "moneda" y "clave" darían fuga
         return X_new.drop(columns=["marca", "modelo", "moneda", "clave"])
 
@@ -100,7 +169,8 @@ def limpiar(df_raw: pd.DataFrame):
     # "clave" identifica al vehículo físico: marca|modelo|versión|año|km (todo normalizado).
     # Sirve para dos cosas: sacar avisos repetidos y, más adelante, agrupar la validación
     # (el mismo auto nunca queda a la vez en train y en test).
-    df["clave"] = (df["marca"].map(norm_text) + "|" + df["modelo"].map(norm_text) + "|" +
+    marca_k, modelo_k = claves_marca_modelo(df)  # "Eco sport" y "EcoSport" son el mismo auto
+    df["clave"] = (marca_k + "|" + modelo_k + "|" +
                    df["version"].map(norm_text) + "|" + df["fabricado_en"].astype(str) + "|" +
                    df["kilometraje"].astype(str))
     # mismo vehículo y mismo precio = el mismo aviso publicado dos veces

@@ -1,0 +1,122 @@
+ubicacion_corregida,autos,mediana_usd,provincia,latitud,longitud,aproximada
+"Buenos Aires, Almirante Brown",4,8292.0,Buenos Aires,-36.677391,-60.558475,True
+"Buenos Aires, Avellaneda",8,7508.0,Buenos Aires,-34.6615337,-58.3685508,False
+"Buenos Aires, Ayacucho",1,2556.0,,,,
+"Buenos Aires, Bahía Blanca",1,8307.0,Buenos Aires,-38.7278292,-62.3102038,False
+"Buenos Aires, Berazategui",2,8626.0,Buenos Aires,-34.7907633,-58.2514432,False
+"Buenos Aires, Berisso",1,4984.0,,,,
+"Buenos Aires, Capital",154,10192.0,Buenos Aires,-34.9205,-57.9536,False
+"Buenos Aires, Ensenada",1,7029.0,Buenos Aires,-34.8568638,-57.8940982,False
+"Buenos Aires, Escobar",3,9585.0,Buenos Aires,-34.3579356,-58.7645942,False
+"Buenos Aires, Ezeiza",4,7542.0,Buenos Aires,-34.8422537,-58.5138922,False
+"Buenos Aires, Florencio Varela",2,6709.0,Buenos Aires,-34.8093625,-58.2589353,False
+"Buenos Aires, General Pueyrredón",6,9400.0,Buenos Aires,-38.0260739,-57.5614022,False
+"Buenos Aires, General Rodríguez",2,12450.0,Buenos Aires,-34.6022942,-58.9891367,False
+"Buenos Aires, General San Martín",9,9521.0,Buenos Aires,-36.677391,-60.558475,True
+"Buenos Aires, Hurlingham",1,9265.0,Buenos Aires,-34.5883826,-58.6293652,False
+"Buenos Aires, Ituzaingó",14,10703.0,Buenos Aires,-36.677391,-60.558475,True
+"Buenos Aires, La Matanza",5,9585.0,Buenos Aires,-34.6815288,-58.5406219,False
+"Buenos Aires, La Plata",10,8473.0,Buenos Aires,-36.677391,-60.558475,True
+"Buenos Aires, Lanús",3,9585.0,Buenos Aires,-34.6938652,-58.4370221,False
+"Buenos Aires, Lomas de Zamora",7,8946.0,Buenos Aires,-34.7606517,-58.3995317,False
+"Buenos Aires, Luján",1,7604.0,Buenos Aires,-34.5455665,-59.1431025,False
+"Buenos Aires, Malvinas Argentinas",3,10799.0,Buenos Aires,-36.677391,-60.558475,True
+"Buenos Aires, Merlo",1,13163.0,Buenos Aires,-34.6695037,-58.7216326,False
+"Buenos Aires, Monte",1,8000.0,Buenos Aires,-36.677391,-60.558475,True
+"Buenos Aires, Monte Hermoso",1,12141.0,,,,
+"Buenos Aires, Moreno",2,9000.0,Buenos Aires,-33.3142651,-60.2549897,False
+"Buenos Aires, Morón",1,2236.0,Buenos Aires,-34.6609361,-58.6449514,False
+"Buenos Aires, Necochea",13,14377.0,Buenos Aires,-38.5563756,-58.7383498,False
+"Buenos Aires, Pergamino",2,16981.0,Buenos Aires,-33.9200428,-60.5600152,False
+"Buenos Aires, Pilar",5,11500.0,Buenos Aires,-34.4760968,-58.8940934,False
+"Buenos Aires, Pinamar",1,12500.0,,,,
+"Buenos Aires, Presidente Perón",1,6390.0,Buenos Aires,-35.6291052,-61.3608312,False
+"Buenos Aires, Quilmes",6,9585.0,Buenos Aires,-34.7454296,-58.2561817,False
+"Buenos Aires, San Fernando",1,11500.0,,,,
+"Buenos Aires, San Isidro",73,11438.0,Buenos Aires,-34.4945778,-58.5472451,False
+"Buenos Aires, San Miguel",1,3834.0,Buenos Aires,-34.5292824,-58.7194522,False
+"Buenos Aires, San Nicolás",1,14058.0,Buenos Aires,-33.3657998,-60.19955,False
+"Buenos Aires, Tandil",2,8285.0,Buenos Aires,-37.2807576,-59.1351803,False
+"Buenos Aires, Tigre",4,9521.0,Buenos Aires,-34.4194856,-58.5788368,False
+"Buenos Aires, Tres de Febrero",3,7668.0,Buenos Aires,-36.677391,-60.558475,True
+"Buenos Aires, Vicente López",8,5655.0,Buenos Aires,-34.5346548,-58.4677309,False
+"Buenos Aires, Villa Gesell",1,7500.0,,,,
+"Buenos Aires, Zárate",1,9904.0,Buenos Aires,-34.1497828,-59.0128397,False
+"Catamarca, Capital",1,9904.0,Catamarca,-28.4696,-65.7795,False
+"Chaco, Capital",2,8786.0,Chaco,-27.4606,-58.9839,False
+"Chaco, Mayor Luis Jorge Fontana",1,13419.0,,,,
+"Corrientes, Capital",1,20000.0,Corrientes,-27.4692,-58.8306,False
+"Corrientes, Monte Caseros",1,20000.0,Corrientes,-30.2501929,-57.6593899,False
+"Córdoba, Calamuchita",1,7668.0,,,,
+"Córdoba, Capital",1666,11438.0,Córdoba,-31.4201,-64.1888,False
+"Córdoba, Colón",7,5431.0,Córdoba,-32.144802,-63.80197,True
+"Córdoba, General San Martín",2,7029.0,Córdoba,-32.144802,-63.80197,True
+"Córdoba, Ischilín",1,10351.0,Córdoba,-30.4228163,-64.3537171,False
+"Córdoba, Punilla",100,12588.0,Córdoba,-31.416514,-64.4858142,False
+"Córdoba, Río Cuarto",15,9265.0,Córdoba,-33.0930708,-64.3254163,False
+"Córdoba, Río Primero",1,8626.0,,,,
+"Córdoba, Río Segundo",6,8323.0,Córdoba,-31.6574267,-63.9161883,False
+"Córdoba, San Alberto",1,6901.0,,,,
+"Córdoba, San Justo",4,11981.0,,,,
+"Córdoba, Santa María",32,15783.0,Córdoba,-32.144802,-63.80197,True
+"Córdoba, Tercero Arriba",11,10000.0,Córdoba,-32.0236819,-64.1963609,False
+"Entre Ríos, Capital",4,10543.0,Entre Ríos,-31.7333,-60.5297,False
+"Entre Ríos, Federación",1,14696.0,,,,
+"Entre Ríos, Gualeguaychú",1,10500.0,Entre Ríos,-33.0250778,-58.5229129,False
+"Entre Ríos, Villaguay",1,8500.0,,,,
+"Jujuy, Capital",2,14377.0,Jujuy,-24.1858,-65.2995,False
+"Mendoza, Capital",1149,10224.0,Mendoza,-32.8895,-68.8458,False
+"Mendoza, General Alvear",13,12460.0,Mendoza,-34.9738431,-67.684383,False
+"Mendoza, Godoy Cruz",1290,10633.0,Mendoza,-32.9225876,-68.8612113,False
+"Mendoza, Guaymallén",1529,10160.0,Mendoza,-32.8951989,-68.7616049,False
+"Mendoza, Junín",54,9361.0,Mendoza,-33.1427437,-68.4853167,False
+"Mendoza, La Paz",6,11502.0,Mendoza,-33.4597299,-67.5458731,False
+"Mendoza, Las Heras",181,8498.0,Mendoza,-34.630388,-68.582945,True
+"Mendoza, Lavalle",8,6965.0,Mendoza,-33.193848,-68.4655287,False
+"Mendoza, Luján De Cuyo",417,10160.0,Mendoza,-33.0415469,-69.0036358,False
+"Mendoza, Maipú",606,9581.0,Mendoza,-32.9932718,-68.7656153,False
+"Mendoza, Malargüe",6,11661.0,Mendoza,-35.4808812,-69.570515,False
+"Mendoza, Rivadavia",104,8466.0,Mendoza,-34.630388,-68.582945,True
+"Mendoza, San Carlos",19,10735.0,Mendoza,-34.630388,-68.582945,True
+"Mendoza, San Martín",367,10160.0,Mendoza,-34.630388,-68.582945,True
+"Mendoza, San Rafael",137,17859.0,Mendoza,-34.6339681,-68.3142176,False
+"Mendoza, Santa Rosa",5,12780.0,Mendoza,-34.630388,-68.582945,True
+"Mendoza, Tunuyán",34,9105.0,Mendoza,-33.5856358,-69.0199798,False
+"Mendoza, Tupungato",24,11342.0,Mendoza,-33.3686033,-69.1459598,False
+"Misiones, Capital",2,15176.0,Misiones,-27.3671,-55.8961,False
+"Misiones, Oberá",1,5815.0,,,,
+"Misiones, San Ignacio",1,15974.0,,,,
+"Neuquén, Confluencia",6,9105.0,Neuquén,-38.9526392,-68.026023,False
+"Neuquén, Los Lagos",1,7029.0,,,,
+"Neuquén, Lácar",2,7641.0,Neuquén,-40.1352663,-71.2924867,False
+"Neuquén, Pehuenches",1,18000.0,,,,
+"Río Negro, Bariloche",1,2236.0,Río Negro,-41.1507675,-71.2977284,False
+"Salta, Anta",1,10224.0,,,,
+"Salta, Capital",19,15016.0,Salta,-24.7821,-65.4232,False
+"San Juan, Angaco",1,19169.0,,,,
+"San Juan, Calingasta",1,5111.0,,,,
+"San Juan, Capital",325,14696.0,San Juan,-31.5375,-68.5364,False
+"San Juan, Caucete",2,7821.0,San Juan,-31.5877833,-67.6612481,False
+"San Juan, Chimbas",2,8147.0,,,,
+"San Juan, Iglesia",1,5431.0,San Juan,-30.2115647,-69.1402013,False
+"San Juan, Pocito",1,11182.0,San Juan,-31.5968876,-68.5331124,False
+"San Juan, Rawson",28,13163.0,San Juan,-31.577267,-68.5304827,False
+"San Juan, Rivadavia",52,12364.0,San Juan,-31.5475275,-68.5534856,False
+"San Juan, Santa Lucía",4,17634.0,San Juan,-31.5117315,-68.4777532,False
+"San Luis, Ayacucho",1,9500.0,,,,
+"San Luis, Capital",54,11502.0,San Luis,-33.295,-66.3356,False
+San Martin,69,16754.0,Buenos Aires,-34.5771577,-58.5377237,False
+"Santa Fe, Capital",11,9000.0,Santa Fe,-31.6333,-60.7,False
+"Santa Fe, Caseros",1,8307.0,Santa Fe,-30.3109575,-61.2338527,False
+"Santa Fe, Constitución",1,10000.0,Santa Fe,-30.708818,-60.950678,True
+"Santa Fe, Garay",1,9904.0,,,,
+"Santa Fe, Las Colonias",1,3323.0,,,,
+"Santa Fe, Rosario",14,8307.0,Santa Fe,-32.9444894,-60.64132,False
+"Santa Fe, San Jerónimo",2,7827.0,Santa Fe,-31.6572683,-60.7114341,False
+"Santa Fe, San Lorenzo",1,4792.0,Santa Fe,-30.708818,-60.950678,True
+"Santa Fe, Vera",1,7029.0,,,,
+"Tierra Del Fuego, Capital",2,23515.0,,,,
+"Tierra Del Fuego, Río Grande",1,13000.0,Tierra Del Fuego,-53.7814905,-67.7602088,False
+Tortuguitas,111,16556.0,Buenos Aires,-34.4705116,-58.7587082,False
+"Tucumán, Capital",3,11502.0,Tucumán,-26.8083,-65.2176,False
+"Tucumán, Famaillá",1,8626.0,,,,

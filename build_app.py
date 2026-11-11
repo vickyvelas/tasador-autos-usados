@@ -48,14 +48,14 @@ def main(ruta_datos: str):
     # Copia con TODAS las columnas (versión, url, fuente, moneda...) para mostrar en la app.
     # El modelo, en cambio, recibe sólo las columnas de abajo (sin las COLUMNAS_SIN_USO).
     info = df.copy()  # guarda versión, fuente y moneda para mostrar en la app
-    # Nombres para mostrar: CarOne escribe en mayúsculas (CITROEN, CRUZE) y DeRuedas no.
-    # El modelo ya los unifica con norm_text; acá se elige la escritura más común para la app.
-    # Nombres para mostrar: el modelo ya unifica CITROEN/Citroen/Citroën con norm_text; acá se elige
-    # la escritura más frecuente de cada marca y modelo para que la app muestre un solo nombre.
-    clave_marca = info["marca"].map(T.norm_text).str.replace(r"[^a-z0-9]", "", regex=True)
-    info["marca"] = info.groupby(clave_marca)["marca"].transform(lambda s: s.value_counts().index[0])
-    clave_mod = clave_marca + "|" + info["modelo"].map(T.norm_text).str.replace(r"[^a-z0-9]", "", regex=True)
-    info["modelo"] = info.groupby(clave_mod)["modelo"].transform(lambda s: s.value_counts().index[0])
+    # Nombres para mostrar: el modelo unifica CITROEN/Citroen/Citroën, Eco sport/EcoSport, Leapmotors/Leapmotor...
+    # con tasador.claves_marca_modelo; acá se elige la escritura más frecuente de cada marca y modelo para mostrar.
+    clave_m, clave_mo = T.claves_marca_modelo(info)
+    info["marca"] = info.groupby(clave_m)["marca"].transform(lambda s: s.value_counts().index[0])
+    info["modelo"] = info.groupby(clave_m + "|" + clave_mo)["modelo"].transform(lambda s: s.value_counts().index[0])
+    # Ubicación: se corrige la codificación y se saca la provincia. Sólo sirve para probar la hipótesis y para el mapa.
+    info["ubicacion_c"] = info["ubicacion"].map(T.arreglar_codificacion).str.replace(r"\s+", " ", regex=True).str.strip()
+    info["provincia"] = info["ubicacion_c"].map(T.provincia_de)
     df = df.drop(columns=T.COLUMNAS_SIN_USO)
 
     # PASO 3 · partición 80/20 por vehículo (GroupShuffleSplit con la clave) y semilla 42, igual que el notebook.
@@ -162,10 +162,15 @@ def main(ruta_datos: str):
         ("sin motor_lt", sin(N, "motor_lt"), C, E), ("sin consumo_lt_100km", sin(N, "consumo_lt_100km"), C, E),
         ("sin transmision", N, sin(C, "transmision"), E),
         ("sin traccion ni combustible", N, [c for c in C if c not in ("traccion", "combustible")], E),
+        # Hipótesis descartada: ¿mejora el modelo si le damos la ubicación? (provincia como categoría;
+        # ciudad con TargetEncoder, igual que el modelo). Las columnas extra se agregan sólo para esta prueba.
+        ("con provincia", N, C + ["provincia"], E),
+        ("con provincia y ciudad", N, C + ["provincia"], E + ["ubicacion_c"]),
     ]
+    X_train_u = X_train.assign(provincia=info.loc[X_train.index, "provincia"], ubicacion_c=info.loc[X_train.index, "ubicacion_c"])
     columnas = []
     for nombre, n, c, t in variantes:
-        m, s = cv_mae(pipe_cols(n, c, t), X_train, y_train, cv, g_train)
+        m, s = cv_mae(pipe_cols(n, c, t), X_train_u, y_train, cv, g_train)
         columnas.append({"variante": nombre, "mae": m, "desvio": s})
     for fila in columnas:
         fila["delta"] = fila["mae"] - columnas[0]["mae"]
@@ -240,6 +245,24 @@ def main(ruta_datos: str):
         "precio_mediano": float(info["precio_usd"].median()),
         "precio_p10_p90": [float(info["precio_usd"].quantile(0.1)), float(info["precio_usd"].quantile(0.9))],
     }
+    # Mapa de la ubicación: un punto por ciudad (coordenadas de data/ubicaciones_coordenadas.csv, geocodificadas una vez)
+    # con cuántos autos hay y el precio mediano. También las provincias simplificadas para dibujar el contorno.
+    ub = (info.groupby("ubicacion_c").agg(autos=("precio_usd", "size"), mediana_usd=("precio_usd", "median"))
+          .reset_index().rename(columns={"ubicacion_c": "ubicacion_corregida"}))
+    coords = pd.read_csv(AQUI / "data" / "ubicaciones_coordenadas.csv")
+    ub = ub.merge(coords, on="ubicacion_corregida", how="left")
+    ub["mediana_usd"] = ub["mediana_usd"].round(0)
+    ub.to_csv(SALIDA / "ubicaciones.csv", index=False, encoding="utf-8")
+    (SALIDA / "provincias.geojson").write_bytes((AQUI / "data" / "provincias.geojson").read_bytes())
+    por_prov = info["provincia"].value_counts()
+    ubicacion = {"eta2_provincia": T.eta_cuadrado(info["precio_usd"], info["provincia"]),
+                 "eta2_ciudad": T.eta_cuadrado(info["precio_usd"], info["ubicacion_c"]),
+                 "eta2_marca": T.eta_cuadrado(info["precio_usd"], info["marca"]),
+                 "n_ciudades": int(info["ubicacion_c"].nunique()), "n_provincias": int(info["provincia"].nunique()),
+                 "sin_coordenadas": int(ub["latitud"].isna().sum()),
+                 "top_provincias": {k: int(v) for k, v in por_prov.head(3).items()},
+                 "pct_top_provincias": float(por_prov.head(3).sum() / por_prov.sum())}
+    metricas["ubicacion"] = ubicacion
     (SALIDA / "metricas.json").write_text(json.dumps(metricas, ensure_ascii=False, indent=1, default=float), encoding="utf-8")
     joblib.dump(modelo_final, SALIDA / "modelo.joblib", compress=3)
     print("listo:", SALIDA)
