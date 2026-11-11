@@ -598,22 +598,23 @@ def _r2(y, p):
     return 1 - ((y - p) ** 2).sum() / ((y - y.mean()) ** 2).sum()
 r2_test = _r2(test_df["precio_usd"], test_df["tasacion_usd"])
 r2_log = _r2(np.log(test_df["precio_usd"]), np.log(test_df["tasacion_usd"]))
-st.markdown("##### Precio real contra precio predicho, en el test")
-st.markdown(f"En el test, el boosting logra un **MAE de {usd(TEST['mae'])}** y un **R² de {num(r2_test, 2)}** en dólares ({num(r2_log, 2)} en escala logarítmica, la del gráfico). La diagonal es la predicción "
-            "perfecta: los puntos se pegan a ella en los autos baratos y se abren en la cola alta, sobre todo cuando el aviso original estaba en dólares.")
+gc1, gc2 = st.columns(2)   # los dos gráficos del test, lado a lado
+gc1.markdown("##### Precio real contra precio predicho, en el test")
+gc1.markdown(f"En el test, el boosting logra un **MAE de {usd(TEST['mae'])}** y un **R² de {num(r2_test, 2)}** en dólares ({num(r2_log, 2)} en escala logarítmica, la del gráfico). La diagonal es la predicción "
+            "perfecta: los puntos se abren en la cola alta, sobre todo en los avisos en dólares.")
 lim_rp = [float(min(test_df["precio_usd"].min(), test_df["tasacion_usd"].min())) * 0.9,
           float(max(test_df["precio_usd"].max(), test_df["tasacion_usd"].max())) * 1.1]
 esc_rp = alt.Scale(type="log", domain=lim_rp)
 pts_rp = alt.Chart(test_df).mark_circle(size=22, opacity=0.6).encode(
     x=alt.X("precio_usd:Q", scale=esc_rp, title="Precio real (USD, escala log)", axis=alt.Axis(format="$,.0f", values=[1000, 2000, 5000, 10000, 20000, 50000, 100000])),
     y=alt.Y("tasacion_usd:Q", scale=esc_rp, title="Precio predicho (USD, escala log)", axis=alt.Axis(format="$,.0f", values=[1000, 2000, 5000, 10000, 20000, 50000, 100000])),
-    color=alt.Color("moneda:N", title="Moneda original", scale=alt.Scale(domain=["ARS", "USD"], range=["#4a86d8", "#e08a60"])),
+    color=alt.Color("moneda:N", title="Moneda original", legend=alt.Legend(orient="top-left", direction="horizontal"), scale=alt.Scale(domain=["ARS", "USD"], range=["#4a86d8", "#e08a60"])),
     tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("fabricado_en:Q", title="Año", format="d"),
              alt.Tooltip("precio_usd:Q", title="Real", format=",.0f"), alt.Tooltip("tasacion_usd:Q", title="Predicho", format=",.0f")])
 diag_rp = alt.Chart(pd.DataFrame({"a": lim_rp, "b": lim_rp})).mark_line(color="#555", strokeDash=[5, 4]).encode(x="a:Q", y="b:Q")
-st.altair_chart((pts_rp + diag_rp).properties(height=460), width="stretch")
-st.markdown("##### Dónde se equivoca el modelo, por tramo de precio")
-st.markdown(f"**Test, una sola vez: {usd(TEST['mae'])}.** Dónde se equivoca: el error en dólares crece con el precio, "
+gc1.altair_chart((pts_rp + diag_rp).properties(height=380), width="stretch")
+gc2.markdown("##### Dónde se equivoca el modelo, por tramo de precio")
+gc2.markdown(f"**Test, una sola vez: {usd(TEST['mae'])}.** Dónde se equivoca: el error en dólares crece con el precio, "
             "pero en porcentaje se mantiene parecido.")
 # Dónde se equivoca, como en el Colab: por cada tramo de precio del test, DOS barras con su propio eje:
 #   azul   = error promedio en dólares (MAE)            -> eje de la IZQUIERDA
@@ -640,9 +641,9 @@ t_mae = base_mae.mark_text(dy=-6, color=TINTA).encode(y="mae:Q", text="mae_txt:N
 g_rel = base_rel.mark_bar(color=NAR_REL).encode(y=y_rel, tooltip=[
     alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("rel_pct:Q", title="Error relativo mediano (%)", format=".1f")])
 t_rel = base_rel.mark_text(dy=-6, color=TINTA).encode(y="rel_pct:Q", text="rel_txt:N")
-st.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=300),
+gc2.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=380),
                 width="stretch")
-st.caption("Cada tramo tiene ~20 % de los autos de test. Azul (eje izquierdo): cuántos dólares se equivoca en promedio. "
+gc2.caption("Cada tramo tiene ~20 % de los autos de test. Azul (eje izquierdo): cuántos dólares se equivoca en promedio. "
            "Naranja (eje derecho): cuánto se equivoca en porcentaje del precio.")
 
 
