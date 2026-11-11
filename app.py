@@ -97,7 +97,6 @@ a.idx small { display:none; }
 .dato { border-radius:8px; padding:.7rem 1rem; background:var(--bg); border:1px solid #e1e6ec; border-left:4px solid var(--bd); margin:.25rem 0 .75rem 0; }
 .dato .v { font-size:1.4rem; font-weight:700; color:var(--tx); line-height:1.15; }
 .dato .l { font-size:.85rem; color:#3d3d3a; }
-@media (max-height: 820px) { .copa-menu { display:none; } }
 @media (max-width: 820px) {
   .hero { padding:1rem 1.1rem; } .hero h1 { font-size:1.5rem; } .hero p { font-size:.95rem; }
   .kpi .v { font-size:1.5rem; } .kpi { margin-bottom:.5rem; } .dato .v { font-size:1.15rem; }
