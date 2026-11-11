@@ -25,31 +25,18 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import (GridSearchCV, GroupKFold, GroupShuffleSplit, KFold,
                                      cross_val_predict, cross_validate)
 
+import geocodificar as G
 import tasador as T
 
 AQUI = Path(__file__).parent
 SALIDA = AQUI / "app_data"
-
-ALIAS_PROVINCIA = {"Capital Federal": "Ciudad Autónoma de Buenos Aires", "Tierra Del Fuego": "Tierra del Fuego"}
-
-
-def centros_provincias(ruta):
-    """Centro (lat, lon) de la caja de cada provincia del geojson, para ubicar ciudades sin coordenadas."""
-    geo = json.loads(Path(ruta).read_text(encoding="utf-8"))
-    centros = {}
-    for f in geo["features"]:
-        pts = [p for poligono in f["geometry"]["coordinates"] for anillo in poligono for p in anillo]
-        lons, lats = [p[0] for p in pts], [p[1] for p in pts]
-        centros[f["properties"]["nombre"]] = ((min(lats) + max(lats)) / 2, (min(lons) + max(lons)) / 2)
-    return centros
-
 
 def cv_mae(pipe, X, y, cv, groups=None):
     r = cross_validate(pipe, X, y, cv=cv, groups=groups, scoring="neg_mean_absolute_error", n_jobs=-1)
     return float(-r["test_score"].mean()), float(r["test_score"].std())
 
 
-def main(ruta_datos: str):
+def main(ruta_datos: str, sin_api: bool = False):
     SALIDA.mkdir(exist_ok=True)
     # PASO 1 · datos de entrada: el CSV de la capa plata que deja el pipeline de Airflow
     # (data/dataset.csv por defecto, o el que se pase con --datos).
@@ -264,20 +251,14 @@ def main(ruta_datos: str):
     # con cuántos autos hay y el precio mediano. También las provincias simplificadas para dibujar el contorno.
     ub = (info.groupby("ubicacion_c").agg(autos=("precio_usd", "size"), mediana_usd=("precio_usd", "median"))
           .reset_index().rename(columns={"ubicacion_c": "ubicacion_corregida"}))
-    coords = pd.read_csv(AQUI / "data" / "ubicaciones_coordenadas.csv")
+    # Coordenadas: geocodificar.py pide a la API (Nominatim) las ubicaciones que todavía no están en
+    # data/ubicaciones_coordenadas.csv y las guarda ahí; las demás salen de esa tabla.
+    prov_de = info.groupby("ubicacion_c")["provincia"].first().to_dict()
+    coords = G.completar_coordenadas(prov_de, AQUI / "data" / "ubicaciones_coordenadas.csv",
+                                     AQUI / "data" / "provincias.geojson", consultar_api=not sin_api)
     ub = ub.merge(coords, on="ubicacion_corregida", how="left")
     ub["mediana_usd"] = ub["mediana_usd"].round(0)
-    # Ciudades que no están en la tabla de coordenadas (por ejemplo, una cosecha nueva): se dibujan en el centro de su
-    # provincia y quedan marcadas como aproximadas, así el mapa se regenera solo y no se pierde ningún auto.
-    ub["provincia"] = ub["provincia"].fillna(ub["ubicacion_corregida"].map(T.provincia_de))
-    centros = centros_provincias(AQUI / "data" / "provincias.geojson")
-    falta = ub["latitud"].isna() | ub["longitud"].isna()
-    n_sin_coordenadas = int(falta.sum())
-    ub["aproximada"] = ub["aproximada"].astype("object").where(~falta, True)
-    for i in ub.index[falta]:
-        c = centros.get(ALIAS_PROVINCIA.get(ub.at[i, "provincia"], ub.at[i, "provincia"]))
-        if c is not None:
-            ub.at[i, "latitud"], ub.at[i, "longitud"] = c
+    n_sin_coordenadas = int(ub["latitud"].isna().sum())
     ub["aproximada"] = ub["aproximada"].fillna(False).astype(bool)
     # Qué autos hay en cada ciudad (para el cartel del mapa): los 3 modelos más publicados con su cantidad y precio
     # mediano, y el auto más caro y el más barato. Los nombres son los de mostrar (marca y modelo unificados).
@@ -312,4 +293,7 @@ def main(ruta_datos: str):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--datos", default=str(AQUI / "data" / "dataset.csv"))
-    main(ap.parse_args().datos)
+    ap.add_argument("--sin-api", action="store_true",
+                    help="no consulta la API de coordenadas: las ciudades nuevas van al centro de su provincia")
+    args = ap.parse_args()
+    main(args.datos, args.sin_api)

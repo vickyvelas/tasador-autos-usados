@@ -29,7 +29,9 @@ DeRuedas (HTML)    ───┘                                                 
 | `notebooks/entrega3_modelo.ipynb` | Análisis y modelo (Entregas 2 y 3), el mismo Colab que se presentó |
 | `tasador.py` | Limpieza y `Pipeline` de scikit-learn, idénticos al notebook. Lo usan `build_app.py` y la app |
 | `build_app.py` | Toma el CSV del pipeline, entrena el modelo con semilla 42 y genera `app_data/` |
-| `app_data/` | Lo que lee la app: `modelo.joblib`, `autos.csv` (cada auto con su tasación) y `metricas.json` |
+| `geocodificar.py` | Pide a la API de Nominatim (OpenStreetMap) las coordenadas de las ubicaciones nuevas del CSV. `build_app.py` lo llama solo |
+| `data/ubicaciones_coordenadas.csv`, `data/provincias.geojson` | Coordenadas ya obtenidas (caché de la API) y contorno de las provincias para el mapa |
+| `app_data/` | Lo que lee la app: `modelo.joblib`, `autos.csv` (cada auto con su tasación), `ubicaciones.csv` (datos del mapa) y `metricas.json` |
 | `app.py` | La aplicación de Streamlit |
 | `data/dataset.csv` | Cosecha del 9/9/2026 (capa plata): 9.039 filas, 8.909 después de limpiar |
 | `requirements.txt` | Versiones fijas de la app |
@@ -86,6 +88,12 @@ python build_app.py --datos pipeline/include/output/silver/final_AAAA-MM-DD.csv
 
 Sin `--datos` usa `data/dataset.csv`. Repite la misma limpieza, la misma partición (semilla 42), la comparación de
 modelos, la grilla de 32 combinaciones, el test y la importancia, y reescribe `app_data/`. Tarda unos minutos.
+
+**Mapa.** `build_app.py` llama a `geocodificar.py`, que toma las `ubicacion_corregida` del CSV, busca cuáles no están en
+`data/ubicaciones_coordenadas.csv` y le pide la latitud y longitud de cada una a Nominatim (1 consulta por segundo). Acepta el
+resultado sólo si cae dentro de su provincia; si no responde la API o el punto cae afuera, usa el centro de la provincia y la
+ubicación queda como *aproximada* (el cartel del mapa lo avisa). Las respuestas de la API quedan guardadas en esa tabla, así
+cada ciudad se pide una sola vez. Con `--sin-api` no se consulta nada (por ejemplo, sin internet).
 Después se suben los cambios a GitHub y Streamlit Cloud vuelve a publicar la app solo.
 
 Las versiones de `requirements.txt` están fijas a propósito: con otras versiones de scikit-learn el boosting da
