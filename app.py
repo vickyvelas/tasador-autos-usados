@@ -18,16 +18,16 @@ import tasador as T  # noqa: F401  (necesario para cargar el modelo con joblib)
 AQUI = Path(__file__).parent
 DATA = AQUI / "app_data"
 
-st.set_page_config(page_title="Tasador de autos usados · 5K09-03", page_icon="🚗", layout="wide")
+st.set_page_config(page_title="Tasador de autos usados · 5K09 grupo 03", layout="wide")
 alt.data_transformers.disable_max_rows()
 
 # --- colores: significan lo mismo en toda la app ---------------------------
 # Una paleta para toda la app: cada color significa siempre lo mismo (tallo y copa).
-AZUL = "#2a78d6"      # el modelo / la tasación
+AZUL = "#2c5f8f"      # el modelo / la tasación
 GRIS = "#9a9a9a"      # referencia (piso, otros autos, datos sin modelo)
 TINTA = "#3d3d3a"     # precios reales
-VERDE = "#1a9e77"     # más barato que la tasación
-NARANJA = "#d95926"   # más caro que la tasación
+VERDE = "#3f7d6b"     # más barato que la tasación
+NARANJA = "#b5603a"   # más caro que la tasación
 VEREDICTOS = ["Más barato que la tasación", "En precio (±10 %)", "Más caro que la tasación"]
 ESCALA_VEREDICTO = alt.Scale(domain=VEREDICTOS, range=[VERDE, GRIS, NARANJA])
 ESCALA_PRECIO = alt.Scale(type="log", domain=[1500, 150000], clamp=True)
@@ -73,33 +73,33 @@ def num(x, dec=0):
 # verde = autos/datos, naranja = hallazgo/alerta), así que un color significa lo mismo en tarjetas y gráficos.
 st.markdown("""
 <style>
-[data-testid="stSidebar"] { background: linear-gradient(180deg, #e8f1fc 0%, #f4f8fd 100%); }
-.ficha { background:#1d4f91; color:#fff; border-radius:14px; padding:.8rem 1rem; font-size:.82rem; margin-bottom:1rem; line-height:1.5; }
+[data-testid="stSidebar"] { background:#f4f6f9; }
+.ficha { background:#22364d; color:#fff; border-radius:14px; padding:.8rem 1rem; font-size:.82rem; margin-bottom:1rem; line-height:1.5; }
 .ficha ul { margin:.4rem 0 0 0; padding-left:1.1rem; }
-.idx-titulo { font-weight:800; font-size:1.15rem; color:#1d4f91; margin:0 0 .6rem 0; }
+.idx-titulo { font-weight:700; font-size:1rem; letter-spacing:.06em; text-transform:uppercase; color:#2c3e50; margin:0 0 .6rem 0; }
 .idx-grupo { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:#6b7a90; margin:1rem 0 .35rem 2px; font-weight:700; }
-a.idx { display:flex; align-items:center; gap:.65rem; background:#fff; border:1px solid #d6e4f7; border-left:5px solid var(--c);
+a.idx { display:flex; align-items:center; gap:.65rem; background:#fff; border:1px solid #e1e6ec; border-left:3px solid var(--c);
         border-radius:12px; padding:.55rem .8rem; margin:.3rem 0; text-decoration:none !important; color:#25324a !important;
-        font-weight:600; box-shadow:0 1px 3px rgba(30,70,130,.08); transition:all .15s ease; }
-a.idx:hover { background:var(--c); color:#fff !important; transform:translateX(4px); box-shadow:0 4px 10px rgba(30,70,130,.22); }
+        font-weight:600; box-shadow:none; transition:all .15s ease; }
+a.idx:hover { background:#eef2f6; transform:translateX(3px); }
 a.idx .ic { font-size:1.2rem; }
 a.idx small { display:block; font-weight:400; opacity:.75; font-size:.72rem; }
-.hero { background:linear-gradient(120deg,#1d4f91 0%,#2a78d6 55%,#3fa7e0 100%); border-radius:18px; padding:1.6rem 1.8rem; color:#fff; margin-bottom:1rem; }
-.hero h1 { color:#fff; margin:0; padding:0; font-size:2.4rem; }
+.hero { background:#22364d; border-radius:10px; padding:1.6rem 1.8rem; color:#fff; margin-bottom:1rem; }
+.hero h1 { color:#fff; margin:0; padding:0; font-size:2.2rem; font-weight:700; }
 .hero p { margin:.5rem 0 0 0; font-size:1.1rem; opacity:.95; }
-.kpi { border-radius:16px; padding:1rem 1.2rem; color:#fff; box-shadow:0 3px 10px rgba(0,0,0,.12); height:100%; }
-.kpi .v { font-size:2rem; font-weight:800; line-height:1.1; }
+.kpi { border-radius:10px; padding:1rem 1.2rem; color:#fff; box-shadow:none; height:100%; }
+.kpi .v { font-size:1.9rem; font-weight:700; line-height:1.1; }
 .kpi .l { font-size:.9rem; opacity:.95; margin-top:.25rem; }
 .kpi .s { font-size:.75rem; opacity:.8; margin-top:.35rem; }
-.dato { border-radius:14px; padding:.8rem 1rem; background:var(--bg); border:1px solid var(--bd); border-left:6px solid var(--bd); margin:.25rem 0 .75rem 0; }
-.dato .v { font-size:1.5rem; font-weight:800; color:var(--tx); line-height:1.15; }
+.dato { border-radius:8px; padding:.7rem 1rem; background:var(--bg); border:1px solid #e1e6ec; border-left:4px solid var(--bd); margin:.25rem 0 .75rem 0; }
+.dato .v { font-size:1.4rem; font-weight:700; color:var(--tx); line-height:1.15; }
 .dato .l { font-size:.85rem; color:#3d3d3a; }
-.kicker { font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; font-weight:800; color:#1d4f91; margin:.4rem 0 -.6rem 0; }
-.kicker.copa { color:#d95926; }
-.concl { border-left:6px solid #1d4f91; background:#f3f7fc; border-radius:0 12px 12px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
-.panel { background:linear-gradient(160deg,#1d4f91 0%,#2f6fa8 100%); color:#fff; border-radius:18px; padding:1.2rem 1.4rem; box-shadow:0 6px 18px rgba(20,60,120,.3); }
+.kicker { font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#2c5f8f; margin:.4rem 0 -.6rem 0; }
+.kicker.copa { color:#b5603a; }
+.concl { border-left:4px solid #2c5f8f; background:#f6f8fa; border-radius:0 8px 8px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
+.panel { background:#22364d; color:#fff; border-radius:10px; padding:1.2rem 1.4rem; }
 .panel .t { font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
-.panel .v { font-size:2.4rem; font-weight:800; line-height:1.1; }
+.panel .v { font-size:2.2rem; font-weight:700; line-height:1.1; }
 .panel .r { font-size:1.02rem; font-weight:700; margin-top:.5rem; }
 .panel .s { font-size:.82rem; opacity:.85; margin-top:.2rem; }
 .panel table { width:100%; font-size:.85rem; margin-top:.4rem; border-collapse:collapse; }
@@ -108,10 +108,10 @@ a.idx small { display:block; font-weight:400; opacity:.75; font-size:.72rem; }
 """, unsafe_allow_html=True)
 
 # Colores de las tarjetas: (fondo/borde, texto)
-TARJ = {"azul": ("#2a78d6", "#2a78d6"), "verde": ("#1a9e77", "#1a9e77"), "naranja": ("#d95926", "#d95926"),
-        "gris": ("#6b7280", "#6b7280"), "violeta": ("#7a4fd0", "#7a4fd0")}
-TARJ_SUAVE = {"azul": ("#eaf2fd", "#2a78d6"), "verde": ("#e6f6f0", "#1a9e77"), "naranja": ("#fcefe8", "#d95926"),
-              "gris": ("#f1f2f4", "#6b7280"), "violeta": ("#f1ecfb", "#7a4fd0")}
+TARJ = {"azul": ("#2c5f8f", "#2c5f8f"), "verde": ("#3f7d6b", "#3f7d6b"), "naranja": ("#b5603a", "#b5603a"),
+        "gris": ("#5f6b7a", "#5f6b7a"), "violeta": ("#6a5a8c", "#6a5a8c")}
+TARJ_SUAVE = {"azul": ("#f3f6fa", "#2c5f8f"), "verde": ("#f2f7f5", "#3f7d6b"), "naranja": ("#faf4f0", "#b5603a"),
+              "gris": ("#f4f5f7", "#5f6b7a"), "violeta": ("#f5f3f8", "#6a5a8c")}
 
 
 def kpi(valor, etiqueta, color="azul", pie=""):
@@ -165,7 +165,7 @@ N_AUTOS = M["pasos"][-1]["filas"]
 # PORTADA: la idea central en una oración + tres números que la sostienen (error en test, piso, cantidad de autos).
 # ÍNDICE: menú lateral para navegar. Cada link apunta a un ancla (`ancla("id")`) puesta justo antes de la sección.
 def idx(destino, icono, titulo, sub, color):
-    return (f'<a class="idx" href="#{destino}" target="_self" style="--c:{color}"><span class="ic">{icono}</span>'
+    return (f'<a class="idx" href="#{destino}" target="_self" style="--c:{color}">'
             f'<span>{titulo}<small>{sub}</small></span></a>')
 
 
@@ -174,31 +174,31 @@ st.sidebar.markdown(
     'Comisión <b>5K09</b> · Grupo <b>03</b>'
     '<ul><li>García, Nicolás</li><li>Ramos, Ignacio</li><li>Velasco, Victoria</li><li>Via, Tomás</li>'
     '<li>Villanueva, Sergio</li></ul></div>'
-    '<div class="idx-titulo">🧭 Índice</div>'
-    + idx("portada", "🏁", "Portada", "La idea en una línea", "#1d4f91")
+    '<div class="idx-titulo">Índice</div>'
+    + idx("portada", "", "Portada", "La idea en una línea", "#22364d")
     + '<div class="idx-grupo">El tallo · la historia</div>'
-    + idx("datos", "🗂️", "1 · Los datos", "De dónde salen y cómo se limpian", "#2a78d6")
-    + idx("hallazgos", "🔍", "2 · Lo que encontramos", "Año, km y ubicación", "#2a78d6")
-    + idx("modelo", "🤖", "3 · El modelo", "Qué tan bien tasa", "#2a78d6")
+    + idx("datos", "", "1 · Los datos", "De dónde salen y cómo se limpian", "#2c5f8f")
+    + idx("hallazgos", "", "2 · Lo que encontramos", "Año, km y ubicación", "#2c5f8f")
+    + idx("modelo", "", "3 · El modelo", "Qué tan bien tasa", "#2c5f8f")
     + '<div class="idx-grupo">La copa · ahora vos</div>'
-    + idx("explora", "🔎", "Explorá los autos", "Filtrá y mirá cada uno", "#d95926")
-    + idx("proba", "🧮", "Probá el tasador", "Cargá tu auto", "#d95926")
+    + idx("explora", "", "Explorá los autos", "Filtrá y mirá cada uno", "#b5603a")
+    + idx("proba", "", "Probá el tasador", "Cargá tu auto", "#b5603a")
     + '<div class="idx-grupo">Más</div>'
-    + idx("pie", "📦", "Repositorio", "Cómo regenerar todo", "#6b7280"),
+    + idx("pie", "", "Repositorio", "Cómo regenerar todo", "#6b7280"),
     unsafe_allow_html=True)
 # La copa de martini del modelo "tallo y copa": el tallo se lee en orden, la copa la maneja quien visita.
 st.sidebar.markdown(
     '<div style="text-align:center;margin-top:1.2rem"><svg width="120" height="150" viewBox="0 0 120 150">'
-    '<polygon points="10,10 110,10 60,80" fill="#cfe2f7" stroke="#2a78d6" stroke-width="3"/>'
-    '<polygon points="22,22 98,22 60,70" fill="#2a78d6" opacity=".55"/>'
-    '<line x1="60" y1="80" x2="60" y2="135" stroke="#d95926" stroke-width="4"/>'
-    '<line x1="35" y1="138" x2="85" y2="138" stroke="#d95926" stroke-width="4" stroke-linecap="round"/>'
-    '<circle cx="82" cy="30" r="5" fill="#d95926"/></svg></div>', unsafe_allow_html=True)
+    '<polygon points="10,10 110,10 60,80" fill="#dde6ef" stroke="#2c5f8f" stroke-width="3"/>'
+    '<polygon points="22,22 98,22 60,70" fill="#2c5f8f" opacity=".5"/>'
+    '<line x1="60" y1="80" x2="60" y2="135" stroke="#b5603a" stroke-width="4"/>'
+    '<line x1="35" y1="138" x2="85" y2="138" stroke="#b5603a" stroke-width="4" stroke-linecap="round"/>'
+    '<circle cx="82" cy="30" r="5" fill="#b5603a"/></svg></div>', unsafe_allow_html=True)
 st.sidebar.caption("Dentro de cada sección, el desplegable *Cómo lo sabemos* tiene la evidencia técnica.")
 st.caption("Proyecto integrador · Ciencia de Datos · UTN FRM · 2026 · grupo 5K09-03")
 ancla("portada")
 st.markdown(
-    f'''<div class="hero"><div style="opacity:.85;font-size:.85rem;letter-spacing:.06em;margin-bottom:.3rem">CIENCIA DE DATOS · UTN FRM · 2026 · COMISIÓN 5K09 · GRUPO 03</div><h1>🚗 ¿Cuánto vale un auto usado?</h1>
+    f'''<div class="hero"><div style="opacity:.85;font-size:.85rem;letter-spacing:.06em;margin-bottom:.3rem">CIENCIA DE DATOS · UTN FRM · 2026 · COMISIÓN 5K09 · GRUPO 03</div><h1>¿Cuánto vale un auto usado?</h1>
     <p>Con la marca, el modelo, el año y la ficha técnica, el tasador estima el precio con un error típico de
     <b>{num(TEST['rel_mediano'] * 100, 1)} %</b>: <b>{num(PISO['mae'] / TEST['mae'], 1)} veces menos error</b>
     que tasar todo al precio mediano.</p></div>''', unsafe_allow_html=True)
@@ -362,7 +362,7 @@ vez, con la misma validación cruzada agrupada. Si el error sube menos que el de
 UB = M["ubicacion"]
 CPV = {c["variante"]: c for c in M["columnas_probadas"]}
 c_prov, c_ciu = CPV["con provincia"], CPV["con provincia y ciudad"]
-st.markdown("### 📍 Hipótesis que descartamos: «el precio depende de dónde se vende el auto»")
+st.markdown("### Hipótesis que descartamos: «el precio depende de dónde se vende el auto»")
 st.markdown(
     f"Se la dimos al modelo y **no movió la aguja**: con la provincia el error pasó de {usd(CPV['referencia (todas)']['mae'])} a "
     f"{usd(c_prov['mae'])}, y con provincia y ciudad a {usd(c_ciu['mae'])}. Son diferencias de dólares, mucho menores que el "
@@ -557,7 +557,7 @@ ancla("explora")
 ancla("proba")
 st.markdown('<div class="kicker copa">La copa · tu turno</div>', unsafe_allow_html=True)
 st.header("Ahora vos")
-tab_exp, tab_probar = st.tabs(["🔎 Explorá los autos", "🧮 Probá el tasador"])
+tab_exp, tab_probar = st.tabs(["Explorá los autos", "Probá el tasador"])
 
 with tab_exp:
     st.markdown("Cada punto es un auto publicado. El color compara su precio con lo que dijo el tasador "
