@@ -592,6 +592,26 @@ st.markdown(
     f"lineal por varios desvíos. El elegido, en azul, es el boosting con la grilla ajustada: "
     f"{usd(AJ['mae'])} ± {num(AJ['desvio'])} en validación y **{usd(TEST['mae'])} en test**, que es el número honesto.")
 
+# Real vs. predicho en el test (como en el Colab): cada punto es un auto que el modelo nunca vio; la diagonal es la predicción perfecta.
+test_df = AUTOS[AUTOS["conjunto"] == "test"].copy()
+def _r2(y, p):
+    return 1 - ((y - p) ** 2).sum() / ((y - y.mean()) ** 2).sum()
+r2_test = _r2(test_df["precio_usd"], test_df["tasacion_usd"])
+r2_log = _r2(np.log(test_df["precio_usd"]), np.log(test_df["tasacion_usd"]))
+st.markdown("##### Precio real contra precio predicho, en el test")
+st.markdown(f"En el test, el boosting logra un **MAE de {usd(TEST['mae'])}** y un **R² de {num(r2_test, 2)}** en dólares ({num(r2_log, 2)} en escala logarítmica, la del gráfico). La diagonal es la predicción "
+            "perfecta: los puntos se pegan a ella en los autos baratos y se abren en la cola alta, sobre todo cuando el aviso original estaba en dólares.")
+lim_rp = [float(min(test_df["precio_usd"].min(), test_df["tasacion_usd"].min())) * 0.9,
+          float(max(test_df["precio_usd"].max(), test_df["tasacion_usd"].max())) * 1.1]
+esc_rp = alt.Scale(type="log", domain=lim_rp)
+pts_rp = alt.Chart(test_df).mark_circle(size=22, opacity=0.6).encode(
+    x=alt.X("precio_usd:Q", scale=esc_rp, title="Precio real (USD, escala log)", axis=alt.Axis(format="$,.0f", values=[1000, 2000, 5000, 10000, 20000, 50000, 100000])),
+    y=alt.Y("tasacion_usd:Q", scale=esc_rp, title="Precio predicho (USD, escala log)", axis=alt.Axis(format="$,.0f", values=[1000, 2000, 5000, 10000, 20000, 50000, 100000])),
+    color=alt.Color("moneda:N", title="Moneda original", scale=alt.Scale(domain=["ARS", "USD"], range=["#4a86d8", "#e08a60"])),
+    tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("fabricado_en:Q", title="Año", format="d"),
+             alt.Tooltip("precio_usd:Q", title="Real", format=",.0f"), alt.Tooltip("tasacion_usd:Q", title="Predicho", format=",.0f")])
+diag_rp = alt.Chart(pd.DataFrame({"a": lim_rp, "b": lim_rp})).mark_line(color="#555", strokeDash=[5, 4]).encode(x="a:Q", y="b:Q")
+st.altair_chart((pts_rp + diag_rp).properties(height=460), width="stretch")
 st.markdown("##### Dónde se equivoca el modelo, por tramo de precio")
 st.markdown(f"**Test, una sola vez: {usd(TEST['mae'])}.** Dónde se equivoca: el error en dólares crece con el precio, "
             "pero en porcentaje se mantiene parecido.")
