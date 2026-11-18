@@ -59,6 +59,17 @@ def alfabetico(valores):
     return sorted(valores, key=lambda v: unicodedata.normalize("NFKD", str(v)).encode("ascii", "ignore").decode().lower())
 
 
+def capitulo(n, kicker, pregunta, copa=False):
+    """Encabezado de capítulo: número grande, nombre de la sección y la pregunta que responde (para que se lea como una historia)."""
+    st.markdown(f'<div class="cap{" copa" if copa else ""}"><div class="n">{n}</div><div><div class="k">{kicker}</div>'
+                f'<div class="q">{pregunta}</div></div></div>', unsafe_allow_html=True)
+
+
+def puente(texto, copa=False):
+    """Frase de enlace al final de una sección: cierra lo que se vio y abre la pregunta de la siguiente."""
+    st.markdown(f'<div class="puente{" copa" if copa else ""}"><span class="fl">&rarr;</span><div>{texto}</div></div>', unsafe_allow_html=True)
+
+
 def usd(x):
     return f"USD {x:,.0f}".replace(",", ".")
 
@@ -104,6 +115,20 @@ a.idx small { display:none; }
 }
 .kicker { font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#2c5f8f; margin:.4rem 0 -.6rem 0; }
 .kicker.copa { color:#b5603a; }
+.cap { display:flex; align-items:center; gap:.9rem; margin:.6rem 0 -.2rem 0; }
+.cap .n { font-size:2.6rem; font-weight:800; line-height:1; color:#d5dde8; letter-spacing:-.02em; }
+.cap .k { font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#2c5f8f; }
+.cap .q { font-size:1.05rem; font-style:italic; color:#4a5568; margin-top:.1rem; }
+.cap.copa .k { color:#b5603a; } .cap.copa .n { color:#f0dccf; }
+.puente { display:flex; align-items:center; gap:.8rem; margin:1.2rem 0 .4rem 0; padding:.7rem 1rem; border-radius:10px;
+          background:linear-gradient(90deg,#eef3f9,#ffffff); border:1px solid #dfe6ee; color:#25324a; font-size:.98rem; }
+.puente .fl { font-size:1.3rem; color:#2c5f8f; font-weight:700; }
+.puente b { color:#2c5f8f; }
+.puente.copa { background:linear-gradient(90deg,#faf1ea,#ffffff); } .puente.copa .fl, .puente.copa b { color:#b5603a; }
+.ruta { display:flex; flex-wrap:wrap; gap:.5rem; margin:.2rem 0 1rem 0; }
+.ruta span { font-size:.8rem; font-weight:600; color:#2c5f8f; background:#eef3f9; border:1px solid #dfe6ee; border-radius:999px; padding:.25rem .8rem; }
+.ruta span.fin { color:#b5603a; background:#faf1ea; border-color:#efd9cb; }
+.ruta i { color:#9aa7b8; font-style:normal; align-self:center; }
 .concl { border-left:4px solid #2c5f8f; background:#f6f8fa; border-radius:0 8px 8px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
 .explica { background:#f4f7fb; border-left:5px solid #2c5f8f; border-radius:8px; padding:.75rem 1rem; font-size:.92rem; line-height:1.45; }
 .explica .t { display:block; font-weight:700; color:#2c5f8f; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; margin-top:.55rem; }
@@ -245,6 +270,8 @@ st.markdown(
     f'<div class="concl">El precio de un usado se puede estimar con un error de <b>{usd(TEST["mae"])}</b> usando año, '
     f'kilometraje, motor, potencia, marca y modelo. El <b>año</b> es lo que más pesa y los autos de alta gama son los que '
     f'más se le escapan.</div>', unsafe_allow_html=True)
+st.markdown('<div class="ruta"><span>01 · Los datos</span><i>&rarr;</i><span>02 · Lo que encontramos</span><i>&rarr;</i>'
+            '<span>03 · El modelo</span><i>&rarr;</i><span class="fin">04 · Ahora vos</span></div>', unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
 c1.markdown(kpi(usd(TEST["mae"]), "Error promedio del tasador (test)", "azul",
                 "En el 20 % de autos que el modelo nunca vio, medido una sola vez"), unsafe_allow_html=True)
@@ -260,7 +287,7 @@ st.divider()
 # TALLO 1 · LOS DATOS. El título afirma algo con números calculados (mediana y percentil 90 del precio).
 p10, p90 = M["precio_p10_p90"]
 ancla("datos")
-st.markdown('<div class="kicker">Los datos</div>', unsafe_allow_html=True)
+capitulo("01", "Los datos", "¿De dónde salen los autos y cuánto cuestan?")
 st.subheader(f"Los datos · La mitad de los autos cuesta menos de {usd(M['precio_mediano'])}, "
              f"pero el 10 % más caro pasa los {usd(p90)}")
 # Fuentes de los datos, con sus logos (app_data/logos/). Los autos por fuente salen de metricas.json.
@@ -332,6 +359,7 @@ descartó en la Entrega 2 (casi no explica el precio). `precio` es el objetivo e
 sería una **fuga**, porque es la respuesta. Ninguna columna que entra se conoce *después* de publicar.
 """)
 
+puente(f"La mitad de los autos cuesta menos de {usd(M['precio_mediano'])}, con una cola larga de autos caros. <b>Siguiente pregunta:</b> ¿qué explica esas diferencias de precio?")
 st.divider()
 
 # =========================================================================
@@ -340,7 +368,7 @@ st.divider()
 # TALLO 2 · LO QUE ENCONTRAMOS. El título usa la depreciación anual que calculó build_app.py (paso 11).
 dep = M["depreciacion_anual"]
 ancla("hallazgos")
-st.markdown('<div class="kicker">Lo que encontramos</div>', unsafe_allow_html=True)
+capitulo("02", "Lo que encontramos", "¿Qué hace que un auto cueste más o menos?")
 st.subheader(f"Lo que encontramos · Un auto pierde cerca del {num(dep * 100)} % de su valor por cada año de antigüedad")
 por_anio = pd.DataFrame(M["mediana_por_anio"]).rename(columns={"fabricado_en": "anio", "median": "mediana", "size": "autos"})
 # Nube de puntos: un punto por auto (con un poquito de desplazamiento horizontal para que no se tapen).
@@ -614,6 +642,7 @@ validación cruzada agrupada por vehículo (GroupKFold). Una diferencia menor a 
 Las coordenadas del mapa son aproximadas (por ciudad) y están en `app_data/ubicaciones.csv`; el η² y las pruebas con provincia y ciudad se calculan en `build_app.py`.
 """)
 
+puente(f"Vimos que el <b>año</b> manda y que la ubicación no aporta. <b>Entonces:</b> ¿con eso se puede armar un tasador que acierte en autos que nunca vio? Probemos modelos.")
 st.divider()
 
 # =========================================================================
@@ -622,7 +651,7 @@ st.divider()
 # TALLO 3 · EL MODELO. "veces" = cuántas veces menor es el error del modelo que el del piso.
 veces = PISO["mae"] / TEST["mae"]
 ancla("modelo")
-st.markdown('<div class="kicker">El modelo</div>', unsafe_allow_html=True)
+capitulo("03", "El modelo", "¿Se puede tasar un auto que nunca vimos, y cuánto nos equivocamos?")
 st.subheader(f"El modelo · El tasador se equivoca en promedio {usd(TEST['mae'])} por auto, "
              f"{num(veces, 1)} veces menos que tasar todo a la mediana")
 # Barras con el error de cada modelo en validación cruzada (con barra de ± 1 desvío). Gris = piso, azul = elegido.
@@ -814,6 +843,7 @@ de 1). Validar al azar en lugar de por vehículo da {usd(fu['mae_azar'])} contra
 modelos raros saldrían *mejor*, y salen peor (tabla de arriba).
 """)
 
+puente(f"Ya sabemos cuánto se equivoca el tasador: <b>{usd(TEST['mae'])}</b> en promedio. <b>Ahora te toca a vos:</b> filtrá los autos, cambiá el eje y probá tasar el tuyo.", copa=True)
 st.divider()
 
 # =========================================================================
@@ -821,7 +851,7 @@ st.divider()
 # =========================================================================
 # COPA · Explorá (panorama + filtros + detalle) y Probá el tasador (caso nuevo).
 ancla("explora")
-st.markdown('<div class="kicker copa">La copa · tu turno</div>', unsafe_allow_html=True)
+capitulo("04", "La copa · tu turno", "Ahora probá vos: ¿qué autos se alejan de la tasación?", copa=True)
 st.header("Ahora vos")
 tab_exp, tab_probar = st.tabs(["Explorá los autos", "Probá el tasador"])
 
@@ -1128,6 +1158,14 @@ with tab_probar:
                     width="stretch")
     probar()
 
+st.markdown("#### Lo que nos llevamos")
+m1, m2, m3 = st.columns(3)
+m1.markdown(kpi("1 · El año manda", "El año es lo que más pesa",  "azul",
+                f"Un auto pierde cerca de {num(M['depreciacion_anual'] * 100)} % por año; sin el año, el error sube {usd(CP['sin fabricado_en']['delta'])}."), unsafe_allow_html=True)
+m2.markdown(kpi("2 · El lugar no", "La ubicación no aporta", "verde",
+                f"La provincia explica {num(M['ubicacion']['eta2_provincia'] * 100, 1)} % del precio; la marca, {num(M['ubicacion']['eta2_marca'] * 100, 0)} %."), unsafe_allow_html=True)
+m3.markdown(kpi("3 · Cuidado con los extremos", "Alta gama y modelos raros", "naranja",
+                f"El tasador se equivoca más en los autos más caros y en modelos con pocos avisos (hasta {num(max(r['rel'] for r in M['target_encoder']) * 100, 0)} % en los nunca vistos)."), unsafe_allow_html=True)
 ancla("pie")
 st.divider()
 st.caption(f"Datos: cosecha del {M['fecha_datos']} del pipeline de Airflow del grupo. Modelo: HistGradientBoosting "
