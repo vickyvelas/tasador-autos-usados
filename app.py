@@ -404,10 +404,12 @@ with st.expander("Cómo lo sabemos"):
     ref = CP["referencia (todas)"]
     anio = CP["sin fabricado_en"]
     st.markdown(f"""
+#### El año manda (y no pide permiso)
 **Hipótesis que se sostuvo: el año es lo que más pesa en el precio.** Correlación de Spearman entre año y precio:
 **{num(M['fuga']['spearman_anio'], 2)}**. Y cuando se saca el año del modelo, el error sube
 **{usd(anio['delta'])}** ({num(anio['delta'] / ref['desvio'], 1)} desvíos), más que cualquier otra columna.
 
+#### El kilometraje, ese cómplice que repite lo que ya dijo el año
 **Hipótesis que no se sostuvo: el kilometraje agrega mucho aparte del año.** Sacarlo sólo sube el error
 **{usd(km['delta'])}** ({num(km['delta'] / ref['desvio'], 1)} desvíos, menos que el ruido de la validación): como los
 km crecen con la antigüedad, lo que dicen ya lo dice el año.
@@ -439,7 +441,8 @@ vez, con la misma validación cruzada agrupada. Si el error sube menos que el de
 UB = M["ubicacion"]
 CPV = {c["variante"]: c for c in M["columnas_probadas"]}
 c_prov, c_ciu = CPV["con provincia"], CPV["con provincia y ciudad"]
-st.markdown("### Hipótesis que descartamos: «el precio depende de dónde se vende el auto»")
+st.markdown("### Mendoza, Córdoba o Buenos Aires: al auto le da lo mismo")
+st.caption("Hipótesis que descartamos: «el precio depende de dónde se vende el auto»")
 st.markdown(
     f"Se la dimos al modelo y **no movió la aguja**: con la provincia el error pasó de {usd(CPV['referencia (todas)']['mae'])} a "
     f"{usd(c_prov['mae'])}, y con provincia y ciudad a {usd(c_ciu['mae'])}. Son diferencias de dólares, mucho menores que el "
@@ -594,7 +597,7 @@ with st.expander("Ejemplos: el mismo auto en distintas provincias"):
                    f"A nivel general, la provincia explica sólo {num(UB['eta2_provincia'] * 100, 1)} % del precio.")
 with st.expander("Cómo lo sabemos"):
     st.markdown(f"""
-#### Hipótesis H4: descarte de la ubicación geográfica
+#### H4 · El auto no cambia de precio por cambiar de provincia
 **Criterio de la cátedra:** una variable con η² menor a 0,05 está en la **zona roja** y no aporta señal.
 Provincia ({num(UB['eta2_provincia'] * 100, 1)} %) y ciudad ({num(UB['eta2_ciudad'] * 100, 1)} %) quedan las dos por debajo: 
 <span style="background:#c0392b;color:#fff;border-radius:6px;padding:1px 8px;font-size:.8rem;font-weight:600">ZONA ROJA</span>
