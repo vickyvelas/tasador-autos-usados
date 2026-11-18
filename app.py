@@ -130,7 +130,7 @@ a.idx small { display:none; }
 .ruta span.fin { color:#b5603a; background:#faf1ea; border-color:#efd9cb; }
 .ruta i { color:#9aa7b8; font-style:normal; align-self:center; }
 .concl { border-left:4px solid #2c5f8f; background:#f6f8fa; border-radius:0 8px 8px 0; padding:.9rem 1.2rem; font-size:1.12rem; margin:.4rem 0 1rem 0; }
-.explica { background:#f4f7fb; border-left:5px solid #2c5f8f; border-radius:8px; padding:.6rem .9rem; font-size:.85rem; line-height:1.35; }
+.explica { background:#f4f7fb; border-left:5px solid #2c5f8f; border-radius:8px; padding:.55rem .85rem; font-size:.82rem; line-height:1.32; }
 .explica .t { display:block; font-weight:700; color:#2c5f8f; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; margin-top:.4rem; }
 .explica .t:first-child { margin-top:0; }
 .explica p { margin:.15rem 0 0 0; }
@@ -309,12 +309,12 @@ hist = alt.Chart(AUTOS[AUTOS["precio_usd"] <= 80000]).mark_bar(color=TINTA, opac
 )
 mediana = alt.Chart(pd.DataFrame({"m": [M["precio_mediano"]]})).mark_rule(
     color=AZUL, strokeDash=[4, 4], size=2).encode(x="m:Q")
-g_h, e_h = st.columns([2.2, 1], gap="large")
+g_h, e_h = st.columns([1.5, 1], gap="medium")
 p90_regla = alt.Chart(pd.DataFrame({"m": [p90]})).mark_rule(color="#C8602F", strokeDash=[4, 4], size=2).encode(x="m:Q")
 st_med = sticker(f"mitad de los autos:\nmenos de {usd(M['precio_mediano'])}", alt.X("m:Q"), px(20), AZUL, valor=M["precio_mediano"], dx=5)
 st_p90 = sticker(f"10 % más caro:\nmás de {usd(p90)}", alt.X("m:Q"), px(62), "#C8602F", valor=p90, dx=5)
 g_h.altair_chart((hist + mediana + p90_regla + st_med + st_p90).properties(
-    height=290, title=alt.TitleParams(f"{num(N_AUTOS)} autos (hasta USD 80.000)", anchor="start", fontSize=13, color="#555")), width="stretch")
+    height=320, title=alt.TitleParams(f"{num(N_AUTOS)} autos (hasta USD 80.000)", anchor="start", fontSize=13, color="#555")), width="stretch")
 e_h.markdown(explica(
     "Cada barra cuenta cuántos autos cuestan entre dos precios (en tramos de USD 2.000): cuanto más alta, más autos. "
     "La línea punteada marca el precio del medio, la mediana.",
@@ -388,9 +388,9 @@ with t_anio:
         tooltip=[alt.Tooltip("anio:Q", title="Año"), alt.Tooltip("mediana:Q", title="Precio mediano", format=",.0f"),
                  alt.Tooltip("autos:Q", title="Autos")],
     )
-    g_a, e_a = st.columns([2.2, 1], gap="large")
+    g_a, e_a = st.columns([1.5, 1], gap="medium")
     st_dep = sticker(f"−{num(dep * 100)} % por año:\nun año más viejo vale ~{num(dep * 100)} % menos", px(10), px(20), "#C8602F")
-    g_a.altair_chart((puntos + linea + st_dep).properties(height=320), width="stretch")
+    g_a.altair_chart((puntos + linea + st_dep).properties(height=340), width="stretch")
     e_a.markdown(explica(
         "Cada punto gris es un auto: cuanto más a la derecha, más nuevo; cuanto más arriba, más caro. "
         "La línea negra une el precio del medio de cada año.",
@@ -683,8 +683,8 @@ bigotes = base.mark_rule(color=TINTA).encode(x="lo:Q", x2="hi:Q")
 textos = base.mark_text(align="left", dx=8, color=TINTA, lineBreak="\n").encode(x="hi:Q", text="txt:N")
 t_comp, t_rp, t_tr = st.tabs(["Comparar modelos", "Real vs. predicho", "Dónde se equivoca"])
 with t_comp:
-    g_c, e_c = st.columns([2.2, 1], gap="large")
-    g_c.altair_chart((barras + bigotes + textos).properties(height=230), width="stretch")
+    g_c, e_c = st.columns([1.5, 1], gap="medium")
+    g_c.altair_chart((barras + bigotes + textos).properties(height=320), width="stretch")
     e_c.markdown(explica(
         "Cada barra es el error promedio, en dólares, de una forma de tasar. Barra más corta = mejor. La rayita negra es la variación entre pruebas.",
         "Para elegir un modelo hay que compararlos a todos con la misma regla. La barra gris es el piso: tasar todos los autos con el precio del medio, sin aprender nada.",
@@ -769,8 +769,8 @@ with t_tr:
     g_rel = base_rel.mark_bar(color=NAR_REL).encode(y=y_rel, tooltip=[
         alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("rel_pct:Q", title="Error relativo mediano (%)", format=".1f")])
     t_rel = base_rel.mark_text(dy=-6, color=TINTA).encode(y="rel_pct:Q", text="rel_txt:N")
-    g_t, e_t = st.columns([2.2, 1], gap="large")
-    g_t.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=300), width="stretch")
+    g_t, e_t = st.columns([1.5, 1], gap="medium")
+    g_t.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=330), width="stretch")
     e_t.markdown(explica(
         "Ordenamos los autos del test del más barato al más caro y los partimos en 5 grupos con la misma cantidad. En cada grupo, "
         "la barra azul (eje izquierdo) son los dólares que el modelo se equivoca en promedio, y la naranja (eje derecho) es el porcentaje del precio.",
