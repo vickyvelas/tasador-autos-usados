@@ -314,14 +314,12 @@ p90_regla = alt.Chart(pd.DataFrame({"m": [p90]})).mark_rule(color="#C8602F", str
 st_med = sticker(f"mitad de los autos:\nmenos de {usd(M['precio_mediano'])}", alt.X("m:Q"), px(20), AZUL, valor=M["precio_mediano"], dx=5)
 st_p90 = sticker(f"10 % más caro:\nmás de {usd(p90)}", alt.X("m:Q"), px(62), "#C8602F", valor=p90, dx=5)
 g_h.altair_chart((hist + mediana + p90_regla + st_med + st_p90).properties(
-    height=320, title=alt.TitleParams(f"{num(N_AUTOS)} autos (hasta USD 80.000)", anchor="start", fontSize=13, color="#555")), width="stretch")
+    height=270, title=alt.TitleParams(f"{num(N_AUTOS)} autos (hasta USD 80.000)", anchor="start", fontSize=13, color="#555")), width="stretch")
 e_h.markdown(explica(
-    "Cada barra cuenta cuántos autos cuestan entre dos precios (en tramos de USD 2.000): cuanto más alta, más autos. "
-    "La línea punteada marca el precio del medio, la mediana.",
-    "Un histograma es la forma más simple de ver cómo se reparten los precios: dónde hay muchos autos y dónde pocos.",
-    f"Casi todos los autos están entre {usd(p10)} y {usd(p90)}. A la derecha queda una cola larga de autos caros "
-    "(el gráfico se corta en USD 80.000 para que se lea).",
-    "Hay muchos autos baratos y pocos muy caros: ahí es donde después le va a costar más al modelo."), unsafe_allow_html=True)
+    "Cada barra: cuántos autos cuestan ese precio. La línea punteada es la mediana.",
+    "Un histograma muestra de un vistazo dónde se juntan los precios.",
+    f"Casi todos están entre {usd(p10)} y {usd(p90)}; a la derecha, una cola de autos caros.",
+    "Muchos baratos, pocos caros: ahí le va a costar más al modelo."), unsafe_allow_html=True)
 
 with st.expander("Cómo lo sabemos"):
     st.markdown(f"""
@@ -390,16 +388,12 @@ with t_anio:
     )
     g_a, e_a = st.columns([1.5, 1], gap="medium")
     st_dep = sticker(f"−{num(dep * 100)} % por año:\nun año más viejo vale ~{num(dep * 100)} % menos", px(10), px(20), "#C8602F")
-    g_a.altair_chart((puntos + linea + st_dep).properties(height=340), width="stretch")
+    g_a.altair_chart((puntos + linea + st_dep).properties(height=290), width="stretch")
     e_a.markdown(explica(
-        "Cada punto gris es un auto: cuanto más a la derecha, más nuevo; cuanto más arriba, más caro. "
-        "La línea negra une el precio del medio de cada año.",
-        "Un gráfico de puntos sirve para ver si dos cosas van juntas. Probamos con el año y el precio. "
-        "El precio va en escala logarítmica para que una pérdida de porcentaje parecido se vea como una recta.",
-        "La línea baja hacia los autos más viejos y es casi recta: el auto no pierde dólares fijos por año, "
-        f"pierde cerca de {num(dep * 100)} % de su valor. Para un mismo año los precios varían mucho: eso lo explican la marca, el modelo y la ficha.",
-        f"El año es lo que más pesa: la correlación con el precio es {num(M['fuga']['spearman_anio'], 2)} y, si el modelo no lo conoce, "
-        f"el error sube {usd(CP['sin fabricado_en']['delta'])}."), unsafe_allow_html=True)
+        "Cada punto es un auto; la línea negra es el precio mediano de cada año.",
+        "El precio va en escala logarítmica: una pérdida de % parecido se ve como una recta.",
+        f"Un auto pierde cerca de {num(dep * 100)} % de su valor por año.",
+        f"El año es lo que más pesa (correlación {num(M['fuga']['spearman_anio'], 2)}): sin él, el error sube {usd(CP['sin fabricado_en']['delta'])}."), unsafe_allow_html=True)
 
     with st.expander("Cómo lo sabemos"):
         km = CP["sin kilometraje"]
@@ -460,12 +454,10 @@ with t_ubic:
     UBIC, GEO = cargar_mapa((DATA / "ubicaciones.csv").stat().st_mtime_ns + len(list(pd.read_csv(DATA / "ubicaciones.csv", nrows=0).columns)))
     UBIC_OK = UBIC.dropna(subset=["latitud", "longitud"])
     st.markdown(explica(
-        "Un círculo por ciudad: cuanto más grande, más autos se publican ahí; cuanto más oscuro, más caro es el precio del medio. "
-        "Podés elegir una provincia para acercarte, y pasar el mouse por un círculo para ver sus autos.",
-        "Para saber si el precio cambia según dónde se vende, lo más directo es mirarlo sobre un mapa.",
-        f"Casi todos los autos están en Mendoza y Córdoba, y los colores de las ciudades grandes son parecidos: no hay zonas mucho más caras. "
-        f"La provincia explica sólo {num(UB['eta2_provincia'] * 100, 1)} % del precio; la marca, {num(UB['eta2_marca'] * 100, 0)} %.",
-        f"Se lo dimos al modelo y no mejoró (+{usd(abs(c_prov['delta']))}): descartamos la ubicación."), unsafe_allow_html=True)
+        "Un círculo por ciudad: más grande = más autos; el color, el precio mediano (azul barato, rojo caro).",
+        "Un mapa muestra directo si el precio cambia según dónde se vende.",
+        f"Los colores de las ciudades grandes son parecidos. La provincia explica sólo {num(UB['eta2_provincia'] * 100, 1)} % del precio; la marca, {num(UB['eta2_marca'] * 100, 0)} %.",
+        f"El modelo no mejoró con la ubicación (+{usd(abs(c_prov['delta']))}): la descartamos."), unsafe_allow_html=True)
     provs = alfabetico(UBIC_OK["provincia"].unique())
     sel_prov = st.multiselect("Provincias en el mapa", provs, placeholder="Todas las provincias")
     mapa_df = UBIC_OK[UBIC_OK["provincia"].isin(sel_prov)] if sel_prov else UBIC_OK
@@ -684,12 +676,12 @@ textos = base.mark_text(align="left", dx=8, color=TINTA, lineBreak="\n").encode(
 t_comp, t_rp, t_tr = st.tabs(["Comparar modelos", "Real vs. predicho", "Dónde se equivoca"])
 with t_comp:
     g_c, e_c = st.columns([1.5, 1], gap="medium")
-    g_c.altair_chart((barras + bigotes + textos).properties(height=320), width="stretch")
+    g_c.altair_chart((barras + bigotes + textos).properties(height=260), width="stretch")
     e_c.markdown(explica(
-        "Cada barra es el error promedio, en dólares, de una forma de tasar. Barra más corta = mejor. La rayita negra es la variación entre pruebas.",
-        "Para elegir un modelo hay que compararlos a todos con la misma regla. La barra gris es el piso: tasar todos los autos con el precio del medio, sin aprender nada.",
-        f"Todos le ganan al piso y el boosting ajustado (azul oscuro) tiene la barra más corta: {usd(AJ['mae'])} en la validación cruzada.",
-        f"Elegimos el boosting ajustado. En autos que nunca vio (test) se equivoca {usd(TEST['mae'])}, {num(veces, 1)} veces menos que el piso."), unsafe_allow_html=True)
+        "Cada barra es el error promedio en dólares. Más corta = mejor.",
+        "Todos se comparan con la misma regla; la gris es el piso (tasar todo a la mediana).",
+        f"Todos le ganan al piso; el boosting ajustado es el mejor: {usd(AJ['mae'])} en validación.",
+        f"En autos nunca vistos (test) se equivoca {usd(TEST['mae'])}: {num(veces, 1)} veces menos que el piso."), unsafe_allow_html=True)
 
     # Real vs. predicho en el test (como en el Colab): cada punto es un auto que el modelo nunca vio; la diagonal es la predicción perfecta.
     test_df = AUTOS[AUTOS["conjunto"] == "test"].copy()
@@ -737,10 +729,10 @@ with t_rp:
     g_p.altair_chart(real_vs_predicho(en_pesos, "#2f6fc0", "Publicados en pesos", txt_rp(en_pesos)), width="stretch")
     g_d.altair_chart(real_vs_predicho(en_dolares, "#C8602F", "Publicados en dólares", txt_rp(en_dolares)), width="stretch")
     st.markdown(explica(
-        "Cada punto es un auto del test (que el modelo nunca vio): a la derecha, más caro era de verdad; arriba, más caro lo tasó el modelo.",
-        "Si acertara siempre, todo caería sobre la línea oscura. Las finas marcan ±10 %.",
-        f"En pesos, {num(dentro_p)} % queda dentro de ±10 % (error {usd(mae_p)}). En dólares, sólo {num(dentro_d)} % (error {usd(mae_d)}).",
-        "En dólares hay más dispersión: ahí conviene fiarse menos de la tasación."), unsafe_allow_html=True)
+        "Cada punto es un auto que el modelo nunca vio. Arriba de la línea, lo tasó más caro.",
+        "Si acertara siempre, todo caería sobre la línea oscura (las finas son ±10 %).",
+        f"En pesos, {num(dentro_p)} % queda dentro de ±10 %; en dólares, {num(dentro_d)} %.",
+        "En dólares hay más dispersión: ahí conviene fiarse menos."), unsafe_allow_html=True)
 
 with t_tr:
     st.markdown("##### Dónde se equivoca el modelo, por tramo de precio")
@@ -770,15 +762,12 @@ with t_tr:
         alt.Tooltip("tramo:N", title="Tramo"), alt.Tooltip("rel_pct:Q", title="Error relativo mediano (%)", format=".1f")])
     t_rel = base_rel.mark_text(dy=-6, color=TINTA).encode(y="rel_pct:Q", text="rel_txt:N")
     g_t, e_t = st.columns([1.5, 1], gap="medium")
-    g_t.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=330), width="stretch")
+    g_t.altair_chart(alt.layer(g_mae + t_mae, g_rel + t_rel).resolve_scale(y="independent").properties(height=290), width="stretch")
     e_t.markdown(explica(
-        "Ordenamos los autos del test del más barato al más caro y los partimos en 5 grupos con la misma cantidad. En cada grupo, "
-        "la barra azul (eje izquierdo) son los dólares que el modelo se equivoca en promedio, y la naranja (eje derecho) es el porcentaje del precio.",
-        "Equivocarse USD 1.000 es poco en un auto de 30.000 y mucho en uno de 3.000. Por eso lo miramos de las dos formas, con un eje para cada una.",
-        f"En dólares el error crece con el precio, de {usd(tramo['mae'].iloc[0])} a {usd(tramo['mae'].iloc[-1])}. En porcentaje queda parecido, entre "
-        f"{num(tramo['rel_pct'].min(), 1)} % y {num(tramo['rel_pct'].max(), 1)} %.",
-        "Los autos caros son los que más se le escapan al modelo en dólares: por eso la app avisa cuando una tasación cae en el 10 % más caro."),
-        unsafe_allow_html=True)
+        "5 grupos de igual cantidad, del más barato al más caro. Azul: error en dólares; naranja: error en %.",
+        "USD 1.000 de error pesa distinto en un auto de 3.000 que en uno de 30.000.",
+        f"El error en dólares crece de {usd(tramo['mae'].iloc[0])} a {usd(tramo['mae'].iloc[-1])}; en % queda parecido ({num(tramo['rel_pct'].min(), 1)} a {num(tramo['rel_pct'].max(), 1)} %).",
+        "Los autos caros son los que más se le escapan."), unsafe_allow_html=True)
 
 
 
@@ -865,12 +854,10 @@ tab_exp, tab_probar = st.tabs(["Explorá los autos", "Probá el tasador"])
 
 with tab_exp:
     st.markdown(explica(
-        "Cada punto es un auto publicado. El color compara su precio con lo que dijo el tasador, que lo tasó <b>sin haber visto ese auto</b>: "
-        "verde = publicado más de 10 % por debajo de la tasación, gris = en precio, naranja = más de 10 % por encima.",
-        "Un gráfico de puntos deja ver miles de autos a la vez y cambiar qué se compara. Vos elegís qué va en el eje horizontal.",
-        "Probá con el año en el eje X: es la caída de valor. Cambiá al kilometraje, la potencia o el motor y mirá qué cambia. "
-        "Pasá el mouse por un punto para ver el auto y hacé clic para abrir su ficha.",
-        "Ahora la pregunta es tuya: filtrá, cambiá los ejes y buscá autos que se alejen de la tasación."), unsafe_allow_html=True)
+        "Cada punto es un auto. Verde: publicado más de 10 % bajo la tasación; gris: en precio; naranja: más de 10 % arriba.",
+        "Deja ver miles de autos y cambiar qué se compara.",
+        "Elegí el eje X (año, km, potencia, motor) y movés los filtros. Clic en un punto abre su ficha.",
+        "Buscá autos que se alejen de la tasación."), unsafe_allow_html=True)
     # Todo el apartado funciona así: a la izquierda están los controles (filtros y eje X) y a la derecha el gráfico. Hay un slider por
     # cada variable numérica. El slider de la variable que está en el eje X es también la ventana del gráfico: al moverlo, el
     # gráfico se acerca o se aleja de ese rango, sin quedar desfasado. Por defecto ese slider arranca en la zona más densa.
