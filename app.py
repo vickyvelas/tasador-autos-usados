@@ -294,9 +294,9 @@ st.subheader(f"Los datos · La mitad de los autos cuesta menos de {usd(M['precio
 import base64
 carone_b64 = base64.b64encode((DATA / "logos" / "carone.svg").read_bytes()).decode()   # el logo de CarOne es blanco: va sobre un chip oscuro
 _, lg0, lg1, lg2, lg3, _ = st.columns([0.4, 0.8, 1.3, 1, 1.3, 0.4], vertical_alignment="center")
-lg0.markdown(f'<div style="background:#22364d;border-radius:10px;padding:8px 12px;display:inline-block"><img src="data:image/svg+xml;base64,{carone_b64}" width="56"></div>', unsafe_allow_html=True)
+lg0.markdown(f'<div style="background:#22364d;border-radius:10px;padding:5px 8px;display:inline-block"><img src="data:image/svg+xml;base64,{carone_b64}" width="36"></div>', unsafe_allow_html=True)
 lg1.markdown(f"**CarOne** · {num(M['por_fuente'].get('carone', 0))} autos<br><span style='font-size:.8rem;color:#6b7280'>API GraphQL</span>", unsafe_allow_html=True)
-lg2.image(str(DATA / "logos" / "deruedas.png"), width=130)
+lg2.image(str(DATA / "logos" / "deruedas.png"), width=85)
 lg3.markdown(f"**DeRuedas** · {num(M['por_fuente'].get('deruedas', 0))} autos<br><span style='font-size:.8rem;color:#6b7280'>páginas HTML</span>", unsafe_allow_html=True)
 st.markdown("<div style='height:1.2rem'></div>", unsafe_allow_html=True)   # aire entre los logos y el gráfico
 # Histograma de precios: marca de barras, x = precio en tramos de USD 2.000, y = cantidad de autos (count).
