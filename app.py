@@ -836,289 +836,297 @@ with tab_exp:
     # Todo el apartado funciona así: a la izquierda están los controles (filtros y eje X) y a la derecha el gráfico. Hay un slider por
     # cada variable numérica. El slider de la variable que está en el eje X es también la ventana del gráfico: al moverlo, el
     # gráfico se acerca o se aleja de ese rango, sin quedar desfasado. Por defecto ese slider arranca en la zona más densa.
-    col_sel, col_graf = st.columns([1, 4], gap="medium")
-    X_OPC = {"Año de fabricación": "fabricado_en", "Kilometraje": "kilometraje", "Potencia (HP)": "potencia_hp", "Motor (litros)": "motor_lt"}
-    PASO = {"fabricado_en": 1, "kilometraje": 5000, "potencia_hp": 10, "motor_lt": 0.1}
-    LIM = {}   # rango completo de cada variable (el kilometraje se corta en el percentil 99,5: hay avisos con millones de km)
-    for v in X_OPC.values():
-        lo_v, hi_v = float(AUTOS[v].min()), float(AUTOS[v].quantile(0.995) if v == "kilometraje" else AUTOS[v].max())
-        paso = PASO[v]
-        LIM[v] = (float(np.floor(lo_v / paso) * paso), float(np.ceil(hi_v / paso) * paso))
-        if paso >= 1:
-            LIM[v] = (int(LIM[v][0]), int(LIM[v][1]))
-    pmax = int(np.ceil(AUTOS["precio_usd"].max() / 1000) * 1000)
-
-    def ventana_densa(v):
-        """Zona más densa de la variable: para el año, los 10 años con más autos; para el resto, del percentil 2 al 98."""
-        if v == "fabricado_en":
-            cuenta = AUTOS["fabricado_en"].round().astype(int).value_counts().sort_index()
-            cuenta = cuenta.reindex(range(int(cuenta.index.min()), int(cuenta.index.max()) + 1), fill_value=0)
-            ini = int(cuenta.rolling(10).sum().dropna().idxmax() - 9)
-            return (ini, ini + 9)
-        lo_q, hi_q = AUTOS[v].quantile(0.02), AUTOS[v].quantile(0.98)
-        p = PASO[v]
-        return (float(np.floor(lo_q / p) * p), float(np.ceil(hi_q / p) * p))
-
-    for v in X_OPC.values():   # valores iniciales: todo el rango (la variable del eje X arranca en su zona densa)
-        st.session_state.setdefault(f"rng_{v}", LIM[v])
-    if "x_nom" not in st.session_state:
-        st.session_state["x_nom"] = "Año de fabricación"
-        st.session_state["rng_fabricado_en"] = ventana_densa("fabricado_en")
-
-    def al_cambiar_x():   # al elegir otra variable para el eje X, su slider se acerca a la zona densa y el resto vuelve a todo el rango
+    @st.fragment
+    def explora():
+        """Todo el explorador es un fragmento: al tocar un filtro sólo se vuelve a dibujar esta parte, no toda la página."""
+        col_sel, col_graf = st.columns([1, 4], gap="medium")
+        X_OPC = {"Año de fabricación": "fabricado_en", "Kilometraje": "kilometraje", "Potencia (HP)": "potencia_hp", "Motor (litros)": "motor_lt"}
+        PASO = {"fabricado_en": 1, "kilometraje": 5000, "potencia_hp": 10, "motor_lt": 0.1}
+        LIM = {}   # rango completo de cada variable (el kilometraje se corta en el percentil 99,5: hay avisos con millones de km)
         for v in X_OPC.values():
-            st.session_state[f"rng_{v}"] = LIM[v]
-        vv = X_OPC[st.session_state["x_nom"]]
-        st.session_state[f"rng_{vv}"] = ventana_densa(vv)
+            lo_v, hi_v = float(AUTOS[v].min()), float(AUTOS[v].quantile(0.995) if v == "kilometraje" else AUTOS[v].max())
+            paso = PASO[v]
+            LIM[v] = (float(np.floor(lo_v / paso) * paso), float(np.ceil(hi_v / paso) * paso))
+            if paso >= 1:
+                LIM[v] = (int(LIM[v][0]), int(LIM[v][1]))
+        pmax = int(np.ceil(AUTOS["precio_usd"].max() / 1000) * 1000)
 
-    def ver_todo_x():
-        st.session_state[f"rng_{X_OPC[st.session_state['x_nom']]}"] = LIM[X_OPC[st.session_state['x_nom']]]
+        def ventana_densa(v):
+            """Zona más densa de la variable: para el año, los 10 años con más autos; para el resto, del percentil 2 al 98."""
+            if v == "fabricado_en":
+                cuenta = AUTOS["fabricado_en"].round().astype(int).value_counts().sort_index()
+                cuenta = cuenta.reindex(range(int(cuenta.index.min()), int(cuenta.index.max()) + 1), fill_value=0)
+                ini = int(cuenta.rolling(10).sum().dropna().idxmax() - 9)
+                return (ini, ini + 9)
+            lo_q, hi_q = AUTOS[v].quantile(0.02), AUTOS[v].quantile(0.98)
+            p = PASO[v]
+            return (float(np.floor(lo_q / p) * p), float(np.ceil(hi_q / p) * p))
 
-    marcas = alfabetico(AUTOS["marca"].unique())
-    sel_marcas = col_sel.multiselect("Marca", marcas, placeholder="Todas las marcas")
-    nom_x = col_sel.selectbox("Eje horizontal (X)", list(X_OPC), key="x_nom", on_change=al_cambiar_x)
-    vx, vy = X_OPC[nom_x], "precio_usd"   # el eje vertical es siempre el precio publicado
-    col_sel.button("Ver todo el rango del eje X", on_click=ver_todo_x, width="stretch")
-    ETIQ = {"fabricado_en": "Año de fabricación", "kilometraje": "Kilometraje (km)", "potencia_hp": "Potencia (HP)", "motor_lt": "Motor (litros)"}
-    rangos = {}
-    for v in X_OPC.values():
-        lo_l, hi_l = LIM[v]
-        rangos[v] = col_sel.slider(ETIQ[v] + (" · eje X" if v == vx else ""), lo_l, hi_l, step=PASO[v], key=f"rng_{v}",
-                                   format="%d" if PASO[v] >= 1 else "%.1f")
-    rango_precio = col_sel.slider("Precio publicado (USD)", 0, pmax, (0, pmax), step=1000)
-    CAJAS = {"Todas": None, "Manual": "manual", "Automática": "automatico"}
-    caja = col_sel.radio("Caja", list(CAJAS), horizontal=True)
-    COMBS = {"Todos": None, "Nafta": "nafta", "Diésel": "diesel", "Híbrido": "hibrido", "Eléctrico": "electrico", "GNC": "gnc"}
-    comb_sel = col_sel.selectbox("Combustible", list(COMBS))
+        for v in X_OPC.values():   # valores iniciales: todo el rango (la variable del eje X arranca en su zona densa)
+            st.session_state.setdefault(f"rng_{v}", LIM[v])
+        if "x_nom" not in st.session_state:
+            st.session_state["x_nom"] = "Año de fabricación"
+            st.session_state["rng_fabricado_en"] = ventana_densa("fabricado_en")
 
-    d = AUTOS[AUTOS["precio_usd"].between(*rango_precio)]
-    for v, (lo_s, hi_s) in rangos.items():
-        if (lo_s, hi_s) != LIM[v]:   # sólo se filtra si el slider se achicó (así no se pierden los avisos con datos extremos)
-            d = d[d[v].between(lo_s, hi_s)]
-    if sel_marcas:
-        d = d[d["marca"].isin(sel_marcas)]
-    if CAJAS[caja]:
-        d = d[d["caja"] == CAJAS[caja]]
-    if COMBS[comb_sel]:
-        d = d[d["comb"] == COMBS[comb_sel]]
+        def al_cambiar_x():   # al elegir otra variable para el eje X, su slider se acerca a la zona densa y el resto vuelve a todo el rango
+            for v in X_OPC.values():
+                st.session_state[f"rng_{v}"] = LIM[v]
+            vv = X_OPC[st.session_state["x_nom"]]
+            st.session_state[f"rng_{vv}"] = ventana_densa(vv)
 
-    k1, k2, k3, k4 = col_graf.columns(4)
-    k1.metric("Autos en la vista", num(len(d)))
-    k2.metric("Precio mediano", usd(d["precio_usd"].median()) if len(d) else "–")
-    k3.metric("Error mediano del tasador", f"{num((d['precio_usd'] / d['tasacion_usd'] - 1).abs().median() * 100, 1)} %" if len(d) else "–",
-              help="Diferencia típica entre el precio publicado y la tasación en estos autos. Más alta = el tasador se fía menos en ese grupo.")
-    k4.metric("Más baratos que la tasación", f"{num((d['veredicto'] == VEREDICTOS[0]).mean() * 100)} %" if len(d) else "–",
-              help="Autos publicados más de 10 % por debajo de lo que estima el modelo: posibles oportunidades (o autos con algún problema).")
+        def ver_todo_x():
+            st.session_state[f"rng_{X_OPC[st.session_state['x_nom']]}"] = LIM[X_OPC[st.session_state['x_nom']]]
 
-    # Detalle a pedido: al hacer clic en un punto se guarda su fila y abajo aparece la ficha con la tasación del modelo.
-    clic = alt.selection_point(name="auto", fields=["idx"], on="click", nearest=True, empty=False)
-    dd = d.reset_index(names="idx")
-    dd["dif_pct"] = dd["dif"] * 100
-    pad_x = 0.5 if vx == "fabricado_en" else 0
-    dominio_x = [rangos[vx][0] - pad_x, rangos[vx][1] + pad_x]
-    if vx == "fabricado_en":   # desplazamiento horizontal fijo por auto: los puntos no se mueven entre un clic y otro
-        dd["x_graf"] = dd[vx] + (((dd["idx"] * 2654435761) % 1000) / 1000 - 0.5) * 0.7
-    else:
-        dd["x_graf"] = dd[vx]
-    x_eje = alt.Axis(format="d" if vx == "fabricado_en" else ",.1f" if vx == "motor_lt" else ",.0f")
-    disp = alt.Chart(dd).mark_circle(size=36, opacity=0.65, clip=True).encode(
-        x=alt.X("x_graf:Q", title=nom_x, axis=x_eje, scale=alt.Scale(domain=dominio_x, nice=False)),
-        y=alt.Y("precio_usd:Q", scale=ESCALA_PRECIO, axis=eje("Precio publicado (USD, escala log)", MARCAS_PRECIO)),
-        color=alt.Color("veredicto:N", scale=ESCALA_VEREDICTO, title=None,
-                        legend=alt.Legend(orient="top")),
-        size=alt.condition(clic, alt.value(160), alt.value(36)),
-        tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("version:N", title="Versión"),
-                 alt.Tooltip("fabricado_en:Q", title="Año", format="d"),
-                 alt.Tooltip("kilometraje:Q", title="Km", format=",.0f"),
-                 alt.Tooltip("precio_usd:Q", title="Precio publicado (USD)", format=",.0f"),
-                 alt.Tooltip("tasacion_usd:Q", title="Tasación del modelo (USD)", format=",.0f"),
-                 alt.Tooltip("dif_txt:N", title="Diferencia vs tasación"),
-                 alt.Tooltip("fuente:N", title="Fuente")],
-    ).add_params(clic).properties(height=460)
-    evento = col_graf.altair_chart(disp, width="stretch", on_select="rerun", key="explora")
-    col_graf.caption(f"El eje X muestra de {num(rangos[vx][0], 1 if vx == 'motor_lt' else 0)} a {num(rangos[vx][1], 1 if vx == 'motor_lt' else 0)}. "
-                     "Para moverlo, usá el slider de esa variable (a la izquierda): el gráfico y los números de arriba se ajustan juntos. "
-                     "Pasá el mouse por un punto para ver el auto y hacé clic para abrir su ficha.")
+        marcas = alfabetico(AUTOS["marca"].unique())
+        sel_marcas = col_sel.multiselect("Marca", marcas, placeholder="Todas las marcas")
+        nom_x = col_sel.selectbox("Eje horizontal (X)", list(X_OPC), key="x_nom", on_change=al_cambiar_x)
+        vx, vy = X_OPC[nom_x], "precio_usd"   # el eje vertical es siempre el precio publicado
+        col_sel.button("Ver todo el rango del eje X", on_click=ver_todo_x, width="stretch")
+        ETIQ = {"fabricado_en": "Año de fabricación", "kilometraje": "Kilometraje (km)", "potencia_hp": "Potencia (HP)", "motor_lt": "Motor (litros)"}
+        rangos = {}
+        for v in X_OPC.values():
+            lo_l, hi_l = LIM[v]
+            rangos[v] = col_sel.slider(ETIQ[v] + (" · eje X" if v == vx else ""), lo_l, hi_l, step=PASO[v], key=f"rng_{v}",
+                                       format="%d" if PASO[v] >= 1 else "%.1f")
+        rango_precio = col_sel.slider("Precio publicado (USD)", 0, pmax, (0, pmax), step=1000)
+        CAJAS = {"Todas": None, "Manual": "manual", "Automática": "automatico"}
+        caja = col_sel.radio("Caja", list(CAJAS), horizontal=True)
+        COMBS = {"Todos": None, "Nafta": "nafta", "Diésel": "diesel", "Híbrido": "hibrido", "Eléctrico": "electrico", "GNC": "gnc"}
+        comb_sel = col_sel.selectbox("Combustible", list(COMBS))
 
-    elegido = None
-    try:
-        sel = evento.selection.get("auto") if evento else None
-        if sel:
-            elegido = AUTOS.loc[sel[0]["idx"]]
-    except Exception:
+        d = AUTOS[AUTOS["precio_usd"].between(*rango_precio)]
+        for v, (lo_s, hi_s) in rangos.items():
+            if (lo_s, hi_s) != LIM[v]:   # sólo se filtra si el slider se achicó (así no se pierden los avisos con datos extremos)
+                d = d[d[v].between(lo_s, hi_s)]
+        if sel_marcas:
+            d = d[d["marca"].isin(sel_marcas)]
+        if CAJAS[caja]:
+            d = d[d["caja"] == CAJAS[caja]]
+        if COMBS[comb_sel]:
+            d = d[d["comb"] == COMBS[comb_sel]]
+
+        k1, k2, k3, k4 = col_graf.columns(4)
+        k1.metric("Autos en la vista", num(len(d)))
+        k2.metric("Precio mediano", usd(d["precio_usd"].median()) if len(d) else "–")
+        k3.metric("Error mediano del tasador", f"{num((d['precio_usd'] / d['tasacion_usd'] - 1).abs().median() * 100, 1)} %" if len(d) else "–",
+                  help="Diferencia típica entre el precio publicado y la tasación en estos autos. Más alta = el tasador se fía menos en ese grupo.")
+        k4.metric("Más baratos que la tasación", f"{num((d['veredicto'] == VEREDICTOS[0]).mean() * 100)} %" if len(d) else "–",
+                  help="Autos publicados más de 10 % por debajo de lo que estima el modelo: posibles oportunidades (o autos con algún problema).")
+
+        # Detalle a pedido: al hacer clic en un punto se guarda su fila y abajo aparece la ficha con la tasación del modelo.
+        clic = alt.selection_point(name="auto", fields=["idx"], on="click", nearest=True, empty=False)
+        dd = d.reset_index(names="idx")
+        dd["dif_pct"] = dd["dif"] * 100
+        pad_x = 0.5 if vx == "fabricado_en" else 0
+        dominio_x = [rangos[vx][0] - pad_x, rangos[vx][1] + pad_x]
+        if vx == "fabricado_en":   # desplazamiento horizontal fijo por auto: los puntos no se mueven entre un clic y otro
+            dd["x_graf"] = dd[vx] + (((dd["idx"] * 2654435761) % 1000) / 1000 - 0.5) * 0.7
+        else:
+            dd["x_graf"] = dd[vx]
+        x_eje = alt.Axis(format="d" if vx == "fabricado_en" else ",.1f" if vx == "motor_lt" else ",.0f")
+        disp = alt.Chart(dd).mark_circle(size=36, opacity=0.65, clip=True).encode(
+            x=alt.X("x_graf:Q", title=nom_x, axis=x_eje, scale=alt.Scale(domain=dominio_x, nice=False)),
+            y=alt.Y("precio_usd:Q", scale=ESCALA_PRECIO, axis=eje("Precio publicado (USD, escala log)", MARCAS_PRECIO)),
+            color=alt.Color("veredicto:N", scale=ESCALA_VEREDICTO, title=None,
+                            legend=alt.Legend(orient="top")),
+            size=alt.condition(clic, alt.value(160), alt.value(36)),
+            tooltip=[alt.Tooltip("auto:N", title="Auto"), alt.Tooltip("version:N", title="Versión"),
+                     alt.Tooltip("fabricado_en:Q", title="Año", format="d"),
+                     alt.Tooltip("kilometraje:Q", title="Km", format=",.0f"),
+                     alt.Tooltip("precio_usd:Q", title="Precio publicado (USD)", format=",.0f"),
+                     alt.Tooltip("tasacion_usd:Q", title="Tasación del modelo (USD)", format=",.0f"),
+                     alt.Tooltip("dif_txt:N", title="Diferencia vs tasación"),
+                     alt.Tooltip("fuente:N", title="Fuente")],
+        ).add_params(clic).properties(height=460).interactive(bind_y=False)
+        evento = col_graf.altair_chart(disp, width="stretch", on_select="rerun", key="explora")
+        col_graf.caption(f"El eje X muestra de {num(rangos[vx][0], 1 if vx == 'motor_lt' else 0)} a {num(rangos[vx][1], 1 if vx == 'motor_lt' else 0)}. "
+                         "Para moverlo, usá el slider de esa variable (a la izquierda): el gráfico y los números de arriba se ajustan juntos. "
+                         "Pasá el mouse por un punto para ver el auto y hacé clic para abrir su ficha.")
+
         elegido = None
-    if elegido is not None:
-        st.markdown(f"#### {elegido['marca']} {elegido['modelo']} · {elegido['version']}")
-        e1, e2, e3, e4 = st.columns(4)
-        e1.metric("Precio publicado", usd(elegido["precio_usd"]),
-                  help=f"Original: {num(elegido['precio'])} {elegido['moneda']}")
-        e2.metric("Tasación del modelo", usd(elegido["tasacion_usd"]),
-                  delta=f"{num(elegido['dif'] * 100)} % vs tasación", delta_color="off")
-        e3.metric("Año · km", f"{int(elegido['fabricado_en'])} · {num(elegido['kilometraje'])} km")
-        e4.metric("Avisos de este modelo en entrenamiento", num(elegido["avisos_modelo"]))
-        if abs(elegido["dif"]) >= 0.25:
-            st.error(f"TASACIÓN MUY DESFASADA: el modelo tasa este auto {num(abs(elegido['dif']) * 100)} % "
-                     f"{'por encima' if elegido['dif'] < 0 else 'por debajo'} del precio publicado. "
-                     "Puede ser un precio fuera de mercado o un caso que el modelo no ve bien.", icon=":material/warning:")
-        if elegido["avisos_modelo"] < 10:
-            st.warning("El tasador vio menos de 10 autos de este modelo: su tasación es poco confiable.")
-        if isinstance(elegido["url"], str):
-            st.markdown(f"[Ver la publicación original]({elegido['url']}) · fuente: {elegido['fuente']}")
-    else:
-        st.caption("Tip: hacé clic en un punto para ver la ficha completa de ese auto.")
+        try:
+            sel = evento.selection.get("auto") if evento else None
+            if sel:
+                elegido = AUTOS.loc[sel[0]["idx"]]
+        except Exception:
+            elegido = None
+        if elegido is not None:
+            st.markdown(f"#### {elegido['marca']} {elegido['modelo']} · {elegido['version']}")
+            e1, e2, e3, e4 = st.columns(4)
+            e1.metric("Precio publicado", usd(elegido["precio_usd"]),
+                      help=f"Original: {num(elegido['precio'])} {elegido['moneda']}")
+            e2.metric("Tasación del modelo", usd(elegido["tasacion_usd"]),
+                      delta=f"{num(elegido['dif'] * 100)} % vs tasación", delta_color="off")
+            e3.metric("Año · km", f"{int(elegido['fabricado_en'])} · {num(elegido['kilometraje'])} km")
+            e4.metric("Avisos de este modelo en entrenamiento", num(elegido["avisos_modelo"]))
+            if abs(elegido["dif"]) >= 0.25:
+                st.error(f"TASACIÓN MUY DESFASADA: el modelo tasa este auto {num(abs(elegido['dif']) * 100)} % "
+                         f"{'por encima' if elegido['dif'] < 0 else 'por debajo'} del precio publicado. "
+                         "Puede ser un precio fuera de mercado o un caso que el modelo no ve bien.", icon=":material/warning:")
+            if elegido["avisos_modelo"] < 10:
+                st.warning("El tasador vio menos de 10 autos de este modelo: su tasación es poco confiable.")
+            if isinstance(elegido["url"], str):
+                st.markdown(f"[Ver la publicación original]({elegido['url']}) · fuente: {elegido['fuente']}")
+        else:
+            st.caption("Tip: hacé clic en un punto para ver la ficha completa de ese auto.")
+    explora()
 
 with tab_probar:
-    st.markdown("Cargá un auto y el tasador estima su precio. Sólo se pueden elegir marcas y modelos que el "
-                "modelo vio; si un número se sale de lo habitual, la app te avisa.")
-    # Rangos que vio el modelo (calculados en build_app.py, paso 12) para avisar si el usuario carga algo raro.
-    R = M["rangos"]
-    REAL = {c: AUTOS.loc[AUTOS[c] > 0, c].quantile([0.01, 0.99]).tolist() for c in
-            ["fabricado_en", "kilometraje", "motor_lt", "potencia_hp"]}
-    cuenta = AUTOS.groupby(["marca", "modelo"]).size().rename("n").reset_index()
-    # Formulario a la izquierda (izq) y panel de tasación a la derecha (der).
-    izq, der = st.columns([1.5, 1])
-    c_a, c_b, c_c = izq.columns(3)
-    marcas_p = alfabetico(AUTOS["marca"].unique())
-    marca = c_a.selectbox("Marca", marcas_p, index=marcas_p.index("Volkswagen") if "Volkswagen" in marcas_p else 0)
-    opciones = cuenta[cuenta["marca"] == marca].copy()
-    opciones = opciones.set_index("modelo").loc[alfabetico(opciones["modelo"])].reset_index()  # A-Z
-    lista_mod = opciones["modelo"].tolist()
-    mas_publicado = opciones.sort_values("n", ascending=False)["modelo"].iloc[0]   # la lista va A-Z pero arranca en el más publicado
-    modelo = c_b.selectbox("Modelo", lista_mod, index=lista_mod.index(mas_publicado),
-                           format_func=lambda m: f"{m}  ({int(opciones.set_index('modelo').loc[m, 'n'])} avisos)")
-    ref_m = AUTOS[(AUTOS["marca"] == marca) & (AUTOS["modelo"] == modelo)]
+    @st.fragment
+    def probar():
+        """El tasador también es un fragmento: al cambiar un dato se actualiza sólo el tasador, no toda la página."""
+        st.markdown("Cargá un auto y el tasador estima su precio. Sólo se pueden elegir marcas y modelos que el "
+                    "modelo vio; si un número se sale de lo habitual, la app te avisa.")
+        # Rangos que vio el modelo (calculados en build_app.py, paso 12) para avisar si el usuario carga algo raro.
+        R = M["rangos"]
+        REAL = {c: AUTOS.loc[AUTOS[c] > 0, c].quantile([0.01, 0.99]).tolist() for c in
+                ["fabricado_en", "kilometraje", "motor_lt", "potencia_hp"]}
+        cuenta = AUTOS.groupby(["marca", "modelo"]).size().rename("n").reset_index()
+        # Formulario a la izquierda (izq) y panel de tasación a la derecha (der).
+        izq, der = st.columns([1.5, 1])
+        c_a, c_b, c_c = izq.columns(3)
+        marcas_p = alfabetico(AUTOS["marca"].unique())
+        marca = c_a.selectbox("Marca", marcas_p, index=marcas_p.index("Volkswagen") if "Volkswagen" in marcas_p else 0)
+        opciones = cuenta[cuenta["marca"] == marca].copy()
+        opciones = opciones.set_index("modelo").loc[alfabetico(opciones["modelo"])].reset_index()  # A-Z
+        lista_mod = opciones["modelo"].tolist()
+        mas_publicado = opciones.sort_values("n", ascending=False)["modelo"].iloc[0]   # la lista va A-Z pero arranca en el más publicado
+        modelo = c_b.selectbox("Modelo", lista_mod, index=lista_mod.index(mas_publicado),
+                               format_func=lambda m: f"{m}  ({int(opciones.set_index('modelo').loc[m, 'n'])} avisos)")
+        ref_m = AUTOS[(AUTOS["marca"] == marca) & (AUTOS["modelo"] == modelo)]
 
-    def tipico(col, por_defecto):
-        v = ref_m[col].median()
-        return float(v) if pd.notna(v) else por_defecto
+        def tipico(col, por_defecto):
+            v = ref_m[col].median()
+            return float(v) if pd.notna(v) else por_defecto
 
-    c1, c2, c3 = izq.columns(3)
-    anio = c1.slider("Año de fabricación", int(R["fabricado_en"][2]), int(R["fabricado_en"][3]),
-                     int(np.clip(round(tipico("fabricado_en", 2018)), R["fabricado_en"][2], R["fabricado_en"][3])))
-    km_v = c2.number_input("Kilometraje", min_value=0, max_value=500000,
-                           value=int(round(tipico("kilometraje", 80000), -3)), step=5000)
-    c4, c5, c6 = izq.columns(3)
-    motor = c3.number_input("Motor (litros)", min_value=0.6, max_value=float(R["motor_lt"][3]),
-                            value=float(np.clip(round(tipico("motor_lt", 1.6), 1), 0.6, R["motor_lt"][3])), step=0.1, format="%.1f")
-    hp = c4.number_input("Potencia (HP)", min_value=40.0, max_value=float(R["potencia_hp"][3]),
-                         value=float(np.clip(round(tipico("potencia_hp", 110)), 40, R["potencia_hp"][3])), step=5.0, format="%.0f")
-    # Los desplegables de caja, combustible y tracción ofrecen sólo lo que aparece en los avisos de ESE modelo
-    # (una Amarok sólo se ofrece diésel, no nafta). Con 20 avisos o más se ignora lo que aparece en menos del 3 %
-    # (errores de carga). Si el modelo no tiene dato de alguna, se ofrecen todas.
-    def disponibles(col, mapa):
-        vc = ref_m[col].dropna().value_counts()
-        if len(ref_m) >= 20:
-            vc = vc[vc / len(ref_m) >= 0.03]
-        pres = [k for k, v in mapa.items() if v in vc.index]
-        return (pres or list(mapa)), vc
+        c1, c2, c3 = izq.columns(3)
+        anio = c1.slider("Año de fabricación", int(R["fabricado_en"][2]), int(R["fabricado_en"][3]),
+                         int(np.clip(round(tipico("fabricado_en", 2018)), R["fabricado_en"][2], R["fabricado_en"][3])))
+        km_v = c2.number_input("Kilometraje", min_value=0, max_value=500000,
+                               value=int(round(tipico("kilometraje", 80000), -3)), step=5000)
+        c4, c5, c6 = izq.columns(3)
+        motor = c3.number_input("Motor (litros)", min_value=0.6, max_value=float(R["motor_lt"][3]),
+                                value=float(np.clip(round(tipico("motor_lt", 1.6), 1), 0.6, R["motor_lt"][3])), step=0.1, format="%.1f")
+        hp = c4.number_input("Potencia (HP)", min_value=40.0, max_value=float(R["potencia_hp"][3]),
+                             value=float(np.clip(round(tipico("potencia_hp", 110)), 40, R["potencia_hp"][3])), step=5.0, format="%.0f")
+        # Los desplegables de caja, combustible y tracción ofrecen sólo lo que aparece en los avisos de ESE modelo
+        # (una Amarok sólo se ofrece diésel, no nafta). Con 20 avisos o más se ignora lo que aparece en menos del 3 %
+        # (errores de carga). Si el modelo no tiene dato de alguna, se ofrecen todas.
+        def disponibles(col, mapa):
+            vc = ref_m[col].dropna().value_counts()
+            if len(ref_m) >= 20:
+                vc = vc[vc / len(ref_m) >= 0.03]
+            pres = [k for k, v in mapa.items() if v in vc.index]
+            return (pres or list(mapa)), vc
 
-    CAJAS_P = {"Automática": "automatico", "Manual": "manual"}
-    cajas_ok, vc_caja = disponibles("caja", CAJAS_P)
-    caja_p = c5.selectbox("Caja", cajas_ok, index=cajas_ok.index(next((k for k, v in CAJAS_P.items() if len(vc_caja) and v == vc_caja.index[0] and k in cajas_ok), cajas_ok[0])))
-    comb_opts = {"Diésel": "diesel", "Eléctrico": "electrico", "GNC": "gnc", "Híbrido": "hibrido", "Nafta": "nafta"}  # A-Z
-    combs_ok, vc_comb = disponibles("comb", comb_opts)
-    comb = c6.selectbox("Combustible", combs_ok, index=combs_ok.index(next((k for k, v in comb_opts.items() if len(vc_comb) and v == vc_comb.index[0] and k in combs_ok), combs_ok[0])))
-    TRACS = {"Delantera": "delantera", "Trasera": "trasera", "4x4": "4x4"}
-    tracs_ok, vc_trac = disponibles("trac", TRACS)
-    trac = c_c.selectbox("Tracción", tracs_ok, index=tracs_ok.index(next((k for k, v in TRACS.items() if len(vc_trac) and v == vc_trac.index[0] and k in tracs_ok), tracs_ok[0])))
-    izq.caption("Caja, combustible y tracción: sólo las que aparecen en los avisos de este modelo.")
+        CAJAS_P = {"Automática": "automatico", "Manual": "manual"}
+        cajas_ok, vc_caja = disponibles("caja", CAJAS_P)
+        caja_p = c5.selectbox("Caja", cajas_ok, index=cajas_ok.index(next((k for k, v in CAJAS_P.items() if len(vc_caja) and v == vc_caja.index[0] and k in cajas_ok), cajas_ok[0])))
+        comb_opts = {"Diésel": "diesel", "Eléctrico": "electrico", "GNC": "gnc", "Híbrido": "hibrido", "Nafta": "nafta"}  # A-Z
+        combs_ok, vc_comb = disponibles("comb", comb_opts)
+        comb = c6.selectbox("Combustible", combs_ok, index=combs_ok.index(next((k for k, v in comb_opts.items() if len(vc_comb) and v == vc_comb.index[0] and k in combs_ok), combs_ok[0])))
+        TRACS = {"Delantera": "delantera", "Trasera": "trasera", "4x4": "4x4"}
+        tracs_ok, vc_trac = disponibles("trac", TRACS)
+        trac = c_c.selectbox("Tracción", tracs_ok, index=tracs_ok.index(next((k for k, v in TRACS.items() if len(vc_trac) and v == vc_trac.index[0] and k in tracs_ok), tracs_ok[0])))
+        izq.caption("Caja, combustible y tracción: sólo las que aparecen en los avisos de este modelo.")
 
-    # El caso nuevo, con las MISMAS columnas que recibió el modelo al entrenar (sin precio). IngenieriaAutos lo limpia
-    # igual que a los datos de entrenamiento. Consumo en blanco = el modelo usa la mediana. "moneda" y "clave" son relleno.
-    caso = pd.DataFrame([{
-        "marca": marca, "modelo": modelo, "fabricado_en": anio, "kilometraje": km_v, "moneda": "USD",
-        "motor_lt": motor, "potencia_hp": hp, "transmision": caja_p, "traccion": trac,
-        "combustible": comb_opts[comb], "consumo_lt_100km": np.nan, "clave": "",
-    }])
-    # Predicción del modelo guardado (el mismo que dio el test).
-    precio = float(MODELO.predict(caso)[0])
-    n_train_mod = int(ref_m["avisos_modelo"].iloc[0]) if len(ref_m) else 0
-    TE = {r["avisos_en_train"]: r["rel"] for r in M["target_encoder"]}
-    tramo_te = "1–9" if n_train_mod < 10 else "10–49" if n_train_mod < 50 else "50+"
-    # Rango probable: error relativo mediano del test para modelos con tantos avisos como éste
-    # (los modelos raros tienen más error, ver la tabla "Avisos de ese modelo en train").
-    margen = TE.get(tramo_te, TEST["rel_mediano"])
+        # El caso nuevo, con las MISMAS columnas que recibió el modelo al entrenar (sin precio). IngenieriaAutos lo limpia
+        # igual que a los datos de entrenamiento. Consumo en blanco = el modelo usa la mediana. "moneda" y "clave" son relleno.
+        caso = pd.DataFrame([{
+            "marca": marca, "modelo": modelo, "fabricado_en": anio, "kilometraje": km_v, "moneda": "USD",
+            "motor_lt": motor, "potencia_hp": hp, "transmision": caja_p, "traccion": trac,
+            "combustible": comb_opts[comb], "consumo_lt_100km": np.nan, "clave": "",
+        }])
+        # Predicción del modelo guardado (el mismo que dio el test).
+        precio = float(MODELO.predict(caso)[0])
+        n_train_mod = int(ref_m["avisos_modelo"].iloc[0]) if len(ref_m) else 0
+        TE = {r["avisos_en_train"]: r["rel"] for r in M["target_encoder"]}
+        tramo_te = "1–9" if n_train_mod < 10 else "10–49" if n_train_mod < 50 else "50+"
+        # Rango probable: error relativo mediano del test para modelos con tantos avisos como éste
+        # (los modelos raros tienen más error, ver la tabla "Avisos de ese modelo en train").
+        margen = TE.get(tramo_te, TEST["rel_mediano"])
 
-    # Avisos: modelo con pocos autos, o valores fuera del rango (percentil 1 a 99) de lo que vio el modelo.
-    avisos = []
-    n_mod = len(ref_m)
-    if n_mod < 10:
-        avisos.append(f"Hay sólo {n_mod} avisos de {marca} {modelo}: con tan pocos autos el error en test fue de "
-                      "varios miles de dólares. Tomalo como orientación.")
-    if n_mod >= 3 and not (ref_m["fabricado_en"].min() <= anio <= ref_m["fabricado_en"].max()):
-        avisos.append(f"No hay {marca} {modelo} de {anio} en los datos: los autos de este modelo van de "
-                      f"{int(ref_m['fabricado_en'].min())} a {int(ref_m['fabricado_en'].max())}. La tasación es una extrapolación.")
-    for col, v, nombre in [("fabricado_en", anio, "El año"), ("kilometraje", km_v, "El kilometraje"),
-                           ("motor_lt", motor, "El motor"), ("potencia_hp", hp, "La potencia")]:
-        p01, p99 = REAL[col]
-        if v < p01 or v > p99:
-            avisos.append(f"{nombre} ({num(v, 1 if col == 'motor_lt' else 0)}) está fuera del rango donde está el 98 % "
-                          f"de los autos que vio el modelo ({num(p01, 1 if col == 'motor_lt' else 0)} a "
-                          f"{num(p99, 1 if col == 'motor_lt' else 0)}).")
-    # Autos caros: el tramo de precio más alto es donde más se equivoca el modelo (ver el gráfico de "El modelo").
-    alto = TEST["por_tramo"][-1]
-    if precio > p90:
-        avisos.append(f"Esta tasación está en el 10 % más caro del mercado (más de {usd(p90)}). Ahí el modelo se equivoca "
-                      f"más: en el tramo más caro del test el error fue de {usd(alto['mae'])} en promedio "
-                      f"({num(alto['rel'] * 100, 1)} %). Tomalo como orientación.")
-    if anio >= 2025 and km_v > 60000:
-        avisos.append("Un auto tan nuevo con tantos kilómetros es raro en los datos.")
+        # Avisos: modelo con pocos autos, o valores fuera del rango (percentil 1 a 99) de lo que vio el modelo.
+        avisos = []
+        n_mod = len(ref_m)
+        if n_mod < 10:
+            avisos.append(f"Hay sólo {n_mod} avisos de {marca} {modelo}: con tan pocos autos el error en test fue de "
+                          "varios miles de dólares. Tomalo como orientación.")
+        if n_mod >= 3 and not (ref_m["fabricado_en"].min() <= anio <= ref_m["fabricado_en"].max()):
+            avisos.append(f"No hay {marca} {modelo} de {anio} en los datos: los autos de este modelo van de "
+                          f"{int(ref_m['fabricado_en'].min())} a {int(ref_m['fabricado_en'].max())}. La tasación es una extrapolación.")
+        for col, v, nombre in [("fabricado_en", anio, "El año"), ("kilometraje", km_v, "El kilometraje"),
+                               ("motor_lt", motor, "El motor"), ("potencia_hp", hp, "La potencia")]:
+            p01, p99 = REAL[col]
+            if v < p01 or v > p99:
+                avisos.append(f"{nombre} ({num(v, 1 if col == 'motor_lt' else 0)}) está fuera del rango donde está el 98 % "
+                              f"de los autos que vio el modelo ({num(p01, 1 if col == 'motor_lt' else 0)} a "
+                              f"{num(p99, 1 if col == 'motor_lt' else 0)}).")
+        # Autos caros: el tramo de precio más alto es donde más se equivoca el modelo (ver el gráfico de "El modelo").
+        alto = TEST["por_tramo"][-1]
+        if precio > p90:
+            avisos.append(f"Esta tasación está en el 10 % más caro del mercado (más de {usd(p90)}). Ahí el modelo se equivoca "
+                          f"más: en el tramo más caro del test el error fue de {usd(alto['mae'])} en promedio "
+                          f"({num(alto['rel'] * 100, 1)} %). Tomalo como orientación.")
+        if anio >= 2025 and km_v > 60000:
+            avisos.append("Un auto tan nuevo con tantos kilómetros es raro en los datos.")
 
-    # ---- Panel de tasación (a la derecha del formulario) ----
-    # Percentil: de todos los autos publicados, qué porcentaje cuesta menos que esta tasación.
-    pct = float((AUTOS["precio_usd"] < precio).mean() * 100)
-    p_min, p_max = float(AUTOS["precio_usd"].min()), float(AUTOS["precio_usd"].max())
-    # Posición en la barra: escala logarítmica entre el auto más barato y el más caro publicados.
-    pos = float(np.clip((np.log(precio) - np.log(p_min)) / (np.log(p_max) - np.log(p_min)), 0, 1)) * 100
-    lo, hi, tc = precio * (1 - margen), precio * (1 + margen), M["tipo_cambio"]
-    # Comparables: los 3 avisos del mismo modelo más parecidos en año y km (con su precio real y la tasación del modelo).
-    comp_html = ""
-    alerta_html = ""
-    if len(ref_m):
-        cerca = ref_m.assign(dist=(ref_m["fabricado_en"] - anio).abs() * 10000 + (ref_m["kilometraje"] - km_v).abs() / 10).nsmallest(3, "dist")
-        filas = "".join(
-            f"<tr><td>{r.marca} {r.modelo} · {int(r.fabricado_en)} · {num(r.kilometraje)} km</td>"
-            f"<td style='text-align:right'>{usd(r.precio_usd)} real<br>{usd(r.tasacion_usd)} tasado</td></tr>"
-            for r in cerca.itertuples())
-        comp_html = f"<div class='r' style='margin-top:.5rem'>Comparables en los datos</div><table>{filas}</table>"
-        # Alerta de desfase: la tasación contra el precio real mediano de los comparables más parecidos.
-        med_comp = float(cerca["precio_usd"].median())
-        desf = precio / med_comp - 1
-        if abs(desf) >= 0.25:
-            sentido = "más CARA" if desf > 0 else "más BARATA"
-            alerta_html = (f"<div class='alerta'><b>TASACIÓN MUY DESFASADA</b><br>Es {num(abs(desf) * 100)} % {sentido} que "
-                           f"los {len(cerca)} avisos más parecidos (mediana {usd(med_comp)}). Revisá los datos cargados "
-                           "(año, kilometraje, versión) o no te fíes de este número.</div>")
-    der.markdown(alerta_html + 
-        f"<div class='panel'><div class='t'>Tasación estimada</div><div class='v'>{usd(precio)}</div>"
-        f"<div class='s'>≈ ARS {num(precio * tc)} (cotización de referencia {num(tc)} ARS/USD)</div>"
-        f"<div class='r'>Rango sugerido: {usd(lo)} a {usd(hi)} (± {num(margen * 100, 1)} %)</div>"
-        f"<div class='s'>En pesos: ARS {num(lo * tc)} a ARS {num(hi * tc)}</div>"
-        f"<div class='nota'>Margen proporcional al valor: el error mediano en test para modelos con {tramo_te} avisos "
-        f"(en general es {num(TEST['rel_mediano'] * 100, 1)} %, pero sube cuando el modelo tiene pocos avisos). "
-        f"{marca} {modelo} tiene {n_train_mod} en entrenamiento.</div>"
-        f"<div class='barra'><div class='punto' style='left:{pos:.1f}%'></div></div>"
-        f"<div class='ext'><span>{usd(p_min)}</span><span>{usd(p_max)}</span></div>"
-        f"<div class='r'>Percentil {num(pct)} del mercado ({num(len(AUTOS))} autos)</div>{comp_html}</div>",
-        unsafe_allow_html=True)
-    for a_ in avisos:
-        izq.warning(a_)
-    r2 = st.container()
-    with r2:
+        # ---- Panel de tasación (a la derecha del formulario) ----
+        # Percentil: de todos los autos publicados, qué porcentaje cuesta menos que esta tasación.
+        pct = float((AUTOS["precio_usd"] < precio).mean() * 100)
+        p_min, p_max = float(AUTOS["precio_usd"].min()), float(AUTOS["precio_usd"].max())
+        # Posición en la barra: escala logarítmica entre el auto más barato y el más caro publicados.
+        pos = float(np.clip((np.log(precio) - np.log(p_min)) / (np.log(p_max) - np.log(p_min)), 0, 1)) * 100
+        lo, hi, tc = precio * (1 - margen), precio * (1 + margen), M["tipo_cambio"]
+        # Comparables: los 3 avisos del mismo modelo más parecidos en año y km (con su precio real y la tasación del modelo).
+        comp_html = ""
+        alerta_html = ""
         if len(ref_m):
-            otros = alt.Chart(ref_m).mark_circle(color=GRIS, opacity=0.6, size=40).encode(
-                x=alt.X("fabricado_en:Q", title="Año", axis=alt.Axis(format="d"),
-                        scale=alt.Scale(zero=False, padding=12)),
-                y=alt.Y("precio_usd:Q", scale=alt.Scale(zero=False), axis=eje("Precio (USD)")),
-                tooltip=[alt.Tooltip("version:N", title="Versión"), alt.Tooltip("fabricado_en:Q", title="Año"),
-                         alt.Tooltip("kilometraje:Q", title="Km", format=",.0f"),
-                         alt.Tooltip("precio_usd:Q", title="Precio publicado", format=",.0f")])
-            tuyo = alt.Chart(pd.DataFrame({"a": [anio], "p": [precio]})).mark_point(
-                shape="diamond", size=320, filled=True, color=AZUL).encode(
-                x="a:Q", y="p:Q", tooltip=[alt.Tooltip("p:Q", title="Tasación de tu auto", format=",.0f")])
-            st.altair_chart((otros + tuyo).properties(
-                height=300, title=f"Tu auto (rombo azul) entre los {n_mod} {marca} {modelo} publicados"),
-                width="stretch")
+            cerca = ref_m.assign(dist=(ref_m["fabricado_en"] - anio).abs() * 10000 + (ref_m["kilometraje"] - km_v).abs() / 10).nsmallest(3, "dist")
+            filas = "".join(
+                f"<tr><td>{r.marca} {r.modelo} · {int(r.fabricado_en)} · {num(r.kilometraje)} km</td>"
+                f"<td style='text-align:right'>{usd(r.precio_usd)} real<br>{usd(r.tasacion_usd)} tasado</td></tr>"
+                for r in cerca.itertuples())
+            comp_html = f"<div class='r' style='margin-top:.5rem'>Comparables en los datos</div><table>{filas}</table>"
+            # Alerta de desfase: la tasación contra el precio real mediano de los comparables más parecidos.
+            med_comp = float(cerca["precio_usd"].median())
+            desf = precio / med_comp - 1
+            if abs(desf) >= 0.25:
+                sentido = "más CARA" if desf > 0 else "más BARATA"
+                alerta_html = (f"<div class='alerta'><b>TASACIÓN MUY DESFASADA</b><br>Es {num(abs(desf) * 100)} % {sentido} que "
+                               f"los {len(cerca)} avisos más parecidos (mediana {usd(med_comp)}). Revisá los datos cargados "
+                               "(año, kilometraje, versión) o no te fíes de este número.</div>")
+        der.markdown(alerta_html + 
+            f"<div class='panel'><div class='t'>Tasación estimada</div><div class='v'>{usd(precio)}</div>"
+            f"<div class='s'>≈ ARS {num(precio * tc)} (cotización de referencia {num(tc)} ARS/USD)</div>"
+            f"<div class='r'>Rango sugerido: {usd(lo)} a {usd(hi)} (± {num(margen * 100, 1)} %)</div>"
+            f"<div class='s'>En pesos: ARS {num(lo * tc)} a ARS {num(hi * tc)}</div>"
+            f"<div class='nota'>Margen proporcional al valor: el error mediano en test para modelos con {tramo_te} avisos "
+            f"(en general es {num(TEST['rel_mediano'] * 100, 1)} %, pero sube cuando el modelo tiene pocos avisos). "
+            f"{marca} {modelo} tiene {n_train_mod} en entrenamiento.</div>"
+            f"<div class='barra'><div class='punto' style='left:{pos:.1f}%'></div></div>"
+            f"<div class='ext'><span>{usd(p_min)}</span><span>{usd(p_max)}</span></div>"
+            f"<div class='r'>Percentil {num(pct)} del mercado ({num(len(AUTOS))} autos)</div>{comp_html}</div>",
+            unsafe_allow_html=True)
+        for a_ in avisos:
+            izq.warning(a_)
+        r2 = st.container()
+        with r2:
+            if len(ref_m):
+                otros = alt.Chart(ref_m).mark_circle(color=GRIS, opacity=0.6, size=40).encode(
+                    x=alt.X("fabricado_en:Q", title="Año", axis=alt.Axis(format="d"),
+                            scale=alt.Scale(zero=False, padding=12)),
+                    y=alt.Y("precio_usd:Q", scale=alt.Scale(zero=False), axis=eje("Precio (USD)")),
+                    tooltip=[alt.Tooltip("version:N", title="Versión"), alt.Tooltip("fabricado_en:Q", title="Año"),
+                             alt.Tooltip("kilometraje:Q", title="Km", format=",.0f"),
+                             alt.Tooltip("precio_usd:Q", title="Precio publicado", format=",.0f")])
+                tuyo = alt.Chart(pd.DataFrame({"a": [anio], "p": [precio]})).mark_point(
+                    shape="diamond", size=320, filled=True, color=AZUL).encode(
+                    x="a:Q", y="p:Q", tooltip=[alt.Tooltip("p:Q", title="Tasación de tu auto", format=",.0f")])
+                st.altair_chart((otros + tuyo).properties(
+                    height=300, title=f"Tu auto (rombo azul) entre los {n_mod} {marca} {modelo} publicados"),
+                    width="stretch")
+    probar()
 
 ancla("pie")
 st.divider()
